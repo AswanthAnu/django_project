@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content%}
+
+<section class="signin-page account">
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="block text-center">
+          <a class="logo" href="index.html">
+            <img src="images/logo.png" alt="">
+          </a>
+          {% include 'includes/alerts.html' %}
+          <h2 class="text-center">Welcome Back</h2>
+          <form class="text-left clearfix" action="{%url 'login' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+              <input type="email" class="form-control"  placeholder="Email" name='email' id='email'>
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control" placeholder="Password" name='password' id='password'>
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-main text-center" >Login</button>
+            </div>
+          </form>
+          <p class="mt-20">New in this site ?<a href="{% url 'register'%}"> Create New Account</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+ 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  $(document).on('submit','#loginform',function(e)
+ {
+  e.preventDefault();
+  var username=$('#email').val()
+  var pass= $('#password').val() 
+  console.log(email,password)
+  
+  $.ajax({
+    type:'POST',
+    url:'',
+    dataType:'json',
+    data:{
+      'email':email,
+      'password':password,
+      csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+    },
+    success:function(responce){
+      console.log(responce)
+      if(responce.success==true){
+      window.location.replace('register')
+    }
+    else{
+      alert('Invalid credentials')
+    }
+  }
+  })
+  
+})
+
+
+
+</script>
+
+
+{% endblock %}

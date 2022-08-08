@@ -95,3 +95,8 @@
 
 
 })(jQuery);
+
+
+setTimeout(function(){
+  $('#message_time').fadeOut('slow')
+}, 2000)

@@ -10251,3 +10251,7 @@ if ( !noGlobal ) {
 
 return jQuery;
 } );
+
+setTimeout(function(){
+	$('#message').fadeOut('slow')
+}, 2000)
