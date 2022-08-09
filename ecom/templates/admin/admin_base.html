@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -6,19 +7,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Connect Plus</title>
     <!-- plugins:css -->
-    <link rel="stylesheet" href="assets/vendors/mdi/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="assets/vendors/flag-icon-css/css/flag-icon.min.css">
-    <link rel="stylesheet" href="assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="{% static 'admin_static/vendors/mdi/css/materialdesignicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'admin_static/vendors/flag-icon-css/css/flag-icon.min.css' %}">
+    <link rel="stylesheet" href="{% static 'admin_static/vendors/css/vendor.bundle.base.css' %}">
     <!-- endinject -->
     <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="assets/vendors/font-awesome/css/font-awesome.min.css" />
-    <link rel="stylesheet" href="assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="{% static 'admin_static/vendors/font-awesome/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'admin_static/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css' %}">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <!-- endinject -->
     <!-- Layout styles -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="{% static 'admin_static/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'admin_static/table_css/style.css' %}">
     <!-- End layout styles -->
-    <link rel="shortcut icon" href="assets/images/favicon.png" />
+    <link rel="shortcut icon" href="{% static 'admin_static/images/favicon.png' %}" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ 
   </head>
   <body>
+    <div class="container-scroller">
+
+
+        {% comment %} header {% endcomment %}
+        {% include 'includes/admin_navbar.html' %}
+
+        {% comment %} footer {% endcomment %}
+        {% include 'includes/admin_sidebar.html' %}
+
+        
+        {% block content %}
+
+        {% comment %} content {% endcomment %}
+        </div>
+        </div>
+        {% endblock %}
+     
+    
+ <script src="{% static 'admin_static/vendors/js/vendor.bundle.base.js' %}"></script>
+ <!-- endinject -->
+ <!-- Plugin js for this page -->
+ <script src="{% static 'admin_static/vendors/chart.js/Chart.min.js' %}"></script>
+ <script src="{% static 'admin_static/vendors/jquery-circle-progress/js/circle-progress.min.js' %}"></script>
+ <script src="{% static 'admin_static/js/jquery.cookie.js' %}" type="text/javascript"></script>
+ <!-- End plugin js for this page -->
+ <!-- inject:js -->
+ <script src="{% static 'admin_static/js/off-canvas.js' %}"></script>
+ <script src="{% static 'admin_static/js/hoverable-collapse.js' %}"></script>
+ <script src="{% static 'admin_static/js/misc.js' %}"></script>
+ <!-- endinject -->
+ <!-- Custom js for this page -->
+ <script src="{% static 'admin_static/js/dashboard.js' %}"></script>
+ <!-- End custom js for this page -->
+</body>
+</html>

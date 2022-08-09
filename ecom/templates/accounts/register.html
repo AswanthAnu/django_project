@@ -35,7 +35,8 @@
               {{form.confirm_password}}
             </div>
             <div class="text-center">
-              <button type="submit" class="btn btn-main text-center">Sign In</button>
+              {% comment %} <input type="button" class="btn btn-main text-center" id="btnsave" value="Sign In"> </input> {% endcomment %}
+              <button type="submit" class="btn btn-main text-center" >Login</button>
             </div>
              {{form.email.errors}}
              {{form.non_field_errors}}
@@ -48,4 +49,63 @@
   </div>
 </section>
 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+  $("#btnsave").click(function()
+  {console.log("save button clicked");
+   let email=$('#email_id').val()
+   let first_name=$('#first_name_id').val()
+   let last_name=$('#last_name_id').val()
+   let phone_number=$('#phone_number_id').val()
+   let password=$('#password_id').val()
+   let confirm_password=$('#confirm_password_id').val()
+   let csrf = $("input[name=csrfmiddlewaretoken]").val()
+   if( first_name == ""){
+    console.log("please enter first_name");
+   }
+   else if ( last_name == "") {
+    console.log("please enter last_name");
+   }
+   else if ( email == "") {
+    console.log("please enter email");
+   }
+
+   else if ( phone_number == "") {
+    console.log("please enter phone_number");
+   }
+
+   else if ( password == "") {
+    console.log("please enter password");
+   }
+
+   else if ( confirm_password == "") {
+    console.log("please enter confirm_password");
+   }else {
+    //console.log(first_name);
+   // console.log(last_name);
+    //console.log(email);
+   // console.log(phone_number);
+   // console.log(password);
+    
+    ///var temp = email.split("@");
+    //var username = temp[0];
+
+    mydata = {first_name : first_name, last_name : last_name,  email : email, phone_number : phone_number, password : password, confrim_password : confirm_password, csrfmiddlewaretoken :csrf };
+    $.ajax({
+      url: "{% url 'register' %}",
+      method: "POST",
+      data: mydata,
+      success: function(data) {
+        console.log(data);
+      },
+    });
+    console.log(mydata);
+    
+   }
+  });
+
+</script>
+
+
 {% endblock %}
+

@@ -4,6 +4,7 @@ from django.contrib.auth.models import auth, User
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from .form import RegistrationForm
+
 from .models import Account
 from django.http import HttpResponse,JsonResponse
 
@@ -18,6 +19,8 @@ def register(request):
 
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
+        for val in form:
+            print(val)
         if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
@@ -27,6 +30,16 @@ def register(request):
 
             username = email.split('@')[0]
 
+            # # user = Account.objects.create_user(first_name = first_name, last_name = last_name, email = email, username = username, password = password,)
+            # # user.phone_number = phone_number
+            # first_name = request.POST['first_name']
+            # last_name = request.POST['last_name']
+            # email = request.POST['email']
+            # phone_number = request.POST['phone_number']
+            # password = request.POST['password']
+            # # username = request.POST['username']
+            # username = email.split('@')[0]
+
             user = Account.objects.create_user(first_name = first_name, last_name = last_name, email = email, username = username, password = password,)
             user.phone_number = phone_number
           
@@ -34,17 +47,19 @@ def register(request):
             user.is_staff = False
             user.is_admin = False
             user.save()
+            print("save")
             messages.success(request, 'Your account registered successfully')
             return redirect('register')
 
-
+        else:
+            return redirect( 'register')
     else:
         form = RegistrationForm()
 
-    context = {
+        context = {
         'form' : form,
-    }
-    return render(request, 'accounts/register.html', context)
+        }
+        return render(request, 'accounts/register.html', context)
 
 def login(request):
     if request.method == 'POST':
@@ -90,5 +105,8 @@ def login(request):
 
     return render(request, 'accounts/login.html')
 
+
+
 def logout(request):
     return render(request, 'accounts/login.html')
+

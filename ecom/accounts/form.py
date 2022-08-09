@@ -5,17 +5,25 @@ from .models import Account
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder' : 'Password'
+        'placeholder' : 'Password', 'id' :'password_id', 'class':'form-control',
     }))
 
     confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder' : 'Confirm Password'
+        'placeholder' : 'Confirm Password', 'id' :'confirm_password_id', 'class':'form-control',
     }))
 
     class Meta:
         model = Account
         fields = ['first_name', 'last_name', 'phone_number', 'email', 'password']
-  
+
+        widgets = {
+            'first_name' : forms.TextInput(attrs={'id' : 'first_name_id'}),
+            'last_name' : forms.TextInput(attrs={'id' : 'last_name_id'}),
+            'phone_number' : forms.TextInput (attrs={'id' : 'phone_number_id'}),
+            'email' : forms.EmailInput (attrs={'id' : 'email_id'}),
+            'password' : forms.PasswordInput (attrs={'id' : 'password_id'}),
+        }
+
   
     def clean(self):
         cleaned_data = super(RegistrationForm, self).clean()
