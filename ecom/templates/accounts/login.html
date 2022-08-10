@@ -14,8 +14,9 @@
             <img src="images/logo.png" alt="">
           </a>
           {% include 'includes/alerts.html' %}
+          <h5 class="text-bg-danger" style="display:none ;" id="warning">Invalid Credentials</h5>
           <h2 class="text-center">Welcome Back</h2>
-          <form class="text-left clearfix" action="{%url 'login' %}" method="POST">
+          <form class="text-left clearfix" action="" method="POST" id="loginform">
             {% csrf_token %}
             <div class="form-group">
               <input type="email" class="form-control"  placeholder="Email" name='email' id='email'>
@@ -27,12 +28,62 @@
               <button type="submit" class="btn btn-main text-center" >Login</button>
             </div>
           </form>
+          <p class="mt-20"><a href="#editEmployeeModal"  data-toggle="modal">Login with Phone Number</a></p>
           <p class="mt-20">New in this site ?<a href="{% url 'register'%}"> Create New Account</a></p>
+
         </div>
       </div>
     </div>
   </div>
 </section>
+<div id="editEmployeeModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{% url 'add_brand'%}" method="POST">
+        {% csrf_token %}
+        <div class="modal-header">						
+          <h4 class="modal-title"><p class="mt-20"><a href="">Login with Phone Number</a></p></h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        </div>
+        <div class="modal-body">					
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input name="phone_number"  type="text" class="form-control" required>
+          </div>           
+        </div>
+        <div class="modal-footer">
+          <a href="#otpEmployeeModal"  class="btn btn-default"  data-toggle="modal">Enter OTP</a>
+          <input type="submit" class="btn btn-default" value="Send">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div id="otpEmployeeModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{% url 'add_brand'%}" method="POST">
+        {% csrf_token %}
+        <div class="modal-header">						
+          <h4 class="modal-title"><p class="mt-20"><a href="">Wait and Proceed</a></p></h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        </div>
+        <div class="modal-body">					
+          <div class="form-group">
+            <label>OTP</label>
+            <input name="phone_number"  type="text" class="form-control" required>
+          </div>           
+        </div>
+        <div class="modal-footer">
+          
+          <input type="submit" class="btn btn-success" value="Login">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -40,13 +91,13 @@
   $(document).on('submit','#loginform',function(e)
  {
   e.preventDefault();
-  var username=$('#email').val()
-  var pass= $('#password').val() 
+  var email=$('#email').val()
+  var password= $('#password').val() 
   console.log(email,password)
   
   $.ajax({
     type:'POST',
-    url:'',
+    url:'{% url 'login' %}',
     dataType:'json',
     data:{
       'email':email,
@@ -56,10 +107,11 @@
     success:function(responce){
       console.log(responce)
       if(responce.success==true){
-      window.location.replace('register')
+      window.location.href="{% url 'home' %}"
     }
     else{
-      alert('Invalid credentials')
+      //alert('Invalid credentials')
+      document.getElementById("warning").style.display="block";
     }
   }
   })

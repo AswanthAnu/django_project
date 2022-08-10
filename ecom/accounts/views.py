@@ -19,8 +19,6 @@ def register(request):
 
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
-        for val in form:
-            print(val)
         if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
@@ -51,17 +49,16 @@ def register(request):
             messages.success(request, 'Your account registered successfully')
             return redirect('register')
 
-        else:
-            return redirect( 'register')
+        
     else:
         form = RegistrationForm()
 
-        context = {
-        'form' : form,
-        }
-        return render(request, 'accounts/register.html', context)
+    context = {
+            'form' : form,
+            }
+    return render(request, 'accounts/register.html', context)
 
-def login(request):
+def login(request,):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
@@ -75,12 +72,12 @@ def login(request):
         #         return redirect('home')
         user = authenticate(email=email, password=password)
         
-        if user is not None:
-            auth.login(request, user)
-            return redirect('register')
-        else:
-            messages.error(request, 'Invalid login credentials')
-            return redirect('login')
+        # if user is not None:
+        #     auth.login(request, user)
+        #     return redirect('register')
+        # else:
+        #     messages.error(request, 'Invalid login credentials')
+        #     return redirect('login')
 
         if user is not None:
              return JsonResponse(
@@ -95,7 +92,6 @@ def login(request):
             return JsonResponse(
                 {
                 'success':False},
-
                  safe=False
                 
                 )

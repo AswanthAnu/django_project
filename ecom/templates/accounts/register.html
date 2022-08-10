@@ -92,7 +92,7 @@
 
     mydata = {first_name : first_name, last_name : last_name,  email : email, phone_number : phone_number, password : password, confrim_password : confirm_password, csrfmiddlewaretoken :csrf };
     $.ajax({
-      url: "{% url 'register' %}",
+      url: "",
       method: "POST",
       data: mydata,
       success: function(data) {

@@ -1,3 +1,4 @@
+from multiprocessing import context
 from unicodedata import category
 from django.shortcuts import render, get_object_or_404
 from .models import product
@@ -24,4 +25,13 @@ def store(request,category_slug= None):
 
 
 def product_detail(request, category_slug, product_slug):
-    return render(request, 'store/product_detail.html')
+    try:
+        single_product = product.objects.get(category__slug = category_slug, slug = product_slug)
+    except Exception as e:
+        raise e
+    
+    context = {
+        'single_product' : single_product, 
+    }
+
+    return render(request, 'store/product_detail.html', context)
