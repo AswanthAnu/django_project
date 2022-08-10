@@ -30,23 +30,30 @@
 								
 							</span>
 						</th>
-                        <th>Product Name</th>
-                        <th>Brand</th>
-                        <th>Category</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                        <th>Action</th>
+                        <th><h4>Product</h4></th>
+                        <th><h4>Brand</h4></th>
+                        <th><h4>Category</h4></th>
+                        <th><h4>Description</h4></th>
+                        <th><h4>Price</h4></th>
+						<th><h4>Stock</h4></th>
+						<th><h4>Images</h4></th>
+                        <th><h4>Action</h4></th>
                         
                     </tr>
                 </thead>
                 <tbody>
-				{% for brand in brandd%}
+				{% for product in products%}
                     <tr>
 						<td>
 							
 						</td>
-                        <td>{{brand.brand_name}}</td>
-                        <td>{{brand.description}}</td>
+                        <td><h5>{{product.product_name}}</h5></td>
+                        <td><h5>{{product.brand}}</h2></td>
+						<td><h5>{{product.category}}</h2></td>
+						<td><h5>{{product.description}}</h2></td>
+						<td><h5>Rs. {{product.price}}</h2></td>
+						<td><h5>{{product.stock}}</h2></td>
+						<td><img src="{{product.images.url}}" class="img-thumbnail "></td>
 						
                         
                         <td>
@@ -75,21 +82,66 @@
 	<div id="addEmployeeModal" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form action="{% url 'add_brand'%}" method="POST">
+				<form action="{% url 'add_product'%}" method="POST" enctype="multipart/form-data" >
 					{% csrf_token %}
 					<div class="modal-header">						
-						<h4 class="modal-title">Add Brand</h4>
+						<h4 class="modal-title">Add Products</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 					</div>
 					<div class="modal-body">					
 						<div class="form-group">
-							<label>Brand Name</label>
-							<input name="brand_name"  type="text" class="form-control" required>
+							<label>Product Name</label>
+							<input name="product_name"  type="text" class="form-control" required>
+						</div>
+						<div class="form-group">
+							<label>Brand </label>
+							<select  name="brand" type="text" class="form-control" required>
+							<option value="" selected>---------</option>
+							{% for brand in brands %}
+							<option data-style="btn-dark" value="{{brand.id}}">{{brand.brand_name}}</option>
+							{% endfor %}
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Category</label>
+							<select  name="category" type="text" class="form-control" required>
+							<option value="" selected>---------</option>
+							{% for category in categories %}
+							<option data-style="btn-dark"value="{{category.id}}">{{category.category_name}}</option>
+							{% endfor %}
+						    </select>
 						</div>
 						<div class="form-group">
 							<label>Description</label>
 							<input name="description" type="text" class="form-control" required>
 						</div>
+						<div class="form-group">
+							<label>Price</label>
+							<input name="price" type="text" class="form-control" required>
+						</div>
+						<div class="form-group">
+							<label>Stocks</label>
+							<input name="stock" type="text" class="form-control" required>
+						</div>
+						<div class="d-flex justify-content-left " style="display: flex;">
+							<label>Images</label>
+							<div class="mb-3 mx-2 pt-3" style="display: flex; justify-content: left;">
+								<input type="file" class="form-control " required name="images"  id="imageInp">
+								
+							  
+							</div>
+							<div class="mb-3 pt-3 mx-2" style="display: flex; justify-content: left; ">
+								<input type="file" class="form-control" required style="position: static;"  name="image2"  id="imageInp2">
+							</div>
+							
+							<div class="mb-3 pt-3" style="display: flex; justify-content: left;">
+								<input type="file" class="form-control" required  name="image3"  id="imageInp3">
+							</div>
+						</div>
+						
+					
+	
+
 											
 					</div>
 					<div class="modal-footer">
@@ -101,31 +153,74 @@
 		</div>
 	</div>
 	<!-- Edit Modal HTML -->
-	{% for brand in brandd %}
+	{% for product in products %}
 	<div id="editEmployeeModal-{{forloop.counter}}" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form action="update_brand/{{brand.id}}" method = "POST" >
+				<form action="update_product/{{product.id}}" method="POST" enctype="multipart/form-data" >
 					{% csrf_token %}
 					<div class="modal-header">						
-						<h4 class="modal-title">Edit Brand</h4>
+						<h4 class="modal-title">Add Products</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 					</div>
 					<div class="modal-body">					
 						<div class="form-group">
-							<label>Brand Name</label>
-							<input name = "brand_name" type="text" value="{{ brand.brand_name}}" class="form-control" required>
+							<label>Product Name</label>
+							<input name="product_name" value='{{product.product_name}}' type="text" class="form-control" required>
+						</div>
+						<div class="form-group">
+							<label>Brand </label>
+							<select  name="brand" type="text" class="form-control" required>
+							<option value="" selected>{{product.brand}}</option>
+							{% for brand in brands %}
+							<option data-style="btn-dark" value="{{brand.id}}">{{brand.brand_name}}</option>
+							{% endfor %}
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Category</label>
+							<select  name="category" type="text" class="form-control" required>
+							<option value="" selected>{{product.category}}</option>
+							{% for category in categories %}
+							<option data-style="btn-dark"value="{{category.id}}">{{category.category_name}}</option>
+							{% endfor %}
+						    </select>
 						</div>
 						<div class="form-group">
 							<label>Description</label>
-							<input  name = "description" type="type"  value="{{ brand.description}}" class="form-control" required>
+							<input name="description" value="description" type="text" class="form-control" required>
+						</div>
+						<div class="form-group">
+							<label>Price</label>
+							<input name="price" value="{{product.price}}" type="text" class="form-control" required>
+						</div>
+						<div class="form-group">
+							<label>Stocks</label>
+							<input name="stock" value="{{product.stock}}"  type="text" class="form-control" required>
+						</div>
+						<div class="d-flex justify-content-left " style="display: flex;">
+							<label>Images</label>
+							<div class="mb-3 mx-2 pt-3" style="display: flex; justify-content: left;">
+								<input type="file" value="{{product.images.url}}"  class="form-control " required name="images"  id="imageInp">
+								
+							  
+							</div>
+							<div class="mb-3 pt-3 mx-2" style="display: flex; justify-content: left; ">
+								<input type="file" value="{{product.image1.url}}"class="form-control" required style="position: static;"  name="image2"  id="imageInp2">
+							</div>
+							
+							<div class="mb-3 pt-3" style="display: flex; justify-content: left;">
+								
+								<input type="file"  value="{{product.image1.url}}" class="form-control" required  name="image3"  id="imageInp3">
+							</div>
 						</div>
 						
-										
+
+											
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="submit" class="btn btn-dark" value="Save">
+						<input type="submit" class="btn btn-dark" value="Add">
 					</div>
 				</form>
 			</div>

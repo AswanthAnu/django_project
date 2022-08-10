@@ -6,7 +6,9 @@ from django.shortcuts import render, redirect
 from accounts.models import Account
 from category.models import category
 from brand.models import brand
+from store.models import product
 from .decorators import log
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 # Create your views here.
@@ -152,4 +154,114 @@ def delete_brand(request,id):
     brands = brand.objects.filter(id = id)
     brands.delete()
     return redirect('admin_brand')
+    
+
+
+      
+def admin_product(request):
+    categories = category.objects.all()
+    brands = brand.objects.all()
+    products = product.objects.all()
+    context={'products' : products, 'brands': brands, 'categories': categories }
+   
+    return render (request, 'admin/admin_product.html' ,  context)
+
+
+
+
+def add_product(request):
+
+
+    products = product()
+    categ = category.objects.all()
+    bran = brand.objects.all()  
+
+
+    if request.method == "POST":
+
+
+        products.product_name = request.POST.get('product_name')
+        products.description = request.POST.get('description')
+        products.price = request.POST.get('price')
+        products.stock = request.POST.get('stock')
+        
+        brands = request.POST.get('brand')
+        categories= request.POST.get('category')
+        print('below  categ')
+        print(categories)
+        print(brands)
+        if products.price == "0" or products.stock == "0" :
+            messages.error(request, 'Please Fill with correct Value')
+            print('inside  price')
+            return redirect('admin_product')
+        if len(products.product_name) == 0 or len(categories) == 0 or len(brands) == 0:
+            print('inside  categ')
+            messages.error(request, 'Fields cannot be blank')
+            return redirect('admin_product')
+
+        products.category   = category.objects.get(id = categories)
+        products.brand   =  brand.objects.get(id = brands)   
+        print('below  brand')
+        if len(request.FILES) != 0:
+            print('inside images')
+            products.images = request.FILES['images']
+            products.image2 = request.FILES['image2']
+            products.image3 = request.FILES['image3']
+            print('inside images')
+        
+            products.save()
+            return redirect('admin_product')
+    return render(request,'admin/admin_product.html')
+
+def edit_product(request):
+    Products = product.objects.all()
+    categories = product.objects.all()
+    Products = product.objects.all()
+    context={'products' : Products , 'categories' :categories, "Products" : Products}
+   
+    return render (request, 'admin/admin_product.html' , context)
+
+def update_product(request, id):
+    # if request.method == "POST":
+    #     brand_name = request.POST.get('brand_name')
+    #     description = request.POST.get('description')
+    #     slug = brand_name.replace(" ", "-").lower()
+        
+
+    #     brandd = brand( id = id, brand_name = brand_name, slug = slug,  description = description)
+    #     brandd.save()
+    #     return redirect('admin_product')
+    # return render(request,'admin/admin_product.html')
+    product_detail = product.objects.get(id=id)
+    if request.method == 'POST':
+        if len(request.FILES) != 0: 
+            if product_detail.images:  product_detail.images = request.FILES.get('image1')
+              
+            if product_detail.image2: product_detail.image2 = request.FILES.get('image2')
+             
+            if product_detail.image3: product_detail.image3  = request.FILES.get('image3')
+                
+               
+
+        product_detail.product_name = request.POST.get('product_name')
+        product_detail.description  = request.POST.get('description')
+        product_detail.price        = request.POST.get('price')
+        product_detail.stock        = request.POST.get('stock')
+        if product_detail.price < "0" or product_detail.stock  < "0":
+            messages.error(request, 'Please Fill with correct Value')
+            return redirect(update_product,id)
+
+        product_detail.save()  
+        return redirect(update_product)
+       
+
+    products = product.objects.get(id=id)
+    categories  = category.objects.all()
+    brands  = brand.objects.all()
+    return render(request, 'admin/admin_product.html', {'product': product, 'categories': categories, 'brands':brands} )
+
+def delete_product(request,id):
+    brands = brand.objects.filter(id = id)
+    brands.delete()
+    return redirect('admin_product')
     

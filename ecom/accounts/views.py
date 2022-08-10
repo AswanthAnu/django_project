@@ -1,14 +1,14 @@
 
+from cProfile import Profile
 from django.contrib import messages
 from django.contrib.auth.models import auth, User
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from .form import RegistrationForm
-
-from .models import Account
+from .mixins import MessageHandler
+from .models import Account, profile
 from django.http import HttpResponse,JsonResponse
-
-
+import random   
 
 
 
@@ -100,6 +100,49 @@ def login(request,):
 
 
     return render(request, 'accounts/login.html')
+
+def otp_view(request):
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number')
+        if Account.objects.filter(phone_number = phone_number):
+
+            profile = Account.objects.get(phone_number, id)
+            Profile.otp = random.randint(1000, 9999)
+            Profile.save()
+            message_handler = MessageHandler(f'+91'+phone_number ,Profile[0].otp).send_otp_on_phone
+            message_handler()
+            return JsonResponse(
+                    {
+                    'success':True},  id, safe=False,
+
+                  
+                
+                )
+
+        else:
+            # return render('login')
+            print("Failed")
+            return JsonResponse(
+                {
+                'success':False},
+                 safe=False
+                
+                )
+
+        
+    # return redirect(request, 'otp_login/{profiles[0].uid}')
+       
+
+def otp_login(request, id):
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        profile = Account.objects.get(uid = id)
+        if otp == profile.otp:
+            login(request, profile.user)
+            return redirect('home')
+        
+        return redirect('otp_login')
+    return render(request, 'login.html')
 
 
 

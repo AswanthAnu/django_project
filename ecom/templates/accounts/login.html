@@ -36,10 +36,10 @@
     </div>
   </div>
 </section>
-<div id="editEmployeeModal" class="modal fade">
+<div id="editEmployeeModal" class="modal fade" >
   <div class="modal-dialog">
     <div class="modal-content">
-      <form action="{% url 'add_brand'%}" method="POST">
+      <form action="" method="POST"  id="otp_view">
         {% csrf_token %}
         <div class="modal-header">						
           <h4 class="modal-title"><p class="mt-20"><a href="">Login with Phone Number</a></p></h4>
@@ -48,7 +48,7 @@
         <div class="modal-body">					
           <div class="form-group">
             <label>Phone Number</label>
-            <input name="phone_number"  type="text" class="form-control" required>
+            <input name="phone_number" id="phone_number" type="text" class="form-control" required>
           </div>           
         </div>
         <div class="modal-footer">
@@ -64,7 +64,7 @@
 <div id="otpEmployeeModal" class="modal fade">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form action="{% url 'add_brand'%}" method="POST">
+      <form action="" method="POST"  id="otp_login" >
         {% csrf_token %}
         <div class="modal-header">						
           <h4 class="modal-title"><p class="mt-20"><a href="">Wait and Proceed</a></p></h4>
@@ -73,7 +73,7 @@
         <div class="modal-body">					
           <div class="form-group">
             <label>OTP</label>
-            <input name="phone_number"  type="text" class="form-control" required>
+            <input name="otp" id="otp" type="text" class="form-control" required>
           </div>           
         </div>
         <div class="modal-footer">
@@ -118,6 +118,70 @@
   
 })
 
+
+
+$(document).on('submit','#otp_view',function(e)
+ {
+  e.preventDefault();
+  var phone_number=$('#phone_number').val()
+  console.log(phone_number)
+  
+  $.ajax({
+    type:'POST',
+    url:'{% url 'otp_view' %}',
+    dataType:'json',
+    data:{
+      'phone_number':phone_number,
+     
+      csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+    },
+    success:function(responce){
+      console.log(responce)
+      if(responce.success==true){
+      window.location.href="#otpEmployeeModal"
+    }
+    else{
+      //alert('Invalid credentials')
+      console.log(responce)
+      document.getElementById("warning").style.display="block";
+    }
+  }
+  })
+  
+})
+
+
+
+$(document).on('submit','#otp_login',function(e)
+ {
+  e.preventDefault();
+  var otp=$('#otp').val()
+  var otp=$('#otp').val()
+  console.log(otp)
+  
+  $.ajax({
+    type:'POST',
+    url:'{% url 'otp_login' %}',
+    dataType:'json',
+    data:{
+      'otp':otp,
+     
+      csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+    },
+    success:function(responce){
+      console.log(responce)
+      if(responce.success==true){
+      window.location.href="'{% url 'home' %}"
+    }
+    else{
+      //alert('Invalid credentials')
+      console.log(responce)
+      document.getElementById("warning").style.display="block";
+    }
+  }
+  })
+  
+})
 
 
 </script>

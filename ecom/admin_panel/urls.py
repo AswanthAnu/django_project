@@ -18,6 +18,12 @@ urlpatterns = [
     path('edit_brand', views.edit_brand, name='edit_brand'),
     path('delete_brand/<str:id>', views.delete_brand, name='delete_brand'),
     path('update_brand/<str:id>', views.update_brand, name='update_brand'),
+
+    path('admin_product', views.admin_product, name='admin_product'),
+    path('add_product', views.add_product, name='add_product'),
+    path('edit_product', views.edit_product, name='edit_product'),
+    path('delete_product/<str:id>', views.delete_product, name='delete_product'),
+    path('update_product/<str:id>', views.update_product, name='update_product'),
     
 
     path('block_unblock/<int:id>',views.block_unblock,name='block_unblock'),
