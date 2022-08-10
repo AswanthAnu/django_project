@@ -23,8 +23,9 @@ urlpatterns = [
     path('', include('homeapp.urls')),
     path('accounts/', include('accounts.urls')),
     path('admin_login/', include('admin_panel.urls')),
+    path('store/', include('store.urls')),
 
 
 ]
-
-urlpatterns + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT )
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT )

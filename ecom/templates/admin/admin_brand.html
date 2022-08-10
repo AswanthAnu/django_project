@@ -13,7 +13,7 @@
             <div class="table-title bg-dark">
                 <div class="row">
                     <div class="col-sm-6 ">
-						<h2>Category </h2>
+						<h2>Brands </h2>
 					</div>
 					<div class="col-sm-6">
 						<a href="#addEmployeeModal" class="btn  btn-dark " data-toggle="modal"><span>Add</span></a>
@@ -30,19 +30,19 @@
 								
 							</span>
 						</th>
-                        <th>Category Name</th>
+                        <th>Brand Name</th>
                         <th>Description</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-				{% for category in categ%}
+				{% for brand in brandd%}
                     <tr>
 						<td>
 							
 						</td>
-                        <td>{{category.category_name}}</td>
-                        <td>{{category.description}}</td>
+                        <td>{{brand.brand_name}}</td>
+                        <td>{{brand.description}}</td>
 						
                         
                         <td>
@@ -71,16 +71,16 @@
 	<div id="addEmployeeModal" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form action="{% url 'add_category'%}" method="POST">
+				<form action="{% url 'add_brand'%}" method="POST">
 					{% csrf_token %}
 					<div class="modal-header">						
-						<h4 class="modal-title">Add Category</h4>
+						<h4 class="modal-title">Add Brand</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 					</div>
 					<div class="modal-body">					
 						<div class="form-group">
-							<label>Category Name</label>
-							<input name="category_name"  type="text" class="form-control" required>
+							<label>Brand Name</label>
+							<input name="brand_name"  type="text" class="form-control" required>
 						</div>
 						<div class="form-group">
 							<label>Description</label>
@@ -97,24 +97,24 @@
 		</div>
 	</div>
 	<!-- Edit Modal HTML -->
-	{% for category in categ %}
+	{% for brand in brandd %}
 	<div id="editEmployeeModal-{{forloop.counter}}" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form action="update_category/{{category.id}}" method = "POST" >
+				<form action="update_brand/{{brand.id}}" method = "POST" >
 					{% csrf_token %}
 					<div class="modal-header">						
-						<h4 class="modal-title">Edit Category</h4>
+						<h4 class="modal-title">Edit Brand</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 					</div>
 					<div class="modal-body">					
 						<div class="form-group">
-							<label>Category Name</label>
-							<input name = "category_name" type="text" value="{{ category.category_name}}" class="form-control" required>
+							<label>Brand Name</label>
+							<input name = "brand_name" type="text" value="{{ brand.brand_name}}" class="form-control" required>
 						</div>
 						<div class="form-group">
 							<label>Description</label>
-							<input  name = "description" type="type"  value="{{ category.description}}" class="form-control" required>
+							<input  name = "description" type="type"  value="{{ brand.description}}" class="form-control" required>
 						</div>
 						
 										
@@ -129,22 +129,22 @@
 	</div>
 	{% endfor %}
 	<!-- Delete Modal HTML -->
-	{% for category in categ %}
+	{% for brand in brandd %}
 	<div id="deleteEmployeeModal-{{forloop.counter}}" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<form >
 					<div class="modal-header">						
-						<h4 class="modal-title">Delete Category</h4>
+						<h4 class="modal-title">Delete Brand</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 					</div>
 					<div class="modal-body">					
-						<p>Are you sure you want to delete {{category.category_name}} category?</p>
+						<p>Are you sure you want to delete {{brand.brand_name}} brand?</p>
 						<p class="text-warning"><small>This action cannot be undone </small></p>
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<a href="delete_category/{{category.id}}" type="submit" class="btn btn-dark" >Delete</a>
+						<a href="delete_brand/{{brand.id}}" type="submit" class="btn btn-dark" >Delete</a>
 					</div>
 				</form>
 			</div>

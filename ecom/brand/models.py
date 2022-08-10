@@ -4,7 +4,7 @@ from django.db import models
 
 class brand(models.Model):
     brand_name = models.CharField(max_length=100, unique= True)
-    slug = models.SlugField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True, null=True)
     description = models.TextField(max_length=255, blank=True)
     brand_img = models.ImageField(upload_to='photos/brand', blank=True)
     
