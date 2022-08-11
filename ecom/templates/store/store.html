@@ -9,35 +9,31 @@
 		<div class="row">
 			<div class="col-md-3">
 				<div class="widget">
-					<h4 class="widget-title">Categories</h4>
+					<h4 class="widget-title"></h4>
 					<div class='category-wrap dropdown d-inline-block float-right'>
-					<button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown">Select</button>
-                    <div  class="dropdown-menu">
-							{% for category in links %}
-                           <a class="dropdown-item" href="{{category.get_url}}">{{ category.category_name}}</a>
-							{% endfor %}
-					</div>
+					
+                    
 				</div>
 						
                     
 	            </div>
 				<div class="widget product-category">
-					<h4 class="widget-title">Categories</h4>
+					<h4 class="widget-title"></h4>
 					<div class="panel-group commonAccordion" id="accordion" role="tablist" aria-multiselectable="true">
 					  	<div class="panel panel-default">
 						    <div class="panel-heading" role="tab" id="headingOne">
 						      	<h4 class="panel-title">
 						        	<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-						          	Shoes
+										Categories
 						        	</a>
 						      	</h4>
 						    </div>
 					    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
 							<div class="panel-body">
-								<ul>
-									<li><a href="#!">Brand & Twist</a></li>
-									<li><a href="#!">Shoe Color</a></li>
-									<li><a href="#!">Shoe Color</a></li>
+								<ul>{% for category in links %}
+									<li><a href="{{category.get_url}}">{{ category.category_name}}</a></li>
+									{% endfor %}
+									
 								</ul>
 							</div>
 					    </div>
@@ -46,16 +42,15 @@
 					    <div class="panel-heading" role="tab" id="headingTwo">
 					      <h4 class="panel-title">
 					        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-					         	Duty Wear
+					         	Brands
 					        </a>
 					      </h4>
 					    </div>
 					    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
 					    	<div class="panel-body">
-					     		<ul>
-									<li><a href="#!">Brand & Twist</a></li>
-									<li><a href="#!">Shoe Color</a></li>
-									<li><a href="#!">Shoe Color</a></li>
+					     		<ul>{% for category in links %}
+									<li><a href="{{category.get_url}}">{{ category.category_name}}</a></li>
+									{% endfor %}
 								</ul>
 					    	</div>
 					    </div>
@@ -64,17 +59,17 @@
 					    <div class="panel-heading" role="tab" id="headingThree">
 					      <h4 class="panel-title">
 					        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-					          	WorkOut Shoes
+					          	Filter
 					        </a>
 					      </h4>
 					    </div>
 					    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
 					    	<div class="panel-body">
 					      		<ul>
-									<li><a href="#!">Brand & Twist</a></li>
-									<li><a href="#!">Shoe Color</a></li>
-									<li><a href="#!">Gladian Shoes</a></li>
-									<li><a href="#!">Swis Shoes</a></li>
+									<li><a href="#!">Size</a></li>
+									<li><a href="#!">Color</a></li>
+									<li><a href="#!">Price</a></li>
+									<li><a href="#!"></a></li>
 								</ul>
 					    	</div>
 					    </div>
@@ -109,7 +104,7 @@
                                       </div>
                                 </div>
                                 <div class="product-content">
-                                    <h4><a href="product-single.html">{{product.product_name}}</a></h4>
+                                    <h4><a href="{{ product.get_url }}">{{product.product_name}}</a></h4>
                                     <p class="price">Rs.{{product.price}}</p>
                                 </div>
                             </div>

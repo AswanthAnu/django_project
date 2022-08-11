@@ -261,7 +261,7 @@ def update_product(request, id):
     return render(request, 'admin/admin_product.html', {'product': product, 'categories': categories, 'brands':brands} )
 
 def delete_product(request,id):
-    brands = brand.objects.filter(id = id)
-    brands.delete()
+    products = product.objects.filter(id = id)
+    products.delete()
     return redirect('admin_product')
     

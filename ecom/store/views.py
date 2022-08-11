@@ -10,6 +10,7 @@ from category.models import category
 def store(request,category_slug= None):
     categories = None
     products = None
+    
 
     if category_slug != None:
         categories = get_object_or_404(category, slug = category_slug  )
