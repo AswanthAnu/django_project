@@ -59,47 +59,55 @@ def register(request):
     return render(request, 'accounts/register.html', context)
 
 def login(request,):
-    if request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
-        print(email)
-        print(password)
 
-        # user = User.objects.get(email=email, password=password)
-        # if check_password(password, user.password):
-        #     if user.is_active:
-        #         login(request, user)
-        #         return redirect('home')
-        user = authenticate(email=email, password=password)
-        
-        # if user is not None:
-        #     auth.login(request, user)
-        #     return redirect('register')
-        # else:
-        #     messages.error(request, 'Invalid login credentials')
-        #     return redirect('login')
 
-        if user is not None:
-             return JsonResponse(
+        if 'email' in request.session:
+
+            return redirect ('home')
+
+    
+        if request.method == 'POST':
+            email = request.POST['email']
+            password = request.POST['password']
+            print(email)
+            print(password)
+
+            # user = User.objects.get(email=email, password=password)
+            # if check_password(password, user.password):
+            #     if user.is_active:
+            #         login(request, user)
+            #         return redirect('home')
+            user = authenticate(email=email, password=password)
+            
+            # if user is not None:
+            #     auth.login(request, user)
+            #     return redirect('register')
+            # else:
+            #     messages.error(request, 'Invalid login credentials')
+            #     return redirect('login')
+
+            if user is not None:
+                request.session['email'] = email
+                return JsonResponse(
+                        {
+                        'success':True},
+
+                        safe=False
+                    
+                    )
+            else :
+                print("Failed")
+                return JsonResponse(
                     {
-                    'success':True},
-
+                    'success':False},
                     safe=False
-                
-                )
-        else :
-            print("Failed")
-            return JsonResponse(
-                {
-                'success':False},
-                 safe=False
-                
-                )
+                    
+                    )
 
 
 
 
-    return render(request, 'accounts/login.html')
+        return render(request, 'accounts/login.html')
 
 def otp_view(request):
     if request.method == 'POST':

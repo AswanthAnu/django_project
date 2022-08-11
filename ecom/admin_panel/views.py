@@ -8,12 +8,16 @@ from category.models import category
 from brand.models import brand
 from store.models import product
 from .decorators import log
+from django.views.decorators.cache import cache_control
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 # Create your views here.
-
+@cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def admin_login(request):
+
+    if 'email' in request.session:
+        return redirect('admin_dashboard')
 
     if request.method == 'POST':
         email = request.POST['email']
@@ -24,6 +28,7 @@ def admin_login(request):
         user = authenticate(email=email, password=password,)
         
         if user.is_admin == True:
+            request.session['email'] = email
             print(user.is_admin)
             auth.login(request, user)
             print('dash')
@@ -36,7 +41,8 @@ def admin_login(request):
 
     return render(request, 'admin/admin_login.html')
 
-
+@cache_control(no_cache =True, must_revalidate =True, no_store =True)
+@log(admin_login)
 def admin_dashboard(request):
     return render(request, 'admin/admin_dashboard.html')
 
@@ -62,19 +68,19 @@ def block_unblock(request,id):
         user.save()
         return redirect(admin_user)
 
-
+@log(admin_login)
 def admin_product(request):
     return render (request, 'admin/admin_product.html')
 
 
-    
+@log(admin_login)   
 def admin_category(request):
     categ = category.objects.all()
     context={'categ' : categ }
    
     return render (request, 'admin/admin_category.html' , context)
 
-
+@log(admin_login)
 def add_category(request):
     if request.method == "POST":
         category_name = request.POST.get('category_name')
@@ -84,7 +90,7 @@ def add_category(request):
         categ.save()
         return redirect('admin_category')
     return render(request,'admin/admin_category.html')
-
+@log(admin_login)
 def edit_category(request):
     categories = category.objects.all()
     context={'categories' : categories }

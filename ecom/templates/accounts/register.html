@@ -36,12 +36,12 @@
             </div>
             <div class="text-center">
               {% comment %} <input type="button" class="btn btn-main text-center" id="btnsave" value="Sign In"> </input> {% endcomment %}
-              <button type="submit" class="btn btn-main text-center" >Login</button>
+              <button type="submit" class="btn btn-main text-center" >Signin</button>
             </div>
              {{form.email.errors}}
              {{form.non_field_errors}}
           </form>
-          <p class="mt-20">Already hava an account ?<a href="{%url 'login' %}"> Signin</a></p>
+          <p class="mt-20">Already hava an account ?<a href="{%url 'login' %}"> Login</a></p>
           <p><a href="forget-password.html"> Forgot your password?</a></p>
         </div>
       </div>
