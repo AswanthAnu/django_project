@@ -1,5 +1,5 @@
 
-from cProfile import Profile
+import email
 from django.contrib import messages
 from django.contrib.auth.models import auth, User
 from django.contrib.auth import authenticate
@@ -28,22 +28,20 @@ def register(request):
 
             username = email.split('@')[0]
 
-            # # user = Account.objects.create_user(first_name = first_name, last_name = last_name, email = email, username = username, password = password,)
-            # # user.phone_number = phone_number
-            # first_name = request.POST['first_name']
-            # last_name = request.POST['last_name']
-            # email = request.POST['email']
-            # phone_number = request.POST['phone_number']
-            # password = request.POST['password']
-            # # username = request.POST['username']
-            # username = email.split('@')[0]
-
             user = Account.objects.create_user(first_name = first_name, last_name = last_name, email = email, username = username, password = password,)
             user.phone_number = phone_number
-          
             user.is_active = True
             user.is_staff = False
             user.is_admin = False
+
+            otp=random.randint(1000,9999)
+
+            prof= profile.objects.create(user=user,phone_number=phone_number,otp=f'{otp}')
+
+            messagehandler=MessageHandler(f'+91'+phone_number,otp).send_otp_via_message()
+
+            red = redirect()
+
             user.save()
             print("save")
             messages.success(request, 'Your account registered successfully')
@@ -58,7 +56,7 @@ def register(request):
             }
     return render(request, 'accounts/register.html', context)
 
-def login(request,):
+def login(request):
 
 
         if 'email' in request.session:
@@ -110,47 +108,64 @@ def login(request,):
         return render(request, 'accounts/login.html')
 
 def otp_view(request):
-    if request.method == 'POST':
-        phone_number = request.POST.get('phone_number')
-        if Account.objects.filter(phone_number = phone_number):
-
-            profile = Account.objects.get(phone_number, id)
-            Profile.otp = random.randint(1000, 9999)
-            Profile.save()
-            message_handler = MessageHandler(f'+91'+phone_number ,Profile[0].otp).send_otp_on_phone
-            message_handler()
-            return JsonResponse(
-                    {
-                    'success':True},  id, safe=False,
-
-                  
-                
-                )
-
-        else:
-            # return render('login')
-            print("Failed")
-            return JsonResponse(
-                {
-                'success':False},
-                 safe=False
-                
-                )
-
-        
-    # return redirect(request, 'otp_login/{profiles[0].uid}')
        
 
-def otp_login(request, id):
+        if request.method == 'POST':
+            phone_number = request.POST.get('phone_number')
+            print(phone_number,'-')
+            if Account.objects.filter(phone_number = phone_number).exists():
+                
+                
+               
+            #     prof[0].otp = random.randint(1000, 9999)
+            #     print('account here')
+            #     #print(profile.otp)
+            #     prof.save()
+                
+               
+                id = request.session['email'] = email
+                otp = random.randint(1000, 9999)
+                print(otp)
+                profi = Account(otp = otp)
+                
+                profi.save
+                #message_handler = MessageHandler(f'+91'+phone_number ,prof.otp).send_otp_on_phone
+                #message_handler()
+                print('------',profi.otp, '-------')
+                return redirect( 'otp_login')
+                #     return JsonResponse(
+                #             {
+                #             'success': object.uid }, safe=False,
+
+                        
+                        
+                #         )
+
+                # else:
+                #     # return render('login')
+                #     print("Failed")
+                #     return JsonResponse(
+                #         {
+                #         'success':False},
+                #          safe=False
+                        
+                #         )
+
+        
+        return render(request, 'accounts/otp_view.html ')
+       
+
+def otp_login(request, email=None):
     if request.method == 'POST':
         otp = request.POST.get('otp')
-        profile = Account.objects.get(uid = id)
-        if otp == profile.otp:
-            login(request, profile.user)
+        
+        prof = Account.objects.filter(email = email, otp = otp)
+        if otp == prof.otp:
+            login(request, Account.user)
             return redirect('home')
         
-        return redirect('otp_login')
-    return render(request, 'login.html')
+        return redirect('login')
+    return render(request, 'accounts/otp_login.html')
 
 
 

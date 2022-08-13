@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: config2py
+Version: 0.0.3
+Summary: Simplified reading and writing configurations from various sources and formats
+Home-page: https://github.com/i2mint/config2py
+Author: OtoSense
+License: apache-2.0
+Platform: any
+Description-Content-Type: text/markdown
+
+
+# config2py
+Simplified reading and writing configurations from various sources and formats
+
+
+To install:	```pip install config2py```
+
+

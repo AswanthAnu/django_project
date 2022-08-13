@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content%}
+
+<section class="signin-page account">
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="block text-center">
+          <a class="logo" href="index.html">
+            <img src="images/logo.png" alt="">
+          </a>
+          {% include 'includes/alerts.html' %}
+          <h5 class="text-bg-danger" style="display:none ;" id="warning">Invalid Credentials</h5>
+          <h2 class="text-center">Welcome Back</h2>
+          <form class="text-left clearfix" action="{% url 'otp_login' %}" method="POST" id="otp_form">
+            {% csrf_token %}
+            <div class="form-group">
+              <input type="text" class="form-control"  placeholder="Enter otp" name='otp' id='otp'>
+            </div>
+            
+            <div class="text-center">
+              <button type="submit" class="btn btn-main text-center" >Submit</button>
+            </div>
+          </form>
+      
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<div id="otpEmployeeModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{% url 'otp_login'%}" method="POST"  id="otp_login" >
+        {% csrf_token %}
+        <div class="modal-header">						
+          <h4 class="modal-title"><p class="mt-20"><a href="">Wait and Proceed</a></p></h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        </div>
+        <div class="modal-body">					
+          <div class="form-group">
+            <label>OTP</label>
+            <input name="otp" id="otp" type="text" class="form-control" required>
+          
+          </div>           
+        </div>
+        <div class="modal-footer">
+          
+          <input type="submit" class="btn btn-success" value="Login">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+ 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+
+{% endblock %}

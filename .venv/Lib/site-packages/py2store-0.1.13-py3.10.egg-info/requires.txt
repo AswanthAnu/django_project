@@ -1,0 +1,6 @@
+dol
+config2py
+importlib_resources
+
+[test]
+pytest

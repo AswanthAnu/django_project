@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+
 from pathlib import Path
+import os
+
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -44,6 +48,7 @@ INSTALLED_APPS = [
     'brand.apps.BrandConfig',
     'store.apps.StoreConfig',
     'admin_panel.apps.AdminPanelConfig',
+    'carts.apps.CartsConfig',
    
    
 ]
@@ -86,7 +91,7 @@ AUTH_USER_MODEL = 'accounts.Account'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pepper',
+        'NAME': 'DjangoEcom',
         'USER': 'postgres',
         'PASSWORD': '1234',
         'HOST': 'localhost', 
@@ -152,5 +157,7 @@ MESSAGE_TAGS = {
     50: 'critical',
 }
 
-# ACCOUNT_SID =  env('sid')
-# AUTH_TOKEN = env('token')
+#twilio
+
+account_sid = 'AC158fc54ebc80234dce390049a8f81b04'
+auth_token = '22cbf2ebf45b6e1f90f4e969f4c53873'

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content%}
+
+
+<div class="page-wrapper">
+    <div class="cart shopping">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2">
+            <div class="block">
+              <div class="product-list">
+                <form method="post">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th class="">Product</th> 
+                        <th class=""></th>
+                        <th class="">Quantity</th>
+                        <th class="">Item Price</th>
+                        <th class="">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for cart_item in cart_items %}
+                      <tr class="">
+                        <td class="">
+                          <div class="product-info">
+                            <img width="80" src="{{ cart_item.product.images.url}}" alt="" />
+                           
+                          </div>
+                        </td>
+                        
+                        <td >
+                          <a href="#!">{{ cart_item.product.product_name}}</a>
+                          <p class="text-muted small">color : red <br> size : XL</p>
+                        </td>
+                       
+                        
+                        <td >
+                           <div class="product-quantity" style="width: 1px;">
+                           
+                            <div class="product-quantity-slider " style="width: 100px; height:10px;">
+                                <div class="input-group bootstrap-touchspin block"><span class="input-group-btn "><button class="btn btn-default bootstrap-touchspin-down block" type="button">-</button></span><span class="input-group-addon bootstrap-touchspin-prefix b" style="display: none; "></span><input id="product-quantity" type="text" value="{{ cart_item.quantity}}" name="product-quantity" class="form-control " style="display: block; height:34px"><span class="input-group-addon bootstrap-touchspin-postfix" style="display: none;"></span><span class="input-group-btn"><a href="{% url 'add_cart' cart_item.product.id %}" class="btn btn-default bootstrap-touchspin-up" type="button">+</a></span></div>
+                            </div>
+                            </div> 
+                          </td>
+                          </td>
+                          <td class="">
+                            <div class="price-wrap ">
+                              <p class="price fw-500">Rs.{{ cart_item.sub_total }}</p>
+                              <small class="text-muted">Rs.{{ cart_item.product.price}} each</small>
+                            </div>
+
+
+                          </td>
+                        <td class="">
+                          <a class="product-remove" href="#!">Remove</a>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  <div class="container py-5">
+                    <div class="row d-flex justify-content-center my-4">
+                      <div class="col-md-8">
+                        <div class="card mb-4">
+
+                  <div class="col-md-4">
+                    <div class="card mb-4">
+                      <div class="card-header py-3">
+                        <h5 class="mb-0">Summary</h5>
+                      </div>
+                      <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                          <li
+                            class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0" ">
+                            <span  >Total Price :</span> <span style="margin-left :40px; ">Rs.{{ total }}</span>
+                           
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span  >Tax :</span> <span style="margin-left :88px; ">Rs.{{ gst }}0</span>
+                          </li>
+                          <li
+                            class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
+                            <div>
+                              <strong>Total amount</strong>
+                              <strong>
+                                <span style="margin-left :25px; "><strong>Rs.{{ grand_total}}0</strong></span>
+                              </strong>
+                            </div>
+                           
+                          </li>
+                        </ul>
+            
+                      </div>
+                    </div>
+                    
+                  <a href="checkout.html" class="btn btn-main pull-right">Checkout</a>
+                </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+  
+
+{% endblock %}

@@ -28,62 +28,9 @@
               <button type="submit" class="btn btn-main text-center" >Login</button>
             </div>
           </form>
-          <p class="mt-20"><a href="#editEmployeeModal"  data-toggle="modal">Login with Phone Number</a></p>
+          <p class="mt-20"><a href="{% url 'otp_view' %}"  data-toggle="modal">Login with Phone Number</a></p>
           <p class="mt-20">New in this site ?<a href="{% url 'register'%}"> Create New Account</a></p>
 
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<div id="editEmployeeModal" class="modal fade" >
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form action="" method="POST"  id="otp_view">
-        {% csrf_token %}
-        <div class="modal-header">						
-          <h4 class="modal-title"><p class="mt-20"><a href="">Login with Phone Number</a></p></h4>
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        </div>
-        <div class="modal-body">					
-          <div class="form-group">
-            <label>Phone Number</label>
-            <input name="phone_number" id="phone_number" type="text" class="form-control" required>
-          </div>           
-        </div>
-        <div class="modal-footer">
-          <a href="#otpEmployeeModal"  class="btn btn-default"  data-toggle="modal">Enter OTP</a>
-          <input type="submit" class="btn btn-default" value="Send">
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-
-<div id="otpEmployeeModal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form action="" method="POST"  id="otp_login" >
-        {% csrf_token %}
-        <div class="modal-header">						
-          <h4 class="modal-title"><p class="mt-20"><a href="">Wait and Proceed</a></p></h4>
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        </div>
-        <div class="modal-body">					
-          <div class="form-group">
-            <label>OTP</label>
-            <input name="otp" id="otp" type="text" class="form-control" required>
-          </div>           
-        </div>
-        <div class="modal-footer">
-          
-          <input type="submit" class="btn btn-success" value="Login">
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
 
  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -119,72 +66,6 @@
 })
 
 
-
-$(document).on('submit','#otp_view',function(e)
- {
-  e.preventDefault();
-  var phone_number=$('#phone_number').val()
-  console.log(phone_number)
-  
-  $.ajax({
-    type:'POST',
-    url:'{% url 'otp_view' %}',
-    dataType:'json',
-    data:{
-      'phone_number':phone_number,
-     
-      csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-    },
-    success:function(responce){
-      console.log(responce)
-      if(responce.success==true){
-      window.location.href="#otpEmployeeModal"
-    }
-    else{
-      //alert('Invalid credentials')
-      console.log(responce)
-      document.getElementById("warning").style.display="block";
-    }
-  }
-  })
-  
-})
-
-
-
-$(document).on('submit','#otp_login',function(e)
- {
-  e.preventDefault();
-  var otp=$('#otp').val()
-  var otp=$('#otp').val()
-  console.log(otp)
-  
-  $.ajax({
-    type:'POST',
-    url:'{% url 'otp_login' %}',
-    dataType:'json',
-    data:{
-      'otp':otp,
-     
-      csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-    },
-    success:function(responce){
-      console.log(responce)
-      if(responce.success==true){
-      window.location.href="'{% url 'home' %}"
-    }
-    else{
-      //alert('Invalid credentials')
-      console.log(responce)
-      document.getElementById("warning").style.display="block";
-    }
-  }
-  })
-  
-})
-
-
-</script>
 
 
 {% endblock %}

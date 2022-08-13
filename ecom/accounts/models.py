@@ -46,7 +46,7 @@ class Account(AbstractBaseUser):
     email = models.EmailField(max_length=100, unique=True)
     phone_number = models.CharField(max_length=50)
     
-
+    otp = models.CharField(max_length = 100, null = True , blank = True)
 
 
     #required
