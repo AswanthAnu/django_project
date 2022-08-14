@@ -97,9 +97,13 @@
                                             <li>
                                                 <a href="#!" ><i class="tf-ion-ios-heart"></i></a>
                                             </li>
+											{% if product.stock != 0 %}
                                             <li>
                                                 <a href="{% url 'add_cart' product.id %}"><i class="tf-ion-android-cart"></i></a>
                                             </li>
+											{% else %}
+											
+											{% endif %}
                                         </ul>
                                       </div>
                                 </div>
@@ -110,7 +114,49 @@
                             </div>
                         </div>
                         {% endfor %}
-				</div>				
+				</div>		
+			
+					
+					<nav aria-label="Page navigation example">
+						{% if products.has_other_pages %}
+						<ul class="pagination pg-black">
+							{% if products.has_previous %}
+						  <li class="page-item  ">
+							<a class="page-link" href="?page={{ products.previous_page_number}}" tabindex="-1" style="color: black;">Previous</a>
+						  </li>
+						  {% else %}
+						  <li class="page-item  ">
+							<a class="page-link" href="#" tabindex="-1" style="color: black;"></a>
+						  </li>
+						  {% endif %}
+						  
+						 
+						  {% for i in products.paginator.page_range %}
+						  {% if products.number == i %}
+						  
+						  <li class="page-item active">
+							<a class="page-link" style="background-color: black;">{{i}}<span class="sr-only">{{i}}</span></a>
+						  </li>
+						  {% else %}
+						  <li class="page-item" style="color: black;"><a class="page-link" href="?page={{i}}" style="color: black;">{{i}}</a></li>
+						  {% endif %}
+						  {% endfor %}
+						 
+						 
+						  {% if products.has_next %}
+						  <li class="page-item  ">
+							<a class="page-link" href="?page={{ products.next_page_number}}" tabindex="-1" style="color: black;">Next</a>
+						  </li>
+						 
+						  {% else %}
+						  <li class="page-item  ">
+							<a class="page-link" href="#" tabindex="-1" style="color: black;"></a>
+						  </li>
+						  {% endif %}
+						</ul>
+					  </nav>
+					{% endif %}
+			
 			</div>
 		
 		</div>

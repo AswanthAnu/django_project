@@ -106,7 +106,13 @@
 					{% if single_product.stock <= 0%}
 					<a class="btn  mt-20 btn-danger">Out Of Stock</a>
 					{% else %}
+					{% if in_cart %}
+					<a href="#" class="btn btn-main mt-20">Added To Cart</a>
+					<a href="{% url 'cart' %}" class="btn btn-main mt-20">View Cart</a>
+					
+					{% else %}
 					<a href="{% url 'add_cart' single_product.id %}" class="btn btn-main mt-20">Add To Cart</a>
+					{% endif %}
 					{% endif %}
 				</div>
 			</div>

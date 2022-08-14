@@ -106,9 +106,13 @@
 								<li>
 			                        <a href="#!" ><i class="tf-ion-ios-heart"></i></a>
 								</li>
+								{% if product.stock != 0 %}
 								<li>
 									<a href="{% url 'add_cart' product.id %}"><i class="tf-ion-android-cart"></i></a>
 								</li>
+								{% else %} 
+								
+								{% endif %}
 							</ul>
                       	</div>
 					</div>
