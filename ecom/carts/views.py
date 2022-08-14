@@ -2,8 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Cart, CartItem
 from store.models import product
 from django.core.exceptions import ObjectDoesNotExist
-
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
@@ -57,9 +56,12 @@ def add_cart(request, product_id):
     return redirect('cart')
 
 
-def cart(request, total = 0, quantity = 0 , cart_item = None):
+def cart(request, total = 0, quantity = 0 , cart_items = None):
     
     try:
+        gst = 0
+        cart_items = 0
+        grand_total = 0
         cart =  Cart.objects.get(cart_id = _cart_id(request))
         cart_items = CartItem.objects.filter(cart = cart , is_active = True)
         for cart_item in cart_items:
@@ -107,3 +109,38 @@ def remove_cart_item(request, product_id):
     cart_item = CartItem.objects.get(product = prod, cart = cart)
     cart_item.delete()
     return redirect('cart')
+
+
+
+
+# @login_required(login_url = 'login')
+def checkout(request, total = 0, quantity = 0 , cart_items = None):
+
+
+    try:
+        total = 0
+        gst = 0
+        cart_items = 0
+        grand_total = 0
+        cart =  Cart.objects.get(cart_id = _cart_id(request))
+        cart_items = CartItem.objects.filter(cart = cart , is_active = True)
+        for cart_item in cart_items:
+            total += (cart_item.product.price * cart_item.quantity)
+            print(total)
+            quantity += cart_item.quantity
+
+        gst = (17 * total)/100
+        grand_total = total + gst
+    except ObjectDoesNotExist:
+        pass
+
+ 
+    context = {
+        'total' : total,
+        'quantity' : quantity, 
+        'cart_items' : cart_items,
+        'gst' : gst,
+        'grand_total' : grand_total
+    }
+
+    return render(request, 'store/checkout.html', context )
