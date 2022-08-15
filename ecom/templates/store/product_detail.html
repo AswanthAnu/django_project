@@ -58,64 +58,56 @@
 				</div>
 			</div>
 			<div class="col-md-7">
-				<div class="single-product-details">
-					<h2>{{single_product.product_name}}</h2>
-					<p class="product-price">Rs.{{single_product.price}}</p>
-					
-					<p class="product-description mt-20">
-						{{single_product.description}}
-					</p>
-					
-					<div class="color-swatches">
-						<span>color:</span>
-						<ul>
-							<li>
-								<a href="#!" class="swatch-violet"></a>
-							</li>
-							<li>
-								<a href="#!" class="swatch-black"></a>
-							</li>
-							<li>
-								<a href="#!" class="swatch-cream"></a>
-							</li>
-						</ul>
-					</div>
-					<div class="product-size">
-						<span>Size:</span>
-						<select class="form-control">
-							<option>S</option>
-							<option>M</option>
-							<option>L</option>
-							<option>XL</option>
+				<form action="{% url 'add_cart' single_product.id %}" method='POST'>
+					{% csrf_token %}
+					<div class="single-product-details">
+						<h2>{{single_product.product_name}}</h2>
+						<p class="product-price">Rs.{{single_product.price}}</p>
+						
+						<p class="product-description mt-20">
+							{{single_product.description}}
+						</p>
+						
+						<div class="product-size">
+							<span>color:</span>
+						<select name="color" class="form-control" id="" required>
+							<option value="" disabled selected>Pick</option>
+							{% for i in single_product.variation_set.colors %}
+							<option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
+							{% endfor %}
 						</select>
-					</div>
-					
-					<div class="product-quantity">
-						<span>Quantity:</span>
-						<div class="product-quantity-slider">
-							<div class="input-group bootstrap-touchspin"><span class="input-group-btn"><button class="btn btn-default bootstrap-touchspin-down" type="button">-</button></span><span class="input-group-addon bootstrap-touchspin-prefix" style="display: none;"></span><input id="product-quantity" type="text" value="0" name="product-quantity" class="form-control" style="display: block;"><span class="input-group-addon bootstrap-touchspin-postfix" style="display: none;"></span><span class="input-group-btn"><button class="btn btn-default bootstrap-touchspin-up" type="button">+</button></span></div>
 						</div>
+						<div class="product-size">
+							<span>Size:</span>
+							<select name="size" class="form-control">
+							<option value="" disabled selected>Pick</option>
+							{% for i in single_product.variation_set.sizes %}
+							<option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
+							{% endfor %}
+							</select>
+						</div>
+						
+						<div class="product-quantity">
+							<span>Quantity:</span>
+							<div class="product-quantity-slider">
+								<div class="input-group bootstrap-touchspin"><span class="input-group-btn"><button class="btn btn-default bootstrap-touchspin-down" type="button">-</button></span><span class="input-group-addon bootstrap-touchspin-prefix" style="display: none;"></span><input id="product-quantity" type="text" value="0" name="product-quantity" class="form-control" style="display: block;"><span class="input-group-addon bootstrap-touchspin-postfix" style="display: none;"></span><span class="input-group-btn"><button class="btn btn-default bootstrap-touchspin-up" type="button">+</button></span></div>
+							</div>
+						</div>
+						<div class="product-category">
+							<span>Categories:</span>
+							<ul>
+								<li><a href="product-single.html">Products</a></li>
+								<li><a href="product-single.html">Soap</a></li>
+							</ul>
+						</div>
+						{% if single_product.stock <= 0%}
+						<a class="btn  mt-20 btn-danger">Out Of Stock</a>
+						{% else %}
+						<button type="submit"  class="btn btn-main mt-20">Add To Cart</button>
+						{% endif %}
 					</div>
-					<div class="product-category">
-						<span>Categories:</span>
-						<ul>
-							<li><a href="product-single.html">Products</a></li>
-							<li><a href="product-single.html">Soap</a></li>
-						</ul>
-					</div>
-					{% if single_product.stock <= 0%}
-					<a class="btn  mt-20 btn-danger">Out Of Stock</a>
-					{% else %}
-					{% if in_cart %}
-					<a href="#" class="btn btn-main mt-20">Added To Cart</a>
-					<a href="{% url 'cart' %}" class="btn btn-main mt-20">View Cart</a>
-					
-					{% else %}
-					<a href="{% url 'add_cart' single_product.id %}" class="btn btn-main mt-20">Add To Cart</a>
-					{% endif %}
-					{% endif %}
 				</div>
-			</div>
+		</form>
 		</div>
 		<div class="row">
 			<div class="col-xs-12">

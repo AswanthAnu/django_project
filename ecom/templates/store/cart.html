@@ -35,7 +35,12 @@
                         
                         <td >
                           <a href="{{ cart_item.product.get_url }}">{{ cart_item.product.product_name}}</a>
-                          <p class="text-muted small">color : red <br> size : XL</p>
+                          <p class="text-muted small"></p>
+                          {% if cart_item.variation.all %}
+                           {% for item in cart_item.variation.all %}
+                          <p class="text-muted small">{{ item.variation_category | capfirst }}: {{item.variation_value | capfirst }}</p>
+                            {% endfor %}
+                          {% endif %}
                         </td>
                        
                         
@@ -43,7 +48,26 @@
                            <div class="product-quantity" style="width: 1px;">
                            
                             <div class="product-quantity-slider " style="width: 100px; height:10px;">
-                                <div class="input-group bootstrap-touchspin block"><span class="input-group-btn "><a href="{% url 'remove_cart' cart_item.product.id %}" class="btn btn-default bootstrap-touchspin-down block" type="button">-</a></span><span class="input-group-addon bootstrap-touchspin-prefix b" style="display: none; "></span><input id="product-quantity" type="text" value="{{ cart_item.quantity}}" name="product-quantity" class="form-control " style="display: block; height:34px"><span class="input-group-addon bootstrap-touchspin-postfix" style="display: none;"></span><span class="input-group-btn"><a href="{% url 'add_cart' cart_item.product.id %}" class="btn btn-default bootstrap-touchspin-up" type="button">+</a></span></div>
+                                <div class="input-group bootstrap-touchspin block">
+                                  <span class="input-group-btn ">
+                                    <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}" class="btn btn-default bootstrap-touchspin-down block" type="button">-</a>
+                                  </span>
+                                  <span class="input-group-addon bootstrap-touchspin-prefix b" style="display: none; "></span>
+                                  
+                                  <input id="product-quantity" value="{{ cart_item.quantity }}" class="form-control " style="display: block; height:34px; width:34px;">
+                                  {% for item in cart_item.variation.all %}
+                                  <span class="input-group-addon bootstrap-touchspin-postfix" style="display: none;">
+                                  </span>
+                                  <span class="input-group-btn">
+                                    <form action="{% url 'add_cart' cart_item.product.id %}" method="POST">
+                                     
+                                      {% csrf_token %}
+                                           <input  type="hidden" value="{{ item.variation_value | capfirst }}" name="{{ item.variation_category | lower }}">
+                                    {% endfor %}
+                                    <button class="btn btn-default bootstrap-touchspin-up" type="submit">+</button>
+                                  </span>
+                                </form>  
+                                </div>
                             </div>
                             </div> 
                           </td>
@@ -57,7 +81,7 @@
 
                           </td>
                         <td class="">
-                          <a class="product-remove" href="{% url 'remove_cart_item' cart_item.product.id %}">Remove</a>
+                          <a class="product-remove" href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}">Remove</a>
                         </td>
                       </tr>
                       {% endfor %}
