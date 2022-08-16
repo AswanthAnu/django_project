@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'store.apps.StoreConfig',
     'admin_panel.apps.AdminPanelConfig',
     'carts.apps.CartsConfig',
+    'orders.apps.OrdersConfig',
    
    
 ]
