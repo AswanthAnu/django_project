@@ -93,7 +93,7 @@
                          <div class="media-body">
                             <h4 class="media-heading"><a href="{{ cart_item.product.get_url }}">{{ cart_item.product.product_name}}</a></h4>
                             <p class="price">{{ cart_item.quantity}} x Rs.{{ cart_item.product.price }}.00</p>
-                            <span class="remove" > <a href="{% url 'remove_cart' cart_item.product.id %}">Remove</a> </span>
+                            <span class="remove" > <a href="{% url 'remove_cart'  cart_item.product.id cart_item.id %}">Remove</a> </span>
                          </div>
                       </div>
                       

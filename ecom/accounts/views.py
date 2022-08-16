@@ -9,7 +9,9 @@ from .mixins import MessageHandler
 from .models import Account, profile
 from django.http import HttpResponse,JsonResponse
 import random   
-
+from carts.views import _cart_id
+from carts.models import Cart, CartItem
+import requests
 
 
 
@@ -85,14 +87,68 @@ def login(request):
             #     return redirect('login')
 
             if user is not None:
-                request.session['email'] = email
-                return JsonResponse(
-                        {
-                        'success':True},
 
-                        safe=False
-                    
-                    )
+                try:
+                    cart = Cart.objects.get(cart_id = _cart_id(request))
+                    is_cart_item_exists = CartItem.objects.filter(cart = cart ).exists()
+                    if is_cart_item_exists:
+                        cart_item = CartItem.objects.filter(cart = cart)
+                    # getting the product variation by cart id
+                    product_variation = []
+                    for item in cart_item:
+                        variation  = item.variation.all()
+                        product_variation.append(list(variation))
+
+                    #get cart item from the user to access his product variations
+                    cart_item = CartItem.objects.filter( user = user)
+                   
+                    existing_variation_list = []
+                    id = []
+                    for item  in cart_item:
+                        existing_variation = item.variation.all()
+                        existing_variation_list.append(list(existing_variation))
+                        id.append(item.id)
+
+                    # product_variation = [1, 2, 3, 4, 6]
+                    # existing_variation_list = [4, 5, 3, 5]
+
+                    for pr in product_variation:
+                        if pr in existing_variation_list:
+                            index = existing_variation_list.index(pr)
+                            item_id = id[index]
+                            item = CartItem.objects.get(id = item.id)
+                            item.quantity +=  1
+                            item.user = user
+                            item.save()
+                        else:
+                            cart_item = CartItem.objects.filter(cart = cart)
+                            for item in cart_item:
+                                item.user = user
+                                item.save()
+
+                #     for item in cart_item:
+                #         item.user = user
+                #         item.save()
+                except:
+                    pass
+                request.session['email'] = email
+                auth.login(request, user)
+                url = request.META.get('HTTP_REFERER')
+                try:
+                    query = requests.utils.urlparse(url).query
+                    # next=/cart/checkout/
+                    params = dict(x.split('=') for x in query.split('&'))
+                    if 'next' in params:
+                        nextPage = params['next']
+                        return redirect(nextPage)  
+                except:
+                    return JsonResponse(
+                            {
+                            'success':True},
+
+                            safe=False
+                        
+                        )
             else :
                 print("Failed")
                 return JsonResponse(
@@ -170,5 +226,9 @@ def otp_login(request, email=None):
 
 
 def logout(request):
-    return render(request, 'accounts/login.html')
+
+    if 'email' in request.session:
+        request.session.flush() 
+
+    return redirect('home')
 
