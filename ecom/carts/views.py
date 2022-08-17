@@ -247,12 +247,12 @@ def checkout(request, total = 0, quantity = 0 , cart_items = None):
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
         for cart_item in cart_items:
             total += (cart_item.product.price * cart_item.quantity)
-            print(total,'============')
+            
             quantity += cart_item.quantity
 
-        gst = (17 * total)/100
+        gst = (2 * total)/100
         grand_total = total + gst
-        print(grand_total, '==============')
+        
     except ObjectDoesNotExist:
         pass
 
@@ -264,5 +264,5 @@ def checkout(request, total = 0, quantity = 0 , cart_items = None):
         'gst' : gst,
         'grand_total' : grand_total,
     }
-    print(context)
+    
     return render(request, 'store/checkout.html', context )

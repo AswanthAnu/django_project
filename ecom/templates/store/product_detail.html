@@ -62,7 +62,7 @@
 					{% csrf_token %}
 					<div class="single-product-details">
 						<h2>{{single_product.product_name}}</h2>
-						<p class="product-price">Rs.{{single_product.price}}</p>
+						<p class="product-price">USD.{{single_product.price}}</p>
 						
 						<p class="product-description mt-20">
 							{{single_product.description}}
@@ -87,17 +87,17 @@
 							</select>
 						</div>
 						
-						<div class="product-quantity">
-							<span>Quantity:</span>
-							<div class="product-quantity-slider">
-								<div class="input-group bootstrap-touchspin"><span class="input-group-btn"><button class="btn btn-default bootstrap-touchspin-down" type="button">-</button></span><span class="input-group-addon bootstrap-touchspin-prefix" style="display: none;"></span><input id="product-quantity" type="text" value="0" name="product-quantity" class="form-control" style="display: block;"><span class="input-group-addon bootstrap-touchspin-postfix" style="display: none;"></span><span class="input-group-btn"><button class="btn btn-default bootstrap-touchspin-up" type="button">+</button></span></div>
-							</div>
-						</div>
-						<div class="product-category">
+
+						<div class="product-category" >
 							<span>Categories:</span>
 							<ul>
-								<li><a href="product-single.html">Products</a></li>
-								<li><a href="product-single.html">Soap</a></li>
+								<li><a href="{{category.get_url}}" >{{single_product.category}}</a></li>
+							</ul>
+						</div>
+							<div class="product-category">
+							<span>Brand:</span>
+							<ul>
+								<li><a href="{{category.get_url}}">{{single_product.brand}}</a></li>
 							</ul>
 						</div>
 						{% if single_product.stock <= 0%}

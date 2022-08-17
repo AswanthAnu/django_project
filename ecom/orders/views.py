@@ -1,10 +1,83 @@
 from django.shortcuts import render, redirect
 from carts.models import CartItem, Cart
 from .forms import OrderForm
-from .models import Order
+from .models import Order, Payment, OrderProduct
+from store.models import product
 import datetime
+import json
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+
 
 # Create your views here.
+
+def payments(request):
+
+    body = json.loads(request.body)
+    order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
+
+    # Store transaction details inside Payment model
+    payment = Payment(
+        user = request.user,
+        payment_id = body['transID'],
+        payment_method = body['payment_method'],
+        amount_paid = order.order_total,
+        status = body['status'],
+    )
+    payment.save()
+
+    order.payment = payment
+    order.is_ordered = True
+    order.save()
+
+    # Adding cart item to product table
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    for item in cart_items:
+        orderproduct = OrderProduct()
+        orderproduct.order_id = order.id
+        orderproduct.payment = payment
+        orderproduct.user_id = request.user.id
+        orderproduct.product_id = item.product_id
+        orderproduct.quantity = item.quantity
+        orderproduct.product_price = item.product.price
+        orderproduct.ordered = True
+        orderproduct.save()
+
+        cart_item = CartItem.objects.get(id=item.id)
+        product_variation = cart_item.variation.all()
+        orderproduct = OrderProduct.objects.get(id=orderproduct.id)
+        orderproduct.variations.set(product_variation)
+        orderproduct.save()
+
+     # Reduce the quantity of the stock
+        prod = product.objects.get(id=item.product_id)
+        prod.stock -= item.quantity
+        prod.save()
+    
+    # clear the cart item
+    CartItem.objects.filter(user=request.user).delete()
+    
+    # send email
+    mail_subject = 'Your order placed successfully...!'
+    print(mail_subject)
+    message = render_to_string('orders/success_email.html', {
+        'user': request.user,
+        'order': order,
+    })
+    to_email = request.user.email
+    print(message)
+    send_email = EmailMessage(mail_subject, message, to=[to_email])
+    send_email.send()
+
+    print(send_email)
+
+
+
+    return render(request, 'orders/payments.html')
+
+
+
 def place_order(request, total=0, quantity=0, ):
 
     current_user = request.user
@@ -21,22 +94,26 @@ def place_order(request, total=0, quantity=0, ):
     tax = (2 * total)/100
     grand_total = total + tax
     
+    
     if request.method == 'POST':
-
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            #store all the billing information inside order table
+        
+        
+        
+            # Store all the billing information inside Order table
+            print('entering if')
             data = Order()
+            
             data.user = current_user
-            data.first_name = form.cleaned_data['first_name']
-            data.last_name = form.cleaned_data['last_name']
-            data.phone = form.cleaned_data['phone_number']
-            data.email = form.cleaned_data['email']
-            data.address_line_1 = form.cleaned_data['user_address1']
-            data.address_line_2 = form.cleaned_data['user_address2']
-            data.country = form.cleaned_data['country']
-            data.state = form.cleaned_data['state']
-            data.city = form.cleaned_data['city']
+            data.first_name = request.POST['first_name']
+            data.last_name = request.POST['last_name']
+            data.phone = request.POST['phone']
+            data.email = request.POST['email']
+            data.address_line_1 = request.POST['address_line_1']
+            data.address_line_2 = request.POST['address_line_2']
+            data.country = request.POST['country']
+            data.state = request.POST['state']
+            data.city = request.POST['city']
+            data.order_note = request.POST['order_note']
             data.order_total = grand_total
             data.tax = tax
             data.ip = request.META.get('REMOTE_ADDR')
@@ -51,9 +128,24 @@ def place_order(request, total=0, quantity=0, ):
             order_number = current_date + str(data.id)
             data.order_number = order_number
             data.save()
+            
+            order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
+            context = {
+                'order': order,
+                'cart_items': cart_items,
+                'total': total,
+                'tax': tax,
+                'grand_total': grand_total,
+            }
+            return render(request, 'orders/payments.html', context)
 
-            return redirect('checkout')
+
+            
+        
+    
     else:
         return redirect('checkout')
 
 
+def order_success(request):
+    return render(request, 'orders/payment_success.html')

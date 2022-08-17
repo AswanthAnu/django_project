@@ -12,52 +12,57 @@
              <div class="col-md-8">
                 <div class="block billing-details">
                    <h4 class="widget-title">Billing Details</h4>
-                   <form class="checkout-form" action='{% url 'place_order' %}' method='POST'>
+                   <form class="checkout-form" action="{% url 'place_order' %}" method='POST'>
                     
-                     {% csrf_token %} 
+                     {% csrf_token %}
                    
                      <div class="checkout-country-code clearfix">
                         <div class="form-group">
-                           <label for="full_name">First Name</label>
-                           <input type="text" class="form-control" id="full_name" name="full_name" placeholder="">
+                           <label >First Name</label>
+                           <input type="text" class="form-control" id="first_name" name="first_name"  value="">
                         </div>
                         <div class="form-group" >
-                           <label for="last_name">last Name</label>
-                           <input type="text" class="form-control" name="last_name" id="last_name" placeholder="">
+                           <label >last Name</label>
+                           <input type="text" class="form-control" name="last_name" id="last_name"  value="">
                         </div>
                      </div>
                      <div class="checkout-country-code clearfix">
                         <div class="form-group">
-                           <label for="email">Email</label>
-                           <input type="text" class="form-control" name="email" id="Email" placeholder="">
+                           <label >Email</label>
+                           <input type="email" class="form-control" name="email" id="email"  value=""> 
                         </div>
                         <div class="form-group" >
-                           <label for="phone_number">Phone Number</label>
-                           <input type="text" class="form-control"name="phone_number" id="phone_number" placeholder="">
+                           <label >Phone Number</label>
+                           <input type="text" class="form-control" name="phone" id="phone_number" value="">
                         </div>
                      </div>
                       <div class="form-group">
-                         <label for="user_address">Address Line 1</label>
-                         <input type="text" class="form-control" name="user_address1"id="user_address1" placeholder="">
+                         <label >Address Line 1</label>
+                         <input type="text" class="form-control" name="address_line_1" id="address_line_1"  value="">
                       </div>
                       <div class="form-group">
-                        <label for="user_address">Address Line 2</label>
-                        <input type="text" class="form-control" name="user_address2"id="user_address2" placeholder="">
+                        <label >Address Line 2</label>
+                        <input type="text" class="form-control" name="address_line_2" id="address_line_2"  value="">
                      </div>
                       <div class="checkout-country-code clearfix">
                          <div class="form-group">
-                            <label for="user_post_code">state</label>
+                            <label >state</label>
                             <input type="text" class="form-control" id="state" name="state" value="">
                          </div>
                          <div class="form-group" >
-                            <label for="user_city">City</label>
+                            <label >City</label>
                             <input type="text" class="form-control" id="city" name="city" value="">
                          </div>
                       </div>
                       <div class="form-group">
-                         <label for="user_country">Country</label>
-                         <input type="text" class="form-control" id="country" name="country" placeholder="">
+                         <label >Country</label>
+                         <input type="text" class="form-control" id="country" name="country" value="">
                       </div>
+                     <div class="form-group">
+                        <label >Order Note</label>
+                        <input type="text" class="form-control" id="order_note" name="order_note"  value="">
+                     </div>
+                    
                  
                 </div>
                
@@ -75,7 +80,7 @@
                         
                          <div class="media-body">
                             <h4 class="media-heading"><a href="{{ cart_item.product.get_url }}">{{ cart_item.product.product_name}}</a></h4>
-                            <p class="price">{{ cart_item.quantity}} x Rs.{{ cart_item.product.price }}.00</p>
+                            <p class="price">{{ cart_item.quantity}} x USD.{{ cart_item.product.price }}.00</p>
                             <span class="remove" > <a href="{% url 'remove_cart'  cart_item.product.id cart_item.id %}">Remove</a> </span>
                          </div>
                       </div>
@@ -89,7 +94,7 @@
                       <ul class="summary-prices">
                          <li>
                             <span>Subtotal:</span>
-                            <span class="price">Rs.Rs.{{ total }}.00 </span>
+                            <span class="price">USD.{{ total }}.00 </span>
                          </li>
                          
                          <li>
@@ -100,17 +105,17 @@
                            
                          <li>
                                 
-                            <span>GST:</span>
-                            <span>Rs.{{ gst }}0</span>
+                            <span>TAX:</span>
+                            <span>USD.{{ gst }}0</span>
                          </li>
                          
                       </ul>
                       <div class="summary-total">
                          <span>Total</span>
-                         <span>Rs.{{ grand_total}}0</span>
+                         <span>USD.{{ grand_total}}0</span>
                       </div>
 
-                      <button type='submit' name='submit' class="btn btn-main mt-20">Place Order</button >
+                      <button type='submit'  class="btn btn-main mt-20">Place Order</button >
                       
                       </form>
                         <div class="verified-icon">

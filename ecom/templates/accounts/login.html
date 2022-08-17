@@ -51,10 +51,10 @@
       'password':password,
       csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
     },
-    success:function(responce){
-      console.log(responce)
-      if(responce.success==true){
-      window.location.href="{% url 'home' %}"
+    success:function(response){
+      console.log(response)
+      if(response.success==true){
+      window.location.replace('/home')
     }
     else{
       //alert('Invalid credentials')

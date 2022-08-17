@@ -163,3 +163,13 @@ MESSAGE_TAGS = {
 
 account_sid = 'AC158fc54ebc80234dce390049a8f81b04'
 auth_token = '22cbf2ebf45b6e1f90f4e969f4c53873'
+
+
+
+
+# SMTP configuration
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'exq.see.me@gmail.com'
+EMAIL_HOST_PASSWORD = 'nqptrihltacmyita'
+EMAIL_USE_TLS = True
