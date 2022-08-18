@@ -1,4 +1,6 @@
  {% load static %}
+
+
  <!-- Start Top Header Bar -->
  <section class="top-header">
 	<div class="container">
@@ -126,28 +128,18 @@
 							<div class="row">
 
 								<!-- Basic -->
-								<div class="col-lg-6 col-md-6 mb-sm-3">
+								<div class="col-lg-6 col-md-6 pr-0 pl-0">
 									<ul>
-										<li class="dropdown-header">Pages</li>
-										<li role="separator" class="divider"></li>
-										<li><a href="shop.html">Shop</a></li>
-										<li><a href="checkout.html">Checkout</a></li>
-										<li><a href="cart.html">Cart</a></li>
-										<li><a href="pricing.html">Pricing</a></li>
-										<li><a href="confirmation.html">Confirmation</a></li>
-
+									
+										
+										<li><a href="{% url 'store' %}">Store</a></li>
+										<li><a href="{% url 'cart' %}">Cart</a></li>
 									</ul>
 								</div>
 
 								<!-- Layout -->
 								<div class="col-lg-6 col-md-6 mb-sm-3">
-									<ul>
-										<li class="dropdown-header">Layout</li>
-										<li role="separator" class="divider"></li>
-										<li><a href="product-single.html">Product Details</a></li>
-										<li><a href="{% url 'store' %}">Shop With Sidebar</a></li>
-
-									</ul>
+									
 								</div>
 
 							</div><!-- / .row -->
@@ -155,31 +147,21 @@
 					</li><!-- / Elements -->
 
 					<!-- Blog -->
-					<li class="dropdown dropdown-slide">
-						<a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="350"
-							role="button" aria-haspopup="true" aria-expanded="false">Blog <span
-								class="tf-ion-ios-arrow-down"></span></a>
-						<ul class="dropdown-menu">
-							<li><a href="blog-left-sidebar.html">Blog Left Sidebar</a></li>
-							<li><a href="blog-right-sidebar.html">Blog Right Sidebar</a></li>
-							<li><a href="blog-full-width.html">Blog Full Width</a></li>
-							<li><a href="blog-grid.html">Blog 2 Columns</a></li>
-							<li><a href="blog-single.html">Blog Single</a></li>
-						</ul>
-					</li><!-- / Blog -->
-
+	
+					{% if user.is_authenticated %}
 					<!-- Shop -->
 					<li class="dropdown dropdown-slide">
 						<a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="350"
-							role="button" aria-haspopup="true" aria-expanded="false">Elements <span
+							role="button" aria-haspopup="true" aria-expanded="false">Profile <span
 								class="tf-ion-ios-arrow-down"></span></a>
 						<ul class="dropdown-menu">
-							<li><a href="typography.html">Typography</a></li>
-							<li><a href="buttons.html">Buttons</a></li>
-							<li><a href="alerts.html">Alerts</a></li>
+							<li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+							<li><a href="{% url 'my_orders' %}">My Orders</a></li>
+							<li><a href="{% url 'edit_profile' %}">Edit Profile</a></li>
+							<li><a href="{% url 'change_password' %}">Change Password</a></li>
 						</ul>
 					</li><!-- / Blog -->
-
+					{% endif %}
 					<!-- Pages -->
 								<!-- Mega Menu -->
 								<!-- Shop -->

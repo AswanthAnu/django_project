@@ -4,7 +4,9 @@ from store.models import product
 
 
 
-# Create your views here.
+# Create your views h
+
+
 def home(request):
     products = product.objects.all().filter(is_available = True)
 

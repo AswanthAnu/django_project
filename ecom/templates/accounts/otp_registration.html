@@ -16,7 +16,7 @@
           {% include 'includes/alerts.html' %}
           <h5 class="text-bg-danger" style="display:none ;" id="warning">Invalid Credentials</h5>
           <h2 class="text-center">Welcome Back</h2>
-          <form class="text-left clearfix" action="{% url 'otp_registeratioin' %}" method="POST" id="otp_form">
+          <form class="text-left clearfix" action="{% url 'otp_registration' %}" method="POST" id="otp_form">
             {% csrf_token %}
             <div class="form-group">
               <input type="text" class="form-control"  placeholder="Enter otp" name='otp' id='otp'>

@@ -8,10 +8,12 @@ from .form import RegistrationForm
 from .mixins import MessageHandler
 from .models import Account, profile
 from django.http import HttpResponse,JsonResponse
-import random   
+import random 
+from orders.models import Order  
 from carts.views import _cart_id
 from carts.models import Cart, CartItem
 import requests
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -30,24 +32,19 @@ def register(request):
 
             username = email.split('@')[0]
 
-            user = Account.objects.create_user(first_name = first_name, last_name = last_name, email = email, username = username, password = password,)
-            user.phone_number = phone_number
+            user = Account.objects.create_user(first_name = first_name, last_name = last_name, email = email, username = username, password = password, phone_umber = phone_number)
+            
             user.is_active = True
             user.is_staff = False
             user.is_admin = False
 
             otp=random.randint(1000,9999)
 
-            prof= profile.objects.create(user=user,phone_number=phone_number,otp=f'{otp}')
+            prof= profile.objects.create(user=user,phone_number=phone_number,otp=otp)
 
-            messagehandler=MessageHandler(f'+91'+phone_number,otp).send_otp_via_message()
-
-            red = redirect()
-
-            user.save()
-            print("save")
-            messages.success(request, 'Your account registered successfully')
-            return redirect('register')
+            message_handler = MessageHandler(f'+91'+phone_number ,prof.otp).send_otp_on_phone
+            message_handler()
+            return redirect('otp_registration')
 
         
     else:
@@ -57,6 +54,13 @@ def register(request):
             'form' : form,
             }
     return render(request, 'accounts/register.html', context)
+
+def otp_registration(request):
+
+    pass
+
+
+
 
 def login(request):
 
@@ -142,21 +146,13 @@ def login(request):
                         nextPage = params['next']
                         return redirect(nextPage)  
                 except:
-                    return JsonResponse(
-                            {
-                            'success':True},
-
-                            safe=False
+                    return redirect( 'home' )
+                            
                         
-                        )
-            else :
-                print("Failed")
-                return JsonResponse(
-                    {
-                    'success':False},
-                    safe=False
-                    
-                    )
+            else:
+                messages.success(request, 'Invalid Credantials')
+                return redirect('login')
+                
 
 
 
@@ -170,56 +166,48 @@ def otp_view(request):
             phone_number = request.POST.get('phone_number')
             print(phone_number,'-')
             if Account.objects.filter(phone_number = phone_number).exists():
-                
-                
-               
-            #     prof[0].otp = random.randint(1000, 9999)
-            #     print('account here')
-            #     #print(profile.otp)
-            #     prof.save()
+                users = Account.objects.get(phone_number = phone_number)
+                print(users)
                 
                
-                id = request.session['email'] = email
+                request.session['id'] = users.id
+                request.session['email'] = users.email
+
                 otp = random.randint(1000, 9999)
                 print(otp)
-                profi = Account(otp = otp)
-                
-                profi.save
-                #message_handler = MessageHandler(f'+91'+phone_number ,prof.otp).send_otp_on_phone
-                #message_handler()
-                print('------',profi.otp, '-------')
+                prof = profile.objects.get(user = users.id )
+                print(prof)
+                prof.otp = otp
+                prof.save()
+                message_handler = MessageHandler(f'+91'+phone_number ,prof.otp).send_otp_on_phone
+                message_handler()
+                print('------',prof.otp, '-------')
                 return redirect( 'otp_login')
-                #     return JsonResponse(
-                #             {
-                #             'success': object.uid }, safe=False,
-
-                        
-                        
-                #         )
-
-                # else:
-                #     # return render('login')
-                #     print("Failed")
-                #     return JsonResponse(
-                #         {
-                #         'success':False},
-                #          safe=False
-                        
-                #         )
+            print('183')
+            messages.success(request, 'Invalid Phone Number')
+            return redirect('otp_view')
 
         
         return render(request, 'accounts/otp_view.html ')
        
 
-def otp_login(request, email=None):
+def otp_login(request):
+    
+    id = request.session['id']
+    users = Account.objects.get(id=id)
     if request.method == 'POST':
         otp = request.POST.get('otp')
         
-        prof = Account.objects.filter(email = email, otp = otp)
+        #email = request.session['email']
+        print(otp, '-----')
+        prof = profile.objects.get( id = id) 
+        print(prof, '--prof-otp-')
         if otp == prof.otp:
-            login(request, Account.user)
+            auth.login(request, users)
+            print("232")
             return redirect('home')
-        
+        print("234")
+        messages.success(request, 'Wrong OTP')
         return redirect('login')
     return render(request, 'accounts/otp_login.html')
 
@@ -227,8 +215,40 @@ def otp_login(request, email=None):
 
 def logout(request):
 
-    if 'email' in request.session:
-        request.session.flush() 
+    
+    request.session.flush() 
 
     return redirect('home')
+@login_required(login_url = 'login')
+def dashboard(request):
 
+    orders = Order.objects.order_by('-created_at').filter(user_id = request.user.id, is_ordered=True)
+    orders_count = orders.count()
+
+    
+
+    context = {
+        
+       
+        'orders_count' : orders_count,
+    }
+
+    return render(request, 'accounts/dashboard.html', context )
+
+
+def my_orders(request):
+
+    orders = Order.objects.filter(user = request.user, is_ordered= True).order_by('-created_at')
+    context = {
+        'orders' : orders,
+    }
+
+    return render(request, 'accounts/my_orders.html', context)
+
+
+def edit_profile(request):
+    return render(request, 'accounts/my_orders.html')
+
+
+def change_password(request):
+    return render(request, 'accounts/my_orders.html')

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+
+
+{% block content%}
+
+<section class="user-dashboard page-wrapper">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+			
+<ul class="list-inline dashboard-menu text-center">
+    <li><a class="active" href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li><a href="{% url 'my_orders' %}">My Orders</a></li>
+    <li><a href="{% url 'edit_profile' %}">Edit Profile</a></li>
+    <li><a href="{% url 'change_password' %}">Change Password</a></li>
+</ul>
+				<div class="dashboard-wrapper user-dashboard">
+					<div class="media">
+						<div class="pull-left">
+							<img class="media-object user-img" src="https://www.w3schools.com/howto/img_avatar.png" alt="User Profile Pictures" width="50" height="120" style="border-radius:50%;" class="avatar">
+						</div>
+						<div class="media-body" >
+							<h2 class="media-heading" style="margin-left:60px ;">Welcome </h2>
+							
+							<div class="col-md-6">
+								<h2 class="media-heading"  style="text-align:center;">{{user.full_name}}</h2>
+                                <div class="card" style="text-align:center;">
+                                    <div class="card-body">
+                                        <p class="mb-0">{{user.email}}</p>
+                                        <p>{{ user.phone_number }}</p>
+                                    </div>
+
+                                </div>
+                            </div>
+						</div>
+					</div>
+					<div class="total-order mt-100">
+						<h4 style="margin-top:60px ; text-align:center;">Total Orders</h4>
+						<div class="table-responsive">
+                            <div class="col-md-12">
+                                <div class="card" style="text-align:center;">
+                                    <div class="card-body">
+                                        <h4>{{orders_count}}</h4>
+                                        <a href="{% url 'my_orders'%}">View Orders</a>
+                                    </div>
+                                </div>
+                            </div>
+						
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+
+
+{% endblock %}
