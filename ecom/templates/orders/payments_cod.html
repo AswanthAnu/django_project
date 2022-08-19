@@ -30,7 +30,7 @@
                          <div class="card-details">
                             <div class="block">
                                <h4 class="widget-title">Payment Method</h4>
-                               <p>PayPal</p>
+                               <p>Cash On Delivery</p>
                                <div class="checkout-product-details">
                                   <div class="payment">
                                      <div class="card-details">
@@ -88,8 +88,8 @@
                          <span>Total</span>
                          <span>USD.{{ grand_total}}0</span>
                       </div>
-
-                      <div id="paypal-button-container">
+                      <div>
+                        <input type='submit' onclick="payments_cod()"   id='cod_submit'  class="btn btn-main mt-20" value="Place Order"></a >
 
                       </div>
                       
@@ -113,7 +113,7 @@
                    <div class="form-group">
                       <input class="form-control" type="text" placeholder="Enter Coupon Code">
                    </div>
-                   <button type="submit" class="btn btn-main">Apply Coupon</button>
+                   <input type='button' class="btn btn-main" value="Place Order">
                 </form>
              </div>
           </div>
@@ -138,76 +138,48 @@
          return cookieValue;
      }
      
+      function payments_cod(){
         var amount = "{{ grand_total }}"
-        var url = "{% url 'payments' %}"
         var csrftoken = getCookie('csrftoken');
         var orderID = "{{order.order_number}}"
-        var payment_method = 'PayPal'
+        var payment_method = 'COD'
         var redirect_url = "{% url 'order_success' %}"
         // Render the PayPal button into #paypal-button-container
-        paypal.Buttons({
-     
-           style: {
-              color: 'blue',
-              shape: 'rect',
-              label: 'pay',
-              height: 40
+        
+         
+         $.ajax({
+           type:'POST',
+           url:'{% url 'payments_cod'  %}',
+           dataType:'json',
+           data:{
+            'orderID': orderID,
+            
+            'payment_method': payment_method,
+            'status': New,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
            },
-     
-           // Set up the transaction
-           createOrder: function(data, actions) {
-              return actions.order.create({
-                 purchase_units: [{
-                    amount: {
-                       value: amount,
-                    }
-                 }]
-              });
-           },
-     
-           // Finalize the transaction
-           onApprove: function(data, actions) {
-              return actions.order.capture().then(function(details) {
-                 // Show a success message to the buyer
-                 console.log(details);
-                 sendData();
-                 function sendData(){
-                    fetch(url, {
-                       method : "POST",
-                       headers: {
-                          "Content-type": "application/json",
-                          "X-CSRFToken": csrftoken,
-                       },
-                       body: JSON.stringify({
-                          orderID: orderID,
-                          transID: details.id,
-                          payment_method: payment_method,
-                          status: details.status,
-                       }),
-                    })
-                     .then((response) => response.json())
-                     .then((data) => {
-                      window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
-                    });
-                 }
-              });
+           success:function(response){
+             console.log(response)
+             if(response.success==true){
+               window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
            }
-     
-     
-        }).render('#paypal-button-container');
-
-
-
-
-
-
-
-
-
-
-
-
-
+           else{
+             //alert('Invalid credentials')
+             document.getElementById("warning").style.display="block";
+           }
+         }
+         })
+         
+      }
+        
+        
+        
+        
+        
+        
+        
+        
+      
 
 
       {/* function getCookie(name) {

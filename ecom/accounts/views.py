@@ -146,11 +146,12 @@ def login(request):
                         nextPage = params['next']
                         return redirect(nextPage)  
                 except:
-                    return redirect( 'home' )
-                            
-                        
+                    pass
+                    
+                return redirect('home')
+
             else:
-                messages.success(request, 'Invalid Credantials')
+                messages.info(request,"Invalid credantials")
                 return redirect('login')
                 
 

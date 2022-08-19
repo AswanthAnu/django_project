@@ -1,3 +1,4 @@
+from multiprocessing import context
 from django.shortcuts import render, redirect
 from carts.models import CartItem, Cart
 from .forms import OrderForm
@@ -11,6 +12,82 @@ from django.http import HttpResponse, JsonResponse
 
 
 # Create your views here.
+def payments_cod(request):
+
+    
+    
+    if request.method == "POST":
+        order = Order.objects.get(user=request.user, is_ordered=False, order_number=request.POST['orderID'])
+    # Store transaction details inside Payment model
+        transID = request.POST['transID']
+        payment_method =  request.POST['payment_method']
+        status = request.POST['status']
+       
+        payment = Payment(
+            user = request.user,
+            payment_id = transID,
+            payment_method = payment_method,
+            amount_paid = order.order_total,
+            status = status,
+        )
+        payment.save()
+
+        order.payment = payment
+        order.is_ordered = True
+        order.save()
+
+        # Adding cart item to product table
+        cart_items = CartItem.objects.filter(user=request.user)
+
+        for item in cart_items:
+            orderproduct = OrderProduct()
+            orderproduct.order_id = order.id
+            orderproduct.payment = payment
+            orderproduct.user_id = request.user.id
+            orderproduct.product_id = item.product_id
+            orderproduct.quantity = item.quantity
+            orderproduct.product_price = item.product.price
+            orderproduct.ordered = True
+            orderproduct.save()
+
+            cart_item = CartItem.objects.get(id=item.id)
+            product_variation = cart_item.variation.all()
+            orderproduct = OrderProduct.objects.get(id=orderproduct.id)
+            orderproduct.variations.set(product_variation)
+            orderproduct.save()
+
+        # Reduce the quantity of the stock
+            prod = product.objects.get(id=item.product_id)
+            prod.stock -= item.quantity
+            prod.save()
+        
+        # clear the cart item
+        CartItem.objects.filter(user=request.user).delete()
+        
+        # send email
+        mail_subject = 'Your order placed successfully...!'
+        print(mail_subject)
+        message = render_to_string('orders/success_email.html', {
+            'user': request.user,
+            'order': order,
+        })
+        to_email = request.user.email
+        
+        send_email = EmailMessage(mail_subject, message, to=[to_email])
+        send_email.send()
+
+        
+
+
+        context= {
+            'order_number': order.order_number,
+            'transID': payment.payment_id,
+        }
+        return render(request, 'orders/order_success.html' , context)
+
+    return render(request, 'orders/payments_cod.html')
+
+
 
 def payments(request):
 
@@ -106,6 +183,7 @@ def place_order(request, total=0, quantity=0, ):
             # Store all the billing information inside Order table
             print('entering if')
             data = Order()
+            pay_method = Payment()
             
             data.user = current_user
             data.first_name = request.POST['first_name']
@@ -122,6 +200,8 @@ def place_order(request, total=0, quantity=0, ):
             data.tax = tax
             data.ip = request.META.get('REMOTE_ADDR')
             data.save()
+            payment_method = request.POST['payment_method']
+            
             # generate order number 
             
             yr = int(datetime.date.today().strftime('%Y'))
@@ -141,7 +221,14 @@ def place_order(request, total=0, quantity=0, ):
                 'tax': tax,
                 'grand_total': grand_total,
             }
-            return render(request, 'orders/payments.html', context)
+            if "cod_method" == payment_method:
+
+
+                #return render(request, 'orders/payments_cod.html', context)
+                return render(request, 'orders/payments_cod.html', context)
+
+            else:
+                return render(request, 'orders/payments.html', context)
 
 
             
