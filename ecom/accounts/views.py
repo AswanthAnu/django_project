@@ -1,11 +1,10 @@
 
-import email
 from django.contrib import messages
 from django.contrib.auth.models import auth, User
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from .form import RegistrationForm
-from .mixins import MessageHandler
+from .mixins import ACCOUNT_SID, AUTH_TOKEN, SERVICES
 from .models import Account, profile
 from django.http import HttpResponse,JsonResponse
 import random 
@@ -14,6 +13,8 @@ from carts.views import _cart_id
 from carts.models import Cart, CartItem
 import requests
 from django.contrib.auth.decorators import login_required
+from twilio.rest import Client
+from django.conf import settings
 
 
 
@@ -32,20 +33,50 @@ def register(request):
 
             username = email.split('@')[0]
 
-            user = Account.objects.create_user(first_name = first_name, last_name = last_name, email = email, username = username, password = password, phone_umber = phone_number)
+            if len(phone_number) == 10:
+
+                user = Account.objects.create_user(first_name = first_name, last_name = last_name, email = email, username = username, password = password)
+                user.phone_number = phone_number
+
+                print(phone_number)
+                
+                user.is_staff = False
+                user.is_admin = False
+                user.save()
+                username = user.email
+                print(username)
+
+                phone_num = "+91" + phone_number
+
+                account_sid = settings.ACCOUNT_SID
+                auth_token = settings.TOKEN_SID
+
+
+                client=Client(account_sid,auth_token)
+                verification = client.verify \
+                    .services(settings.SERVICES) \
+                    .verifications \
+                    .create(to=phone_num,channel='sms')
+
+
+                
+                
+                messages.success(request,'OTP has been sent to ' + str(phone_num))
+                return render(request, 'accounts/otp_registration.html', {'phone_number': phone_number,  'username' : username})
+                
             
-            user.is_active = True
-            user.is_staff = False
-            user.is_admin = False
+            else: 
+                messages.error(request, '10 digits number required')
+               
 
-            otp=random.randint(1000,9999)
+            
 
-            prof= profile.objects.create(user=user,phone_number=phone_number,otp=otp)
-
-            message_handler = MessageHandler(f'+91'+phone_number ,prof.otp).send_otp_on_phone
-            message_handler()
-            return redirect('otp_registration')
-
+        else:
+            
+            messages.error(request, "")
+                
+            
+            
         
     else:
         form = RegistrationForm()
@@ -55,9 +86,57 @@ def register(request):
             }
     return render(request, 'accounts/register.html', context)
 
-def otp_registration(request):
+def otp_registration(request, phone_number):
 
-    pass
+    #username = Account.request.get('email')
+    #print(username,"username" )
+    
+
+
+    if request.method == "POST":
+        phone_num = "+91"+ str(phone_number)
+        otp_input = request.POST['otp']
+
+
+        if len(otp_input)  >0:
+
+
+                account_sid= settings.ACCOUNT_SID
+                auth_token= settings.TOKEN_SID
+                
+                client = Client(account_sid, auth_token)
+
+                otp_check = client.verify \
+                                    .services(settings.SERVICES) \
+                                    .verification_checks \
+                                    .create(to= phone_num, code= otp_input)
+
+
+                if otp_check.status == "approved":
+                    user = Account.objects.get(phone_number)
+                    user.is_active = True   
+                    user.Phone_number = phone_number        
+                    user.save()          
+                    auth.login(request,user)
+                    return redirect('home')
+                else:
+                    messages.success(request, "Invalid OTP")
+                    print("inside otp")
+                    return redirect("otp_registration", phone_number)
+        else:
+            messages.success(request, "Invalid OTP")
+            print("outside otp")
+            return redirect("otp_registration", phone_number)
+
+    else:
+        print("out")
+        return render(request, 'accounts/otp_registration.html', {'phone_number': phone_number} )
+
+
+
+
+
+   
 
 
 
@@ -169,48 +248,80 @@ def otp_view(request):
             if Account.objects.filter(phone_number = phone_number).exists():
                 users = Account.objects.get(phone_number = phone_number)
                 print(users)
+                phone_num = "+91"+ phone_number
+                account_sid= settings.ACCOUNT_SID
+                auth_token= settings.TOKEN_SID
                 
                
                 request.session['id'] = users.id
                 request.session['email'] = users.email
 
-                otp = random.randint(1000, 9999)
-                print(otp)
-                prof = profile.objects.get(user = users.id )
-                print(prof)
-                prof.otp = otp
-                prof.save()
-                message_handler = MessageHandler(f'+91'+phone_number ,prof.otp).send_otp_on_phone
-                message_handler()
-                print('------',prof.otp, '-------')
-                return redirect( 'otp_login')
-            print('183')
-            messages.success(request, 'Invalid Phone Number')
-            return redirect('otp_view')
+                client=Client(account_sid,auth_token)
+                verification = client.verify \
+                    .services(settings.SERVICES) \
+                    .verifications \
+                    .create(to=phone_num,channel='sms')
+                
+                messages.success(request,'OTP has been sent to ' + str(phone_num))
+                return render (request, 'accounts/otp_login.html',{'phone_number':phone_number,'user':users})
+
+            elif  len(phone_number) < 10 or len(phone_number) > 10 :
+                 
+                messages.error(request, '10 digits number required')
+                return redirect('otp_view')
+
+            else:
+                messages.error(request, 'Invalid Phone Number')
+                return render (request, 'accounts/otp_view.html')
+
+
+
 
         
         return render(request, 'accounts/otp_view.html ')
        
 
-def otp_login(request):
+def otp_login(request, phone_number):
     
-    id = request.session['id']
-    users = Account.objects.get(id=id)
     if request.method == 'POST':
-        otp = request.POST.get('otp')
-        
-        #email = request.session['email']
-        print(otp, '-----')
-        prof = profile.objects.get( id = id) 
-        print(prof, '--prof-otp-')
-        if otp == prof.otp:
-            auth.login(request, users)
-            print("232")
-            return redirect('home')
-        print("234")
-        messages.success(request, 'Wrong OTP')
-        return redirect('login')
-    return render(request, 'accounts/otp_login.html')
+        if Account.objects.filter(phone_number= phone_number).exists():
+            user = Account.objects.get(phone_number= phone_number)
+
+
+            phone_num = "+91"+ str(phone_number)
+            otp_input = request.POST['otp']
+
+            if len(otp_input)  >0:
+
+
+                account_sid= settings.ACCOUNT_SID
+                auth_token= settings.TOKEN_SID
+                
+                client = Client(account_sid, auth_token)
+
+                otp_check = client.verify \
+                                    .services(settings.SERVICES) \
+                                    .verification_checks \
+                                    .create(to= phone_num, code= otp_input)
+
+
+                if otp_check.status == "approved":
+                    auth.login(request, user)
+                    return redirect('home')
+
+                else:
+                    messages.error(request, "Invalid OTP")
+                    return redirect("otp_login", phone_number)
+            else:
+                messages.error(request, "Invalid OTP")
+                return redirect("otp_login", phone_number)
+
+        else:
+            messages.error(request, "Invalid Phone Number")
+            return redirect('otp_login', phone_number)
+
+    print(phone_number)
+    return render(request, 'accounts/otp_login.html',{'phone_number':phone_number})
 
 
 

@@ -15,7 +15,7 @@
           </a>
           {% include 'includes/alerts.html' %}
           <h5 class="text-bg-danger" style="display:none ;" id="warning">Invalid Credentials</h5>
-          <h2 class="text-center">Welcome Back</h2>
+          <h2 class="text-center"></h2>
           <form class="text-left clearfix" action=" {% url 'otp_view' %} " method="POST" id="otp_login">
             {% csrf_token %}
             <div class="form-group">

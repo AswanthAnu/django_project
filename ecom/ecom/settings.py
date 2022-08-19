@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 
+from decouple import config
 
 
 
@@ -161,9 +162,9 @@ MESSAGE_TAGS = {
 
 #twilio
 
-account_sid = 'AC158fc54ebc80234dce390049a8f81b04'
-auth_token = '22cbf2ebf45b6e1f90f4e969f4c53873'
-
+ACCOUNT_SID = config("ACCOUNT_SID")
+TOKEN_SID = config("TOKEN_SID")
+SERVICES = config("SERVICES")
 
 
 
