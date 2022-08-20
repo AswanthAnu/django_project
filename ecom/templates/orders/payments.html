@@ -57,7 +57,7 @@
                         
                          <div class="media-body">
                             <h4 class="media-heading"><p >{{ cart_item.product.product_name}}</p></h4>
-                            <p class="price">{{ cart_item.quantity}} x USD.{{ cart_item.product.price }}.00</p>
+                            <p class="price">{{ cart_item.quantity}} x Rs.{{ cart_item.product.price }}.00</p>
                             
                          </div>
                       </div>
@@ -68,7 +68,7 @@
                       <ul class="summary-prices">
                          <li>
                             <span>Subtotal:</span>
-                            <span class="price">USD.{{ total }}.00 </span>
+                            <span class="price">Rs.{{ total }}.00 </span>
                          </li>
                          
                          <li>
@@ -80,13 +80,13 @@
                          <li>
                                 
                             <span>GST:</span>
-                            <span>USD.{{ tax }}0</span>
+                            <span>Rs.{{ tax }}0</span>
                          </li>
                          
                       </ul>
                       <div class="summary-total">
                          <span>Total</span>
-                         <span>USD.{{ grand_total}}0</span>
+                         <span>Rs.{{ grand_total}}0</span>
                       </div>
 
                       <div id="paypal-button-container">

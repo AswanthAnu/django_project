@@ -94,7 +94,7 @@
                         
                          <div class="media-body">
                             <h4 class="media-heading"><a href="{{ cart_item.product.get_url }}">{{ cart_item.product.product_name}}</a></h4>
-                            <p class="price">{{ cart_item.quantity}} x USD.{{ cart_item.product.price }}.00</p>
+                            <p class="price">{{ cart_item.quantity}} x Rs.{{ cart_item.product.price }}.00</p>
                             <span class="remove" > <a href="{% url 'remove_cart'  cart_item.product.id cart_item.id %}">Remove</a> </span>
                          </div>
                       </div>
@@ -108,7 +108,7 @@
                       <ul class="summary-prices">
                          <li>
                             <span>Subtotal:</span>
-                            <span class="price">USD.{{ total }}.00 </span>
+                            <span class="price">Rs.{{ total }}.00 </span>
                          </li>
                          
                          <li>
@@ -120,13 +120,13 @@
                          <li>
                                 
                             <span>TAX:</span>
-                            <span>USD.{{ gst }}0</span>
+                            <span>Rs.{{ gst }}0</span>
                          </li>
                          
                       </ul>
                       <div class="summary-total">
                          <span>Total</span>
-                         <span>USD.{{ grand_total}}0</span>
+                         <span>Rs.{{ grand_total}}0</span>
                       </div>
 
                       <button type='submit'  class="btn btn-main mt-20">Place Order</button >

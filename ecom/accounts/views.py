@@ -4,10 +4,8 @@ from django.contrib.auth.models import auth, User
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from .form import RegistrationForm
-from .mixins import ACCOUNT_SID, AUTH_TOKEN, SERVICES
 from .models import Account, profile
 from django.http import HttpResponse,JsonResponse
-import random 
 from orders.models import Order  
 from carts.views import _cart_id
 from carts.models import Cart, CartItem
@@ -113,7 +111,8 @@ def otp_registration(request, phone_number):
 
 
                 if otp_check.status == "approved":
-                    user = Account.objects.get(phone_number)
+                    user = Account.objects.get(phone_number =phone_number )
+                    print(user)
                     user.is_active = True   
                     user.Phone_number = phone_number        
                     user.save()          
