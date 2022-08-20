@@ -14390,14 +14390,14 @@ dl {
             margin-left: 1rem;
             margin-right: 0; }
           .sidebar .nav .nav-item .nav-link .icon-bg .menu-icon {
-            color: #33c92d; }
+            color: #ffffff; }
             .sidebar .nav .nav-item .nav-link .icon-bg .menu-icon:after, .sidebar .nav .nav-item .nav-link .icon-bg .menu-icon:before {
               font-size: 1rem;
               color: inherit; }
         .sidebar .nav .nav-item .nav-link i {
           color: inherit; }
           .sidebar .nav .nav-item .nav-link i.menu-icon {
-            font-size: 1.125rem;
+           
             line-height: 1;
             margin-right: 0;
             color: #8e94a9; }
@@ -14443,7 +14443,7 @@ dl {
           left: 0;
           top: .5rem;
           bottom: 0;
-          background: #44ce42;
+          
           height: 24px;
           width: 4px; }
           .rtl .sidebar .nav .nav-item.active > .nav-link:before {
