@@ -11,16 +11,17 @@
         <div class="table-wrapper">
             <div class="table-title "style="background-color:black;">
                 <div class="row">
-                    <div class="col-sm-6 ">
+                    <div class="col-md-12 col-12 ">
 						<h2>Users </h2>
 					</div>
-					<div class="col-sm-6">
+					<div class="col-md-12 col-12 ">
 						
 											
 					</div>
                 </div>
             </div>
-            <table class="table table-striped table-hover ">
+            <div style='overflow-x:auto'>
+            <table class="table table-striped table-hover   ">
                 <thead>
                     <tr>
 						<th>
@@ -29,16 +30,16 @@
 								
 							</span>
 						</th>
-            <th ><h4>First Name</h4></th>
-            <th ><h4>Last Name</h4></th>
-            <th ><h4>Username</h4></th>
-            <th><h4>Email</h4></th>
-            <th><h4>Phone number</h4></th>
-            <th><h4>Last login</h4></th>
-            <th><h4>Action</h4></th>
+            <th   scope="col" ><h4>First Name</h4></th>
+            <th   scope="col"><h4>Last Name</h4></th>
+            <th   scope="col"><h4>Username</h4></th>
+            <th  scope="col"><h4>Email</h4></th>
+            <th scope="col"><h4>Phone number</h4></th>
+            <th scope="col"><h4>Last login</h4></th>
+            <th scope="col"><h4>Action</h4></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody  scope="row">
             {% for user in users %}
                     <tr>
 						<td>
@@ -66,12 +67,59 @@
                 {% endfor %}
                 </tbody>
             </table>
+          </div>
 			<div class="clearfix">
+
+        
                 
              
             </div>
         </div>
     </div>
+    <div >
+    <nav aria-label="Page navigation example" style="position: fixed; bottom:70px; right:70px;">
+      {% if users.has_other_pages %}
+      <ul class="pagination pg-black">
+        {% if users.has_previous %}
+        <li class="page-item  ">
+        <a class="page-link" href="?page={{ users.previous_page_number}}" tabindex="-1" style="color: black;">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item  ">
+        <a class="page-link" href="#" tabindex="-1" style="color: black; display:none;"></a>
+        </li>
+        {% endif %}
+        
+       
+        {% for i in users.paginator.page_range %}
+        {% if users.number == i %}
+        
+        <li class="page-item active">
+        <a class="page-link" style="background-color: black;">{{i}}<span class="sr-only">{{i}}</span></a>
+        </li>
+        {% else %}
+        <li class="page-item" style="color: black;"><a class="page-link" href="?page={{i}}" style="color: black;">{{i}}</a></li>
+        {% endif %}
+        {% endfor %}
+       
+       
+        {% if users.has_next %}
+        <li class="page-item  ">
+        <a class="page-link" href="?page={{ users.next_page_number}}" tabindex="-1" style="color: black;">Next</a>
+        </li>
+       
+        {% else %}
+        <li class="page-item  ">
+        <a class="page-link" href="#" tabindex="-1" style="color: black;display:none;"></a>
+        </li>
+        {% endif %}
+      </ul>
+      </nav>
+      {% endif %}
+    </div>
+
+
+    
 	
 	<!-- Delete Modal HTML -->
 	{% for user in users %}

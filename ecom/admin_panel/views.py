@@ -6,10 +6,11 @@ from django.shortcuts import render, redirect
 from accounts.models import Account
 from category.models import category
 from brand.models import brand
-from store.models import product
+from store.models import product, Variation
 from .decorators import log
 from django.views.decorators.cache import cache_control
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -26,16 +27,19 @@ def admin_login(request):
         print(password)
 
         user = authenticate(email=email, password=password,)
-        
-        if user.is_admin == True:
-            request.session['email'] = email
-            print(user.is_admin)
-            auth.login(request, user)
-            print('dash')
-            return redirect('admin_dashboard')
-           
-        else:
-            print('else')
+        try:
+            if user.is_admin == True:
+                request.session['email'] = email
+                print(user.is_admin)
+                auth.login(request, user)
+                print('dash')
+                return redirect('admin_dashboard')
+            
+            else:
+                print('else')
+                messages.error(request, 'Invalid admin credentials')
+                return redirect('admin_login')
+        except:
             messages.error(request, 'Invalid admin credentials')
             return redirect('admin_login')
 
@@ -49,7 +53,10 @@ def admin_dashboard(request):
 
 def admin_user(request):
     user = Account.objects.all()
-    return render(request, 'admin/admin_user.html', {'users' : user})
+    paginator = Paginator(user, 4)
+    page = request.GET.get('page')
+    paged_user = paginator.get_page(page)
+    return render(request, 'admin/admin_user.html', {'users' : paged_user})
 
 
 
@@ -76,7 +83,10 @@ def admin_product(request):
 @log(admin_login)   
 def admin_category(request):
     categ = category.objects.all()
-    context={'categ' : categ }
+    paginator = Paginator(categ, 1)
+    page = request.GET.get('page')
+    paged_categ = paginator.get_page(page)
+    context={'categ' : paged_categ }
    
     return render (request, 'admin/admin_category.html' , context)
 
@@ -118,15 +128,19 @@ def delete_category(request,id):
     return redirect('admin_category')
     
 
-   
+@log(admin_login)  
 def admin_brand(request):
     brandd = brand.objects.all()
-    context={'brandd' : brandd }
+    paginator = Paginator(brandd, 1)
+    page = request.GET.get('page')
+    paged_brandd = paginator.get_page(page)
+   
+    context={'brandd' : paged_brandd}
    
     return render (request, 'admin/admin_brand.html' , context)
 
 
-
+@log(admin_login)
 def add_brand(request):
     if request.method == "POST":
         brand_name = request.POST.get('brand_name')
@@ -163,12 +177,16 @@ def delete_brand(request,id):
     
 
 
-      
+@log(admin_login)     
 def admin_product(request):
     categories = category.objects.all()
     brands = brand.objects.all()
     products = product.objects.all()
-    context={'products' : products, 'brands': brands, 'categories': categories }
+    paginator = Paginator(products, 1)
+    page = request.GET.get('page')
+    paged_products = paginator.get_page(page)
+   
+    context={'products' : paged_products, 'brands': brands, 'categories': categories }
    
     return render (request, 'admin/admin_product.html' ,  context)
 
@@ -270,4 +288,61 @@ def delete_product(request,id):
     products = product.objects.filter(id = id)
     products.delete()
     return redirect('admin_product')
+
+def admin_variation(request):
+    products = product.objects.all()
+    variations = Variation.objects.all()
+    for i in variations:
+        print(i.variation_category)
     
+    paginator = Paginator(variations, 6)
+    page = request.GET.get('page')
+    paged_variations = paginator.get_page(page)
+
+    context = {
+        'variations': paged_variations, 'products' : products
+    }
+
+    return render(request, 'admin/admin_variation.html', context )
+
+def add_variation(request):
+
+    prod = product.objects.all()
+    variations = Variation()
+    bran = brand.objects.all()
+
+
+    if request.method == "POST":
+
+
+        variations.product_id = request.POST.get('products')
+        variations.variation_category = request.POST.get('variation_category')
+        variations.variation_value = request.POST.get('variation_value')
+
+        if len(variations.variation_value.strip()) == 0 :
+            # messages.error(request, 'Please fill Category value')
+            print('inside  categ')
+            return JsonResponse({
+                'success' : False} ,
+                  safe= False  )
+        
+        else:   
+            variations.save()
+            return JsonResponse({
+                'success' : True} ,
+                  safe= False  )
+    return render(request,'admin/admin_variation.html')
+
+
+        
+        
+
+
+
+@log(admin_login)
+def admin_logout(request):
+
+    
+    request.session.flush() 
+
+    return redirect('admin_login')

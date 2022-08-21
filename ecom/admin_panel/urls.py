@@ -24,6 +24,9 @@ urlpatterns = [
     path('edit_product', views.edit_product, name='edit_product'),
     path('delete_product/<str:id>', views.delete_product, name='delete_product'),
     path('update_product/<str:id>', views.update_product, name='update_product'),
+
+    path('admin_variation', views.admin_variation, name='admin_variation'),
+    path('add_variation', views.add_variation, name='add_variation'),
     
 
     path('block_unblock/<int:id>',views.block_unblock,name='block_unblock'),

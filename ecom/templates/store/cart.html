@@ -18,8 +18,11 @@
                       <tr>
                         <th class="">Product</th> 
                         <th class=""></th>
+                        <th class=""></th>
                         <th class="">Quantity</th>
+                        <th class=""></th>
                         <th class="">Item Price</th>
+                        <th class=""></th>
                         <th class="">Actions</th>
                       </tr>
                     </thead>
@@ -45,17 +48,17 @@
                        
                         
                         <td >
-                           <div class="product-quantity" style="width: 1px; display:hidden;">
+                           <div class="product-quantity" style="width: 1px; display:none;">
                            
-                            <div class="product-quantity-slider " style="width: 100px; height:10px;">
+                            <div class="product-quantity-slider " style="width: 100px; height:10px; display:hidden;">
                                 <div class="input-group bootstrap-touchspin block">
                                   {% if cart_item.quantity > 1%}
-                                  <span class="input-group-btn ">
+                                  <span class="input-group-btn " style="display:hidden;">
                                     
                                     <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}" class="btn btn-default bootstrap-touchspin-down block"  type="button">-</a>
                                   </span>
                                   {% else %}
-                                  <span class="input-group-btn ">
+                                  <span class="input-group-btn "style="display:hidden;">
                                     
                                     <a href="" class="btn btn-default bootstrap-touchspin-down block" type="button" class="disabled">-</a>
                                   </span>
@@ -121,12 +124,15 @@
                              </div> 
                            </td>
                            </td>
+                          <td>
+                          </td>
                           <td class="">
                             <div class="price-wrap ">
                               <p class="price fw-500">Rs.{{ cart_item.sub_total }}</p>
                               <small class="text-muted">Rs.{{ cart_item.product.price}} each</small>
                             </div>
-
+                            <td>
+                            </td>
 
                           </td>
                         <td class="">
