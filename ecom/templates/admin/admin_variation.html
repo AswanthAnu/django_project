@@ -153,7 +153,7 @@
 		</div>
 	</div>
 
-
+	
 
 <script>
 
@@ -166,7 +166,7 @@
 
 		$.ajax({
 			method: "POST",
-			url: "{% url 'add_variation'%}",
+			url: "{% url 'add_variation' %}",
 			dataType: 'json',
 			data: {
 				'products': products,
@@ -198,66 +198,173 @@
 
 
 
-
-
-
-
-
-	<!-- Edit Modal HTML -->
-	{% for brand in brandd %}
-	<div id="editEmployeeModal-{{forloop.counter}}" class="modal fade">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<form action="update_brand/{{brand.id}}" method = "POST" >
-					{% csrf_token %}
-					<div class="modal-header">						
-						<h4 class="modal-title">Edit Brand</h4>
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+<!-- Edit Modal HTML -->
+{% for variation in variations %}
+<div id="editEmployeeModal-{{forloop.counter}}" class="modal fade" >
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method = "POST"  id="edit_category" >
+				{% csrf_token %}
+				<div class="modal-header">						
+					<h4 class="modal-title">Edit Variation</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">					
+					<div class="form-group">
+						<label>Product </label>
+						<select id="update_products"  name="products" type="text" class="form-control" required>
+						<option value="" selected>{{variation.product}}</option>
+						{% for product in products %}
+						<option data-style="btn-dark"  value="{{product.id}}">{{product.product_name}}</option>
+						{% endfor %}
+						</select>
 					</div>
-					<div class="modal-body">					
-						<div class="form-group">
-							<label>Brand Name</label>
-							<input name = "brand_name" type="text" value="{{ brand.brand_name}}" class="form-control" required>
-						</div>
-						<div class="form-group">
-							<label>Description</label>
-							<input  name = "description" type="type"  value="{{ brand.description}}" class="form-control" required>
-						</div>
+					<div class="form-group">
+						<label>Variation Category</label>
+						<select id="update_variation_category"  name="variation_category" type="text" class="form-control" required>
+						<option value="" selected>{{variation.variation_category}}</option>
 						
-										
+						<option data-style="btn-dark"value="color">color</option>
+						<option data-style="btn-dark"value="size">size</option>
+						
+						</select>
 					</div>
-					<div class="modal-footer">
-						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="submit" class="btn btn-dark" value="Save">
+					<div class="form-group">
+						<label>Variartion Value</label>
+						<input id="update_variation_value"  name="variation_value" type="text" class="form-control" value="{{variation.variation_value}}" placeholder="category value" required>
 					</div>
-				</form>
-			</div>
+					<div class="form-group" style="display: none;" >
+						<label>Variartion id</label>
+						<input id="update_variation_id"  name="variation_id" type="text" class="form-control" value="{{variation.id}}" placeholder="category value" >
+					</div>
+					
+									
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+					<button type="submit" class="btn btn-dark" >Save</button>
+				</div>
+			</form>
 		</div>
 	</div>
-	{% endfor %}
-	<!-- Delete Modal HTML -->
-	{% for brand in brandd %}
-	<div id="deleteEmployeeModal-{{forloop.counter}}" class="modal fade">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<form >
-					<div class="modal-header">						
-						<h4 class="modal-title">Delete Brand</h4>
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					</div>
-					<div class="modal-body">					
-						<p><h5>Are you sure you want to delete {{brand.brand_name}} brand?</h5></p>
-						<p class="text-warning"><small>This action cannot be undone </small></p>
-					</div>
-					<div class="modal-footer">
-						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<a href="delete_brand/{{brand.id}}" type="submit" class="btn btn-dark" >Delete</a>
-					</div>
-				</form>
-			</div>
+</div>
+{% endfor %}
+
+
+
+<script>
+
+	$(document).on('submit', '#edit_category', function (e) {
+		e.preventDefault();
+		var products = $('#update_products').val()
+		var variation_category = $('#update_variation_category').val()
+		var variation_value = $('#update_variation_value').val()
+		var variation_id = $('#update_variation_id').val()
+		console.log(products)
+		console.log(variation_id)
+		
+		
+
+		$.ajax({
+			method: "POST",
+			url: "update_variation/"+variation_id,
+			dataType: 'json',
+			data: {
+				'products': products,
+				'variation_category': variation_category,
+				'variation_value' : variation_value,
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					window.location.replace('admin_variation')
+				} 
+				
+				else {
+					document.getElementById("update_variation_value").value="";
+					document.getElementById("update_variation_value").placeholder = "Type value here..";
+					document.getElementById("update_variation_value").style.border = "solid red 1px";
+				}
+			}
+		})
+
+
+	})
+	
+
+
+</script>
+
+
+
+<!-- Delete Modal HTML -->
+<!-- Delete Modal HTML -->
+{% for variation in variations %}
+<div id="deleteEmployeeModal-{{forloop.counter}}" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="POST" id="delete_variation" >
+				<div class="modal-header">						
+					<h4 class="modal-title">Delete Variation</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">					
+					<p><h5>Are you sure you want to delete {{variation.variation_category}} variation of {{variation.product}} ?</h5></p>
+					<p class="text-warning"><small>This action cannot be undone </small></p>
+				</div>
+				<div class="form-group" style="display: none;" >
+					<label>Variartion id</label>
+					<input id="delete_variation_id"  name="variation_id" type="text" class="form-control" value="{{variation.id}}" placeholder="category value" >
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+					<button type="submit" class="btn btn-dark" >Delete</button>
+				</div>
+			</form>
 		</div>
 	</div>
-	{% endfor %}
+</div>
+{% endfor %}
+
+
+<script>
+
+	$(document).on('submit', '#delete_variation', function (e) {
+		e.preventDefault();
+		var variation_id = $('#delete_variation_id').val()
+		$.ajax({
+			method: "POST",
+			url: "delete_variation/"+variation_id,
+			dataType: 'json',
+			data: {
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					window.location.replace('admin_variation')
+				} 
+				
+				
+			}
+		})
+
+
+	})
+	
+
+
+</script>
+
+
+
+
+
+
+
+
+
     <script>
         $(document).ready(function(){
             // Activate tooltip

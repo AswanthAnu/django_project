@@ -41,16 +41,22 @@
                 </thead>
                 <tbody  scope="row">
             {% for user in users %}
+            {% if not user.is_admin %}
                     <tr>
-						<td>
+						
+                      <td>
 							
 						</td>
+            
             <td ><h5>{{user.first_name}}</h5></td>
             <td ><h5>{{user.last_name}}</h5></td>
+           
             <td ><h5>{{user.username}}</h5></td>
+         
             <td><h5>{{user.email}}</h5></td>
             <td><h5>{{user.phone_number}}</h5></td>
             <td><h5>{{user.last_login}}</h5></td>
+            
 						
                         
                         <td>
@@ -63,6 +69,7 @@
                   <a href="#unblockEmployeeModal-{{forloop.counter}}" class="btn btn-dark btn-md btn-block" data-toggle="modal"><span>Unblock</span></a>
                         </td>
 
+                {% endif %}
                 {% endif %}
                 {% endfor %}
                 </tbody>

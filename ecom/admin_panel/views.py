@@ -1,4 +1,6 @@
+from cgi import print_environ
 from math import prod
+from multiprocessing import context
 from django.contrib import messages
 from django.contrib.auth.models import auth, User
 from django.contrib.auth import authenticate
@@ -176,8 +178,8 @@ def delete_brand(request,id):
     return redirect('admin_brand')
     
 
-
-@log(admin_login)     
+@cache_control(no_cache =True, must_revalidate =True, no_store =True)
+@log(admin_login)    
 def admin_product(request):
     categories = category.objects.all()
     brands = brand.objects.all()
@@ -289,11 +291,13 @@ def delete_product(request,id):
     products.delete()
     return redirect('admin_product')
 
+
+@cache_control(no_cache =True, must_revalidate =True, no_store =True)
+@log(admin_login)
 def admin_variation(request):
     products = product.objects.all()
     variations = Variation.objects.all()
-    for i in variations:
-        print(i.variation_category)
+
     
     paginator = Paginator(variations, 6)
     page = request.GET.get('page')
@@ -334,15 +338,56 @@ def add_variation(request):
     return render(request,'admin/admin_variation.html')
 
 
+
+def edit_variation(request):
+    variations = Variation.objects.all()
+    products = product.objects.all()
+    context = { 'variations' : variations, 'products' : products}
+
+    return render(request, "admin/admin_variation.html", context)
+
+
+def update_variation(request, id):
+
+
+    variation_detail =  Variation.objects.get(id = id)
+    if request.method =="POST":
+        variation_detail.product_id = request.POST.get('products')
+        variation_detail.variation_category = request.POST.get('variation_category')
+        variation_detail.variation_value = request.POST.get('variation_value')
+        if len(variation_detail.variation_value.strip()) == 0 :
+        # messages.error(request, 'Please fill Category value')
+            print('inside  categ')
+            return JsonResponse({
+                'success' : False} ,
+                    safe= False  )
+    
+        else:   
+            print('outside categ')
+            variation_detail.save()
+            return JsonResponse({
+                'success' : True} ,
+                    safe= False  )
+
+    print('return categ')
+    return render(request,'admin/admin_variation.html' )
+
+def delete_variation(request, id):
+        variations = Variation.objects.filter(id = id)
+        variations.delete()
+        return JsonResponse({
+            'success': True
+        }, safe= False)
+
         
         
 
 
 
-@log(admin_login)
+@cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def admin_logout(request):
 
     
     request.session.flush() 
 
-    return redirect('admin_login')
+    return redirect(admin_login)

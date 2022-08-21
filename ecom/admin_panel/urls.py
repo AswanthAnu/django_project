@@ -27,6 +27,9 @@ urlpatterns = [
 
     path('admin_variation', views.admin_variation, name='admin_variation'),
     path('add_variation', views.add_variation, name='add_variation'),
+    path('edit_variation', views.edit_variation, name='edit_variation'),
+    path('update_variation/<str:id>', views.update_variation, name='update_variation'),
+    path('delete_variation/<str:id>', views.delete_variation, name='delete_variation'),
     
 
     path('block_unblock/<int:id>',views.block_unblock,name='block_unblock'),
