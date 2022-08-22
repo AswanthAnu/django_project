@@ -153,22 +153,8 @@ def login(request):
             password = request.POST['password']
             print(email)
             print(password)
-
-            # user = User.objects.get(email=email, password=password)
-            # if check_password(password, user.password):
-            #     if user.is_active:
-            #         login(request, user)
-            #         return redirect('home')
             user = authenticate(email=email, password=password)
-            
-            # if user is not None:
-            #     auth.login(request, user)
-            #     return redirect('register')
-            # else:
-            #     messages.error(request, 'Invalid login credentials')
-            #     return redirect('login')
-
-            if user is not None:
+            if user is not None and user.is_admin == False:
 
                 try:
                     cart = Cart.objects.get(cart_id = _cart_id(request))
