@@ -2,7 +2,43 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="302e05b3-89bc-4e8e-b154-1257a04685d0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/.env" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/accounts/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/accounts/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/accounts/mixins.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/accounts/mixins.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/accounts/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/accounts/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/accounts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/accounts/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/accounts/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/admin_panel/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/admin_panel/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/admin_panel/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/admin_panel/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/carts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/carts/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/ecom/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/ecom/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/ecom/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/ecom/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/homeapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/homeapp/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/static/admin/css/dark_mode.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/static/admin/js/filters.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/static/plugins/jquery/dist/jquery.js" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/static/plugins/jquery/dist/jquery.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/store/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/store/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/accounts/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/accounts/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/accounts/otp_login.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/accounts/otp_login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/accounts/otp_registeration.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/accounts/otp_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/accounts/otp_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/accounts/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/accounts/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/admin/admin_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/admin/admin_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/admin/admin_brand.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/admin/admin_brand.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/admin/admin_category.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/admin/admin_category.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/admin/admin_login.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/admin/admin_login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/admin/admin_product.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/admin/admin_product.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/admin/admin_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/admin/admin_user.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/includes/admin_navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/includes/admin_navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/includes/admin_sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/includes/admin_sidebar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/includes/alerts.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/includes/alerts.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/includes/footer.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/includes/footer.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/includes/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/includes/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/store/cart.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/store/cart.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/store/checkout.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/store/checkout.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/store/product_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/store/product_detail.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

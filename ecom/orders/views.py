@@ -1,4 +1,5 @@
 from multiprocessing import context
+from time import process_time_ns
 from django.shortcuts import render, redirect
 from carts.models import CartItem, Cart
 from .forms import OrderForm
@@ -6,31 +7,42 @@ from .models import Order, Payment, OrderProduct
 from store.models import product
 import datetime
 import json
+from openexchangerate import OpenExchangeRates
+from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse
+import string
+import random
+
 
 
 # Create your views here.
 def payments_cod(request):
 
     
-    
+    print('entering into payments_cod')
     if request.method == "POST":
         order = Order.objects.get(user=request.user, is_ordered=False, order_number=request.POST['orderID'])
     # Store transaction details inside Payment model
-        transID = request.POST['transID']
+        
         payment_method =  request.POST['payment_method']
         status = request.POST['status']
-       
+        randomLetter = random.choice(string.ascii_letters)
+        print(randomLetter)
+        randomnumber = random.randrange(10000, 99999)
+        print(randomnumber)
         payment = Payment(
             user = request.user,
-            payment_id = transID,
-            payment_method = payment_method,
+            payment_method ='cod',
             amount_paid = order.order_total,
             status = status,
+            payment_id = randomLetter + str(randomnumber),
+        
         )
+
         payment.save()
+        print(payment, '-----------')
 
         order.payment = payment
         order.is_ordered = True
@@ -50,11 +62,13 @@ def payments_cod(request):
             orderproduct.ordered = True
             orderproduct.save()
 
+
             cart_item = CartItem.objects.get(id=item.id)
             product_variation = cart_item.variation.all()
             orderproduct = OrderProduct.objects.get(id=orderproduct.id)
             orderproduct.variations.set(product_variation)
             orderproduct.save()
+            print(orderproduct, '-----------67')
 
         # Reduce the quantity of the stock
             prod = product.objects.get(id=item.product_id)
@@ -74,18 +88,24 @@ def payments_cod(request):
         to_email = request.user.email
         
         send_email = EmailMessage(mail_subject, message, to=[to_email])
-        send_email.send()
+        #send_email.send()
 
         
 
 
-        context= {
+        # data = {
+        #     'success' : True,
+        #     'order_number': order.order_number,
+        #     'transID': payment.payment_id,
+        #     }
+        print("enter into data")
+        return JsonResponse({
+            'success' : True,
             'order_number': order.order_number,
             'transID': payment.payment_id,
-        }
-        return render(request, 'orders/order_success.html' , context)
+            })
 
-    return render(request, 'orders/payments_cod.html')
+
 
 
 
@@ -146,7 +166,7 @@ def payments(request):
     to_email = request.user.email
     
     send_email = EmailMessage(mail_subject, message, to=[to_email])
-    send_email.send()
+    #send_email.send()
 
     
 
@@ -162,6 +182,7 @@ def payments(request):
 def place_order(request, total=0, quantity=0, ):
 
     current_user = request.user
+    print('entering into place_order')
     
     # if the cart count is less than 0 return back to shop
     cart_items  = CartItem.objects.filter(user = current_user)
@@ -212,6 +233,16 @@ def place_order(request, total=0, quantity=0, ):
             order_number = current_date + str(data.id)
             data.order_number = order_number
             data.save()
+
+            # converting indian rupee intto dollar
+            
+            client = OpenExchangeRates(api_key=settings.API_KEY)
+            openx = list(client.latest())
+            openx = openx[0]
+            openxrupee = openx['INR']
+            grand_dollar = round(grand_total / openxrupee,2)
+
+
             
             order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
             context = {
@@ -220,6 +251,8 @@ def place_order(request, total=0, quantity=0, ):
                 'total': total,
                 'tax': tax,
                 'grand_total': grand_total,
+                'grand_dollar':grand_dollar
+
             }
             if "cod_method" == payment_method:
 

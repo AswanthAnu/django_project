@@ -46,6 +46,7 @@
              </div>
              <div class="col-md-4">
                 <div class="product-checkout-details">
+                     {% csrf_token %}
                    <div class="block">
                       <h4 class="widget-title">Product Review</h4>
                       {% for cart_item in cart_items %}
@@ -89,11 +90,12 @@
                          <span>USD.{{ grand_total}}0</span>
                       </div>
                       <div>
-                        <input type='submit' onclick="payments_cod()"   id='cod_submit'  class="btn btn-main mt-20" value="Place Order"></a >
+                      
+                        <button type='submit' onclick="payments_cod()" id='cod_submit'  class="btn btn-main mt-20" value="">Order</button >
 
                       </div>
                       
-                      </form>
+                      
                         <div class="verified-icon">
                          <img src="">
                       </div>
@@ -104,22 +106,60 @@
        </div>
     </div>
  </div>
-    <!-- Modal -->
-    <div class="modal fade" id="coupon-modal" tabindex="-1" role="dialog">
-       <div class="modal-dialog" role="document">
-          <div class="modal-content">
-             <div class="modal-body">
-                <form>
-                   <div class="form-group">
-                      <input class="form-control" type="text" placeholder="Enter Coupon Code">
-                   </div>
-                   <input type='button' class="btn btn-main" value="Place Order">
-                </form>
-             </div>
-          </div>
-       </div>
-    </div>
+ <script>
 
+   function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+  
+   function payments_cod(){
+     var amount = "{{ grand_total }}"
+     var csrftoken = getCookie('csrftoken');
+     var orderID = "{{order.order_number}}"
+     var payment_method = 'COD'
+     var redirect_url = "{% url 'order_success' %}"
+     // Render the PayPal button into #paypal-button-container
+     
+      
+      $.ajax({
+        type:'POST',
+        url:'{% url 'payments_cod'  %}',
+        dataType:'json',
+        data:{
+         'orderID': orderID,
+         
+         'payment_method': payment_method,
+         'status': 'COD',
+         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success:function(response){
+          console.log(response)
+          if(response.success==true){
+            window.location.href = redirect_url + '?order_number='+response.order_number+'&payment_id='+response.transID;
+        }
+       
+      }
+      })
+      
+   }
+     
+     
+     
+
+{% comment %}     
+   
     <script>
 
       function getCookie(name) {
@@ -138,7 +178,8 @@
          return cookieValue;
      }
      
-      function payments_cod(){
+	$(document).on('submit', '#pay_cod', function (e) {
+		e.preventDefault();
         var amount = "{{ grand_total }}"
         var csrftoken = getCookie('csrftoken');
         var orderID = "{{order.order_number}}"
@@ -153,25 +194,26 @@
            dataType:'json',
            data:{
             'orderID': orderID,
-            
             'payment_method': payment_method,
-            'status': New,
-            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+            'status': 'COD',
+            csrfmiddlewaretoken: csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
            },
-           success:function(response){
-             console.log(response)
-             if(response.success==true){
-               window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
-           }
-           else{
-             //alert('Invalid credentials')
-             document.getElementById("warning").style.display="block";
-           }
+           success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
+				} 
+				
+				else {
+					document.getElementById("variation_value").value="";
+					document.getElementById("variation_value").placeholder = "Type value here..";
+					document.getElementById("variation_value").style.border = "solid red 1px";
+				}
          }
-         })
+         });
          
-      }
-        
+      })
+         {% endcomment %}
         
         
         

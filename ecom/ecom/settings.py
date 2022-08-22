@@ -169,8 +169,15 @@ SERVICES = config("SERVICES")
 
 
 # SMTP configuration
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST ='smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'exq.see.me@gmail.com'
-EMAIL_HOST_PASSWORD = 'nqptrihltacmyita'
+EMAIL_HOST_USER ='exq.see.me@gmail.com'
+EMAIL_HOST_PASSWORD =''
 EMAIL_USE_TLS = True
+
+
+#currency converter
+
+
+API_KEY = config("API_KEY")
