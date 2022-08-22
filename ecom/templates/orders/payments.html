@@ -139,6 +139,7 @@
      }
      
         var amount = "{{ grand_total }}"
+        var dollar = "{{ grand_dollar }}"
         var url = "{% url 'payments' %}"
         var csrftoken = getCookie('csrftoken');
         var orderID = "{{order.order_number}}"
@@ -159,7 +160,7 @@
               return actions.order.create({
                  purchase_units: [{
                     amount: {
-                       value: amount,
+                       value: dollar,
                     }
                  }]
               });
