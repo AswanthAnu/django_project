@@ -19,7 +19,8 @@
           <form class="text-left clearfix" action="{% url 'otp_login' phone_number %}" method="POST" id="otp_form">
             {% csrf_token %}
             <div class="form-group">
-              <input type="text" class="form-control"  placeholder="Enter otp" name='otp' id='otp'>
+              <input type="text" class="form-control"  placeholder="Enter otp" name='otp' id='otp' value="">
+              <input type="text" class="form-control" style="dismiss:none;" placeholder="Enter otp" name='phone_number' id='phone_number' value="{{ phone_number }}">
             </div>
             
             <div class="text-center">
@@ -35,6 +36,65 @@
 </section>
 
 
+<script>
+  $(document).on('submit', '#otp_form', function (e) {
+		e.preventDefault();
+		var otp = $('#otp').val()
+    var phone_number = $('#phone_number').val()
+		
+    console.log(otp)
+    console.log(phone_number)
+
+		$.ajax({
+      
+			type: 'POST',
+			url: '{{otp_login}}'+phone_number,
+			dataType: 'json',
+			data: {
+        'otp' : otp,
+				
+				
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					document.getElementById("otp").value="";
+					document.getElementById("otp").placeholder = "True";
+					document.getElementById("otp").style.border = "solid red 1px";
+				}otp
+        else if (responce.success == false) {
+					document.getElementById("otp").value="";
+					document.getElementById("otp").placeholder = "Invalid Phone Number";
+					document.getElementById("otp").style.border = "solid red 1px";
+				}
+        else if (responce.phone == true) {
+          setTimeout(function(){
+            window.location.replace('{{home}}');
+  
+            }, 1500)
+            
+            Swal.fire({
+              toast: true,
+              icon: 'success',
+              title: 'Logged in successfully',
+              animation: false,
+              position: 'top-right',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+            })
+				}
+			}
+		})
+
+
+	})
+	
+</script>
+
+
+{% comment %} 
 <div id="otpEmployeeModal" class="modal fade">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -58,7 +118,7 @@
       </form>
     </div>
   </div>
-</div>
+</div> {% endcomment %}
 
  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

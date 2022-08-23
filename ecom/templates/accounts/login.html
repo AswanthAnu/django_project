@@ -16,16 +16,17 @@
           {% include 'includes/alerts.html' %}
           <h5 class="text-bg-danger" style="display:none ;" id="warning">Invalid Credentials</h5>
           <h2 class="text-center">Welcome Back</h2>
-          <form class="text-left clearfix" action="{% url 'login' %}"  method="POST" >
+          <form class="text-left clearfix"   method="POST" id="login_form">
             {% csrf_token %}
             <div class="form-group">
-              <input type="email" class="form-control"  placeholder="Email" name='email' id='email'>
+              <input type="email" class="form-control"  placeholder="Email" name='email' id='email' value="">
+              
             </div>
             <div class="form-group">
               <input type="password" class="form-control" placeholder="Password" name='password' id='password'>
             </div>
             <div class="text-center">
-              <button type="submit" class="btn btn-main text-center" >Login</button>
+              <input type="submit" class="btn btn-main text-center" value"submit" ></input>
             </div>
           </form>
           <p class="mt-20"><a href="{% url 'otp_view' %}"  data-toggle="modal">Login with Phone Number</a></p>
@@ -33,41 +34,63 @@
 
 
  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <script>
-  $(document).on('submit','#loginform',function(e)
- {
-  e.preventDefault();
-  var email=$('#email').val()
-  var password= $('#password').val() 
-  console.log(email,password)
-  
-  $.ajax({
-    type:'POST',
-    url:'{% url 'login'  %}',
-    dataType:'json',
-    data:{
-      'email':email,
-      'password':password,
-      csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-    },
-    success: function (responce) {
+  $(document).on('submit', '#login_form', function (e) {
+		e.preventDefault();
+		var email = $('#email').val()
+		var password = $('#password').val()
+    console.log(email)
+
+		$.ajax({
       
-      document.getElementById("warning").style.display = "none";
-      if (responce.success == true) {
-        console.log("home")
-        window.location.href('')
-          
-      } 
-      
-      else {
-          document.getElementById("warning").style.display = "block";
-          console.log("false")
-      }
-  }
-  })
+			type: 'POST',
+			url: '{{login}}',
+			dataType: 'json',
+			data: {
+				'email': email,
+				'password': password,
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+          setTimeout(function(){
+            window.location.replace('{{home}}');
   
-})
+            }, 1500)
+            
+            Swal.fire({
+              toast: true,
+              icon: 'success',
+              title: 'Logged in successfully',
+              animation: false,
+              position: 'top-right',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+            })
+
+
+
+        }
+				else if (responce.email_length == true) {
+					document.getElementById("email").value="";
+					document.getElementById("email").placeholder = "Enter valid email";
+					document.getElementById("email").style.border = "solid red 1px";
+				}
+        else if (responce.success == false) {
+					document.getElementById("password").value="";
+					document.getElementById("password").placeholder = "Invalid Credentials";
+					document.getElementById("password").style.border = "solid red 1px";
+				}
+			}
+		})
+
+
+	})
+	
+</script>
 
 
 

@@ -16,10 +16,10 @@
           {% include 'includes/alerts.html' %}
           <h5 class="text-bg-danger" style="display:none ;" id="warning">Invalid Credentials</h5>
           <h2 class="text-center"></h2>
-          <form class="text-left clearfix" action=" {% url 'otp_view' %} " method="POST" id="otp_login">
+          <form class="text-left clearfix"   method="POST" id="otp_login">
             {% csrf_token %}
             <div class="form-group">
-              <input type="text" class="form-control"  placeholder="Phone Number" name='phone_number' id='phone_number'>
+              <input type="text" class="form-control"  placeholder="Phone Number" name='phone_number' id='phone_number' value="">
             </div>
             
             <div class="text-center">
@@ -40,6 +40,46 @@
  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+
+<script>
+  $(document).on('submit', '#otp_login', function (e) {
+		e.preventDefault();
+		var phone_number = $('#phone_number').val()
+		
+    console.log(phone_number)
+
+		$.ajax({
+      
+			type: 'POST',
+			url: '{{otp_view}}',
+			dataType: 'json',
+			data: {
+				'phone_number': phone_number,
+				
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					document.getElementById("phone_number").value="";
+					document.getElementById("phone_number").placeholder = "10 digits number required";
+					document.getElementById("phone_number").style.border = "solid red 1px";
+				}
+        else if (responce.success == false) {
+					document.getElementById("phone_number").value="";
+					document.getElementById("phone_number").placeholder = "Invalid Phone Number";
+					document.getElementById("phone_number").style.border = "solid red 1px";
+				}
+        else if (responce.phone == true) {
+          window.location.replace('{{otp_login}}'+'/'+responce.phone_number)
+				}
+			}
+		})
+
+
+	})
+	
+</script>
 
 
 {% endblock %}

@@ -4,7 +4,8 @@ from .models import Cart, CartItem
 from store.models import product, Variation
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
-# Create your views here.
+from django.http import JsonResponse
+
 
 
 
@@ -227,7 +228,7 @@ def remove_cart_item(request, product_id, cart_item_id):
         cart = Cart.objects.get(cart_id = _cart_id(request))
         cart_item = CartItem.objects.get(product = prod, cart = cart, id = cart_item_id)
     cart_item.delete()
-    return redirect('cart')
+    return JsonResponse({"success" : True}, safe= False)
 
 
 

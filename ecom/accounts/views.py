@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from .form import RegistrationForm
 from .models import Account, profile
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import JsonResponse
 from django.urls import reverse
 from orders.models import Order, OrderProduct  
 from carts.views import _cart_id
@@ -23,6 +23,9 @@ from django.core.paginator import Paginator
 # Create your views here.
 
 def register(request):
+
+    if 'email' in request.session:
+        return redirect('home')
 
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -142,11 +145,16 @@ def login(request):
         if 'email' in request.session:
 
             return redirect ('home')
-
+        
     
         if request.method == 'POST':
             email = request.POST['email']
             password = request.POST['password']
+
+            if len(email.strip()) == 0: 
+                length = len(email.strip())
+                return JsonResponse({"email_length" : True }, safe= False)
+
             print(email)
             print(password)
             user = authenticate(email=email, password=password)
@@ -191,7 +199,7 @@ def login(request):
                                 item.save()
                 except:
                     pass
-                request.session['email'] = email
+                request.session['email'] = user.email
                 auth.login(request, user)
                 url = request.META.get('HTTP_REFERER')
                 try:
@@ -204,15 +212,10 @@ def login(request):
                 except:
                     pass
                     
-                return redirect('home')
+                return JsonResponse({"success":True}, safe= False)
 
             else:
-                messages.info(request,"Invalid credantials")
-                return redirect('login')
-                
-
-
-
+                return JsonResponse({"success":False}, safe= False)
 
         return render(request, 'accounts/login.html')
 
@@ -230,7 +233,7 @@ def otp_view(request):
                 auth_token= settings.TOKEN_SID
                 
                
-                request.session['id'] = users.id
+               
                 request.session['email'] = users.email
 
                 client=Client(account_sid,auth_token)
@@ -239,17 +242,18 @@ def otp_view(request):
                     .verifications \
                     .create(to=phone_num,channel='sms')
                 
-                messages.success(request,'OTP has been sent to ' + str(phone_num))
-                return render (request, 'accounts/otp_login.html',{'phone_number':phone_number,'user':users})
+                #messages.success(request,'OTP has been sent to ' + str(phone_num))
+               
+                return JsonResponse({'phone': True,  'phone_number':phone_number,'user':users}, safe=False)
 
             elif  len(phone_number) < 10 or len(phone_number) > 10 :
                  
-                messages.error(request, '10 digits number required')
-                return redirect('otp_view')
+                #messages.error(request, '10 digits number required')
+                return JsonResponse({'success': True}, safe=False)
 
             else:
-                messages.error(request, 'Invalid Phone Number')
-                return render (request, 'accounts/otp_view.html')
+                #messages.error(request, 'Invalid Phone Number')
+                return JsonResponse({'success': False}, safe=False)
 
 
 
@@ -259,6 +263,10 @@ def otp_view(request):
        
 
 def otp_login(request, phone_number):
+
+
+    if 'email' in request.session:
+        return redirect('home')
     
     if request.method == 'POST':
         if Account.objects.filter(phone_number= phone_number).exists():
@@ -284,18 +292,18 @@ def otp_login(request, phone_number):
 
                 if otp_check.status == "approved":
                     auth.login(request, user)
-                    return redirect('home')
+                    return JsonResponse({"phone" :True }, safe= False)
 
                 else:
-                    messages.error(request, "Invalid OTP")
-                    return redirect("otp_login", phone_number)
+                    #messages.error(request, "Invalid OTP")
+                    return JsonResponse({"success" :True }, safe= False)
             else:
-                messages.error(request, "Invalid OTP")
-                return redirect("otp_login", phone_number)
+                #messages.error(request, "Invalid OTP")
+                return JsonResponse({"success" :True }, safe= False)
 
         else:
-            messages.error(request, "Invalid Phone Number")
-            return redirect('otp_login', phone_number)
+            #messages.error(request, "Invalid Phone Number")
+            return JsonResponse({"success" :False }, safe= False)
 
     print(phone_number)
     return render(request, 'accounts/otp_login.html',{'phone_number':phone_number})
@@ -324,8 +332,12 @@ def dashboard(request):
 
     return render(request, 'accounts/dashboard.html', context )
 
-
+@login_required(login_url = 'login')
 def my_orders(request):
+
+
+    if 'email' in request.session:
+        return redirect('home')
 
     orderproducts = OrderProduct.objects.filter(user = request.user).order_by('-created_at')
     paginator = Paginator(orderproducts, 6)
@@ -356,10 +368,10 @@ def cancel_order(request, order_no, order_prdt, order_qnty ):
 
     return JsonResponse({'success': True},safe= False)
 
-
+@login_required(login_url = 'login')
 def edit_profile(request):
     return render(request, 'accounts/my_orders.html')
 
-
+@login_required(login_url = 'login')
 def change_password(request):
     return render(request, 'accounts/my_orders.html')

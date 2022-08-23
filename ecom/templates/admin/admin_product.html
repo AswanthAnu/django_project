@@ -162,8 +162,8 @@
 						<div class="d-flex justify-content-left " style="display: flex;">
 							<label>Images</label>
 							<div class="mb-3 mx-2 pt-3" style="display: flex; justify-content: left;">
-								<input type="file" class="form-control " required name="images"  id="imageInp">
-								
+							<input type="file" class="form-control " required name="images"  id="imageInp">
+								<button class="btn btn-primary mt-3" style="display:none;" id="confirm-btn">confirm</button>
 							  
 							</div>
 							<div class="mb-3 pt-3 mx-2" style="display: flex; justify-content: left; ">
@@ -188,6 +188,31 @@
 			</div>
 		</div>
 	</div>
+	<script>
+		var $image = $('#imageInp');
+
+$image.cropper({
+  aspectRatio: 16 / 9,
+  crop: function(event) {
+    console.log(event.detail.x);
+    console.log(event.detail.y);
+    console.log(event.detail.width);
+    console.log(event.detail.height);
+    console.log(event.detail.rotate);
+    console.log(event.detail.scaleX);
+    console.log(event.detail.scaleY);
+  }
+});
+
+// Get the Cropper.js instance after initialized
+var cropper = $image.data('cropper');
+	</script>
+
+
+
+
+
+
 	<!-- Edit Modal HTML -->
 	{% for product in products %}
 	<div id="editEmployeeModal-{{forloop.counter}}" class="modal fade">

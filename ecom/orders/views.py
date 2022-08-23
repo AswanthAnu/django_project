@@ -1,12 +1,13 @@
 from multiprocessing import context
 from time import process_time_ns
 from django.shortcuts import render, redirect
-from carts.models import CartItem, Cart
+from carts.models import CartItem
 from .forms import OrderForm
 from .models import Order, Payment, OrderProduct
 from store.models import product
 import datetime
 import json
+from django.views.decorators.cache import cache_control
 from openexchangerate import OpenExchangeRates
 from django.conf import settings
 from django.core.mail import EmailMessage
@@ -18,171 +19,194 @@ import random
 
 
 # Create your views here.
+cart_value = 10
+@cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def payments_cod(request):
 
+
+    if CartItem.quantity == 0:
+        return redirect('cart')
+
+    try: 
+        if cart_value == 10:
     
-    print('entering into payments_cod')
-    if request.method == "POST":
-        order = Order.objects.get(user=request.user, is_ordered=False, order_number=request.POST['orderID'])
-    # Store transaction details inside Payment model
-        
-        payment_method =  request.POST['payment_method']
-        status = request.POST['status']
-        randomLetter = random.choice(string.ascii_letters)
-        print(randomLetter)
-        randomnumber = random.randrange(10000, 99999)
-        print(randomnumber)
-        payment = Payment(
-            user = request.user,
-            payment_method ='cod',
-            amount_paid = order.order_total,
-            status = status,
-            payment_id = randomLetter + str(randomnumber),
-        
-        )
+            print('entering into payments_cod')
+            if request.method == "POST":
+                order = Order.objects.get(user=request.user, is_ordered=False, order_number=request.POST['orderID'])
+            # Store transaction details inside Payment model
+                
+                payment_method =  request.POST['payment_method']
+                status = request.POST['status']
+                randomLetter = random.choice(string.ascii_letters)
+                print(randomLetter)
+                randomnumber = random.randrange(10000, 99999)
+                print(randomnumber)
+                payment = Payment(
+                    user = request.user,
+                    payment_method ='cod',
+                    amount_paid = order.order_total,
+                    status = status,
+                    payment_id = randomLetter + str(randomnumber),
+                
+                )
 
-        payment.save()
-        print(payment, '-----------')
+                payment.save()
+                print(payment, '-----------')
 
-        order.payment = payment
-        order.is_ordered = True
-        order.save()
+                order.payment = payment
+                order.is_ordered = True
+                order.save()
 
-        # Adding cart item to product table
-        cart_items = CartItem.objects.filter(user=request.user)
+                # Adding cart item to product table
+                cart_items = CartItem.objects.filter(user=request.user)
 
-        for item in cart_items:
-            orderproduct = OrderProduct()
-            orderproduct.order_id = order.id
-            orderproduct.payment = payment
-            orderproduct.user_id = request.user.id
-            orderproduct.product_id = item.product_id
-            orderproduct.quantity = item.quantity
-            orderproduct.product_price = item.product.price
-            orderproduct.ordered = True
-            orderproduct.save()
-
-
-            cart_item = CartItem.objects.get(id=item.id)
-            product_variation = cart_item.variation.all()
-            orderproduct = OrderProduct.objects.get(id=orderproduct.id)
-            orderproduct.variations.set(product_variation)
-            orderproduct.save()
-            print(orderproduct, '-----------67')
-
-        # Reduce the quantity of the stock
-            prod = product.objects.get(id=item.product_id)
-            prod.stock -= item.quantity
-            prod.save()
-        
-        # clear the cart item
-        CartItem.objects.filter(user=request.user).delete()
-        
-        # send email
-        mail_subject = 'Your order placed successfully...!'
-        print(mail_subject)
-        message = render_to_string('orders/success_email.html', {
-            'user': request.user,
-            'order': order,
-        })
-        to_email = request.user.email
-        
-        send_email = EmailMessage(mail_subject, message, to=[to_email])
-        #send_email.send()
-
-        
+                for item in cart_items:
+                    orderproduct = OrderProduct()
+                    orderproduct.order_id = order.id
+                    orderproduct.payment = payment
+                    orderproduct.user_id = request.user.id
+                    orderproduct.product_id = item.product_id
+                    orderproduct.quantity = item.quantity
+                    orderproduct.product_price = item.product.price
+                    orderproduct.ordered = True
+                    orderproduct.save()
 
 
-        # data = {
-        #     'success' : True,
-        #     'order_number': order.order_number,
-        #     'transID': payment.payment_id,
-        #     }
-        print("enter into data")
-        return JsonResponse({
-            'success' : True,
-            'order_number': order.order_number,
-            'transID': payment.payment_id,
-            })
+                    cart_item = CartItem.objects.get(id=item.id)
+                    product_variation = cart_item.variation.all()
+                    orderproduct = OrderProduct.objects.get(id=orderproduct.id)
+                    orderproduct.variations.set(product_variation)
+                    orderproduct.save()
+                    print(orderproduct, '-----------67')
+
+                # Reduce the quantity of the stock
+                    prod = product.objects.get(id=item.product_id)
+                    prod.stock -= item.quantity
+                    prod.save()
+                
+                # clear the cart item
+                CartItem.objects.filter(user=request.user).delete()
+                
+                # send email
+                mail_subject = 'Your order placed successfully...!'
+                print(mail_subject)
+                message = render_to_string('orders/success_email.html', {
+                    'user': request.user,
+                    'order': order,
+                })
+                to_email = request.user.email
+                
+                send_email = EmailMessage(mail_subject, message, to=[to_email])
+                #send_email.send()
+
+                
 
 
+                # data = {
+                #     'success' : True,
+                #     'order_number': order.order_number,
+                #     'transID': payment.payment_id,
+                #     }
+                print("enter into data")
+                return JsonResponse({
+                    'success' : True,
+                    'order_number': order.order_number,
+                    'transID': payment.payment_id,
+                    })
+
+    except:
+        return redirect('cart')
 
 
-
+@cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def payments(request):
 
-    body = json.loads(request.body)
-    order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
+    if CartItem.quantity == 0:
+        return redirect('cart')
 
-    # Store transaction details inside Payment model
-    payment = Payment(
-        user = request.user,
-        payment_id = body['transID'],
-        payment_method = body['payment_method'],
-        amount_paid = order.order_total,
-        status = body['status'],
-    )
-    payment.save()
+    try:
+        if cart_value == 10:
 
-    order.payment = payment
-    order.is_ordered = True
-    order.save()
+            body = json.loads(request.body)
+            order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
 
-    # Adding cart item to product table
-    cart_items = CartItem.objects.filter(user=request.user)
+            # Store transaction details inside Payment model
+            payment = Payment(
+                user = request.user,
+                payment_id = body['transID'],
+                payment_method = body['payment_method'],
+                amount_paid = order.order_total,
+                status = body['status'],
+            )
+            payment.save()
 
-    for item in cart_items:
-        orderproduct = OrderProduct()
-        orderproduct.order_id = order.id
-        orderproduct.payment = payment
-        orderproduct.user_id = request.user.id
-        orderproduct.product_id = item.product_id
-        orderproduct.quantity = item.quantity
-        orderproduct.product_price = item.product.price
-        orderproduct.ordered = True
-        orderproduct.save()
+            order.payment = payment
+            order.is_ordered = True
+            order.save()
 
-        cart_item = CartItem.objects.get(id=item.id)
-        product_variation = cart_item.variation.all()
-        orderproduct = OrderProduct.objects.get(id=orderproduct.id)
-        orderproduct.variations.set(product_variation)
-        orderproduct.save()
+            # Adding cart item to product table
+            cart_items = CartItem.objects.filter(user=request.user)
 
-     # Reduce the quantity of the stock
-        prod = product.objects.get(id=item.product_id)
-        prod.stock -= item.quantity
-        prod.save()
-    
-    # clear the cart item
-    CartItem.objects.filter(user=request.user).delete()
-    
-    # send email
-    mail_subject = 'Your order placed successfully...!'
-    print(mail_subject)
-    message = render_to_string('orders/success_email.html', {
-        'user': request.user,
-        'order': order,
-    })
-    to_email = request.user.email
-    
-    send_email = EmailMessage(mail_subject, message, to=[to_email])
-    #send_email.send()
+            for item in cart_items:
+                orderproduct = OrderProduct()
+                orderproduct.order_id = order.id
+                orderproduct.payment = payment
+                orderproduct.user_id = request.user.id
+                orderproduct.product_id = item.product_id
+                orderproduct.quantity = item.quantity
+                orderproduct.product_price = item.product.price
+                orderproduct.ordered = True
+                orderproduct.save()
 
-    
+                cart_item = CartItem.objects.get(id=item.id)
+                product_variation = cart_item.variation.all()
+                orderproduct = OrderProduct.objects.get(id=orderproduct.id)
+                orderproduct.variations.set(product_variation)
+                orderproduct.save()
 
+            # Reduce the quantity of the stock
+                prod = product.objects.get(id=item.product_id)
+                prod.stock -= item.quantity
+                prod.save()
+            
+            # clear the cart item
+            CartItem.objects.filter(user=request.user).delete()
+            
+            # send email
+            mail_subject = 'Your order placed successfully...!'
+            print(mail_subject)
+            message = render_to_string('orders/success_email.html', {
+                'user': request.user,
+                'order': order,
+            })
+            to_email = request.user.email
+            
+            send_email = EmailMessage(mail_subject, message, to=[to_email])
+            #send_email.send()
 
-    data = {
-        'order_number': order.order_number,
-        'transID': payment.payment_id,
-    }
-    return JsonResponse(data)
-
+            
 
 
+            data = {
+                'order_number': order.order_number,
+                'transID': payment.payment_id,
+            }
+            return JsonResponse(data)
+    except:
+        return redirect('cart')
+
+@cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def place_order(request, total=0, quantity=0, ):
+
+    if CartItem.quantity == 0:
+        print(CartItem.quantity)
+        print("----quantity")
+        return redirect('cart')
 
     current_user = request.user
     print('entering into place_order')
+
+    
     
     # if the cart count is less than 0 return back to shop
     cart_items  = CartItem.objects.filter(user = current_user)
@@ -262,43 +286,47 @@ def place_order(request, total=0, quantity=0, ):
 
             else:
                 return render(request, 'orders/payments.html', context)
-
-
-            
-        
-    
+          
     else:
         return redirect('checkout')
 
-
+@cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def order_success(request):
 
 
+    if CartItem.quantity == 0:
+        return redirect('cart')
+
+    try :
+        
     
-    transID = request.GET.get('payment_id')
-    order_number = request.GET.get('order_number')
+            transID = request.GET.get('payment_id')
+            order_number = request.GET.get('order_number')
 
-    try:
-        order = Order.objects.get(order_number=order_number, is_ordered=True)
-        ordered_products = OrderProduct.objects.filter(order_id=order.id)
+            try:
+                order = Order.objects.get(order_number=order_number, is_ordered=True)
+                ordered_products = OrderProduct.objects.filter(order_id=order.id)
 
-        subtotal = 0
-        for i in ordered_products:
-            subtotal += i.product_price * i.quantity
+                subtotal = 0
+                for i in ordered_products:
+                    subtotal += i.product_price * i.quantity
 
-        payment = Payment.objects.get(payment_id=transID)
+                payment = Payment.objects.get(payment_id=transID)
+                cart_value = 9
+                context = {
+                    'order': order,
+                    'ordered_products': ordered_products,
+                    'order_number': order.order_number,
+                    'transID': payment.payment_id,
+                    'payment': payment,
+                    'subtotal': subtotal,
+                }
+            
+                return render(request, 'orders/order_success.html', context )
+            
+            except (Payment.DoesNotExist, Order.DoesNotExist):
+            
+                return redirect('home')
 
-        context = {
-            'order': order,
-            'ordered_products': ordered_products,
-            'order_number': order.order_number,
-            'transID': payment.payment_id,
-            'payment': payment,
-            'subtotal': subtotal,
-        }
-       
-        return render(request, 'orders/order_success.html', context )
-    
-    except (Payment.DoesNotExist, Order.DoesNotExist):
-       
-        return redirect('home')
+    except:
+        return redirect('cart')

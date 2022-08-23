@@ -21,7 +21,7 @@ from orders.models import Order, OrderProduct
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def admin_login(request):
 
-    if 'email' in request.session:
+    if 'is_admin' in request.session:
         return redirect('admin_dashboard')
 
     if request.method == 'POST':
@@ -33,7 +33,7 @@ def admin_login(request):
         user = authenticate(email=email, password=password,)
         try:
             if user.is_admin == True:
-                request.session['email'] = email
+                request.session['is_admin'] = True
                 print(user.is_admin)
                 auth.login(request, user)
                 print('dash')
@@ -50,12 +50,17 @@ def admin_login(request):
     return render(request, 'admin/admin_login.html')
 
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
-@log(admin_login)
+
 def admin_dashboard(request):
+    if 'is_admin' not in request.session:
+        return redirect('admin_login')
     return render(request, 'admin/admin_dashboard.html')
 
 
 def admin_user(request):
+
+    if 'is_admin' not in request.session:
+        return redirect('admin_login')
     user = Account.objects.all()
     paginator = Paginator(user, 4)
     page = request.GET.get('page')
@@ -79,9 +84,6 @@ def block_unblock(request,id):
         user.save()
         return redirect(admin_user)
 
-@log(admin_login)
-def admin_product(request):
-    return render (request, 'admin/admin_product.html')
 
 
 @log(admin_login)   
@@ -134,6 +136,8 @@ def delete_category(request,id):
 
 @log(admin_login)  
 def admin_brand(request):
+    if 'is_admin' not in request.session:
+        return redirect('admin_login')
     brandd = brand.objects.all()
     paginator = Paginator(brandd, 1)
     page = request.GET.get('page')
@@ -183,6 +187,8 @@ def delete_brand(request,id):
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 @log(admin_login)    
 def admin_product(request):
+    if 'is_admin' not in request.session:
+        return redirect('admin_login')
     categories = category.objects.all()
     brands = brand.objects.all()
     products = product.objects.all()
@@ -433,7 +439,7 @@ def admin_cancel_order(request,oid):
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def admin_logout(request):
 
-    
+    auth.logout(request)
     request.session.flush() 
 
     return redirect(admin_login)
