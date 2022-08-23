@@ -6,7 +6,8 @@ from django.shortcuts import render, redirect
 from .decorators import log
 from django.views.decorators.cache import cache_control
 from django.core.paginator import Paginator
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
+from django.urls import reverse
 
 
 
@@ -417,6 +418,16 @@ def change_order_status(request,st,oid,pid):
     #     'order_details':order_details
     # }
     return HttpResponse(orders_pending)
+
+   
+def admin_cancel_order(request,oid):
+    print(oid)
+    print("yeah s")
+    order_cancel = Order.objects.get(id=oid)
+    order_cancel.status = 'Cancelled'
+    print(order_cancel.status )
+    order_cancel.save()
+    return HttpResponseRedirect(reverse('index'))
     
 
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)

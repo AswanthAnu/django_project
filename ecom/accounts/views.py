@@ -1,18 +1,22 @@
 
+from pickle import FALSE
 from django.contrib import messages
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from .form import RegistrationForm
 from .models import Account, profile
-from django.http import HttpResponse,JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
+from django.urls import reverse
 from orders.models import Order, OrderProduct  
 from carts.views import _cart_id
 from carts.models import Cart, CartItem
+from store.models import product
 import requests
 from django.contrib.auth.decorators import login_required
 from twilio.rest import Client
 from django.conf import settings
+from django.core.paginator import Paginator
 
 
 
@@ -130,14 +134,6 @@ def otp_registration(request, phone_number):
     else:
         print("out")
         return render(request, 'accounts/otp_registration.html', {'phone_number': phone_number} )
-
-
-
-
-
-   
-
-
 
 
 def login(request):
@@ -332,11 +328,33 @@ def dashboard(request):
 def my_orders(request):
 
     orderproducts = OrderProduct.objects.filter(user = request.user).order_by('-created_at')
+    paginator = Paginator(orderproducts, 6)
+    page = request.GET.get('page')
+    paged_orderproducts = paginator.get_page(page)
+
     context = {
-        'orderproducts' : orderproducts,
+        'orderproducts' : paged_orderproducts,
     }
 
     return render(request, 'accounts/my_orders.html', context)
+
+  
+def cancel_order(request, order_no, order_prdt, order_qnty ):
+    print(order_no)
+    print("yeah s")
+    order_cancel = Order.objects.get(order_number=order_no)
+    print(order_cancel)
+    order_product = product.objects.get(product_name = order_prdt)
+    print(order_product)
+    order_cancel.status = 'Cancelled'
+    print(order_product.stock, "before")
+    order_product.stock += int(order_qnty)
+    print(order_qnty)
+    print(order_product.stock)
+    order_cancel.save()
+    order_product.save()
+
+    return JsonResponse({'success': True},safe= False)
 
 
 def edit_profile(request):

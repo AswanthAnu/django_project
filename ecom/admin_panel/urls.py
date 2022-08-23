@@ -33,6 +33,7 @@ urlpatterns = [
 
     path('admin_order', views.admin_order, name='admin_order'),
     path('change_order_status/<str:st>/<int:oid>/<int:pid>',views.change_order_status,name="order_status_change"),
+    path('admin_cancel_order/<int:oid>', views.admin_cancel_order, name='admin_cancel_order'),
     
 
     path('block_unblock/<int:id>',views.block_unblock,name='block_unblock'),

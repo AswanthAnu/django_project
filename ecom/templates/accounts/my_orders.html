@@ -19,10 +19,10 @@
 						<table class="table">
 							<thead>
 								<tr>
-									<th class="text-center" >Order ID</th>
-									<th class="text-center" >Billing Name</th>
 									<th class="text-center" >Product</th>
-									<th class="text-center" >Phone</th>
+									<th class="text-center" ></th>
+									<th class="text-center" >Order Id</th>
+									<th class="text-center" >Billing Name</th>
 									<th class="text-center" >Total Price</th>
 									<th class="text-center" >Date</th>
 									<th class="text-center" >Status</th>
@@ -32,25 +32,42 @@
 							<tbody>
 								{% for orderproduct in orderproducts %}
 								<tr>
+									<td class="">
+										<div class="product-info">
+										  <img width="80" src="{{ orderproduct.product.images.url}}" alt="" />
+										 
+										</div>
+									</td>
+									<td>{{    orderproduct.product           }}</td>
 									<td>{{    orderproduct.order.order_number }}</td>
 									<td>{{    orderproduct.order.full_name    }}</td>
-									<td>{{    orderproduct.product            }}</td>
-									<td>{{    orderproduct.order.phone        }}</td>
+									
 									<td>Rs.{{ orderproduct.order.order_total  }}</td>
 									<td>{{    orderproduct.order.created_at   }}</td>
 									
 									{% if orderproduct.order.status == "New" %}
-									<td><div class="text-center"  style="width:100px; color:white; background-color:#3a5172;">New</div></td>
+									<td><div class="text-center"  style="width:100px; color:white; background-color:#3a5172;">Processing</div></td>
 									{% elif orderproduct.order.status == "Transist" %}
 									<td><div class="text-center"  style="width:100px; color:white; background-color:#a3913d;">Transist</div></td>
 									{% elif orderproduct.order.status == "Accepted" %}
-									<td><div class="text-center"  style="width:100px; color:white; background-color:#3b7367;">Accepted</div></td>
+									<td><div class="text-center"  style="width:100px; color:white; background-color:#3b7367;">Out for delivery</div></td>
 									{% elif orderproduct.order.status == "Completed" %}
-									<td><div class="text-center"  style="width:100px; color:white; background-color:#3a723c;">Completed</div></td>
+									<td><div class="text-center"  style="width:100px; color:white; background-color:#3a723c;">Deliverd</div></td>
 									{% elif orderproduct.order.status == "Cancelled" %}
 									<td><div class="text-center"  style="width:100px; color:white; background-color:#b44b4b;">Cancelled</div></td>
 									{% endif %}
-									<td>Cancel</td>
+									{% if orderproduct.order.status == "Completed"%}
+									<td>
+										<button class="btn btn-block btn-dark " type="button" value="{{orderproduct.order.order_number}}" onclick="return_order('{{ orderproduct.order.order_number}}', '{{orderproduct.product}}','{{orderproduct.quantity }}')" >Return</button>
+									</td>
+									{% elif orderproduct.order.status == "Cancelled" %}
+									<td><button class="btn btn-block btn-black disabled">No Action</button></td>
+									{% else %}
+									<td>
+										<button class="btn btn-block btn-dark " type="button" value="{{orderproduct.order.order_number}}" onclick="cancel_order('{{ orderproduct.order.order_number}}', '{{orderproduct.product}}','{{orderproduct.quantity }}')" >Cancel</button>
+									</td>
+									{% endif %}
+
 								</tr>
 								{% endfor %}
 									{% comment %} <td><span class="label label-success">Completed</span></td>
@@ -64,11 +81,160 @@
 							</tbody>
 						</table>
 					</div>
+					
+				
 				</div>
 			</div>
 		</div>
+		<div >
+        
+			<nav aria-label="Page navigation example" style=" bottom:80px; right:70px;">
+			  {% if orderproducts.has_other_pages %}
+			  <ul class="pagination pg-black">
+				{% if orderproducts.has_previous %}
+				<li class="page-item  ">
+				<a class="page-link" href="?page={{ orderproducts.previous_page_number}}" tabindex="-1" style="color: black;">Previous</a>
+				</li>
+				{% else %}
+				<li class="page-item  ">
+				<a class="page-link" href="#" tabindex="-1" style="color: black; display:none;"></a>
+				</li>
+				{% endif %}
+				
+			   
+				{% for i in orderproducts.paginator.page_range %}
+				{% if orderproducts.number == i %}
+				
+				<li class="page-item active">
+				<a class="page-link" style="background-color: black;">{{i}}<span class="sr-only">{{i}}</span></a>
+				</li>
+				{% else %}
+				<li class="page-item" style="color: black;"><a class="page-link" href="?page={{i}}" style="color: black;">{{i}}</a></li>
+				{% endif %}
+				{% endfor %}
+			   
+			   
+				{% if orderproducts.has_next %}
+				<li class="page-item  ">
+				<a class="page-link" href="?page={{ orderproducts.next_page_number}}" tabindex="-1" style="color: black;">Next</a>
+				</li>
+			   
+				{% else %}
+				<li class="page-item  ">
+				<a class="page-link" href="#" tabindex="-1" style="color: black;display:none;"></a>
+				</li>
+				{% endif %}
+			  </ul>
+			  </nav>
+			  {% endif %}
+			</div>
 	</div>
 </section>
+<script type="text/javascript">
+
+	// cancel order
+	function cancel_order(order_no, order_prdt, order_qnty) {
+        console.log(typeof(order_no, order_prdt, order_qnty ))
+        swal({
+          title: "Are you sure?",
+          text: "Do you want to cancel the Order  " ,
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        }).then((willDelete) => {
+          if (willDelete) {
+            // swal("Order cancelled successfully", {
+            //   icon: "success",
+            //   timer: 2000,
+            // })
+            
+            console.log("cancel order");
+             $.ajax({
+              url: 'cancel_order/'+order_no +"/"+order_prdt+"/"+order_qnty,
+              data: {
+                
+              },
+              method: "GET",
+              success: (response) => {
+                if (response.success= true) {
+					swal(" Order cancelled successfuly",{
+						
+						icon : "success",
+						button : false,
+						timer : 2000, 
+
+					})
+                  
+				  setTimeout(function(){
+					location.reload();
+
+				  }, 1900)
+                }
+                console.log(response)
+              },
+            }); 
+              
+          } else {
+            // swal("");
+          }
+        });
+      
+        
+           }
+
+
+
+
+		   //return order
+		   function return_order(order_no, order_prdt, order_qnty) {
+			console.log(typeof(order_no, order_prdt, order_qnty ))
+			swal({
+			  title: "Are you sure?",
+			  text: "Do you want to return the Order  " ,
+			  icon: "warning",
+			  buttons: true,
+			  dangerMode: true,
+			}).then((willDelete) => {
+			  if (willDelete) {
+				// swal("Order cancelled successfully", {
+				//   icon: "success",
+				//   timer: 2000,
+				// })
+				
+				console.log("return order");
+				 $.ajax({
+				  url: 'cancel_order/'+order_no +"/"+order_prdt+"/"+order_qnty,
+				  data: {
+					
+				  },
+				  method: "GET",
+				  success: (response) => {
+					if (response.success= true) {
+						swal(" Order returned successfuly",{
+							
+							icon : "success",
+							button : false,
+							timer : 2000, 
+	
+						})
+					  
+					  setTimeout(function(){
+						location.reload();
+	
+					  }, 1900)
+					}
+					console.log(response)
+				  },
+				}); 
+				  
+			  } else {
+				// swal("");
+			  }
+			});
+		  
+			
+			   }
+	</script>
 
 
 {% endblock %}
