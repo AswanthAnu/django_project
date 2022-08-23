@@ -30,6 +30,9 @@ urlpatterns = [
     path('edit_variation', views.edit_variation, name='edit_variation'),
     path('update_variation/<str:id>', views.update_variation, name='update_variation'),
     path('delete_variation/<str:id>', views.delete_variation, name='delete_variation'),
+
+    path('admin_order', views.admin_order, name='admin_order'),
+    path('change_order_status/<str:st>/<int:oid>/<int:pid>',views.change_order_status,name="order_status_change"),
     
 
     path('block_unblock/<int:id>',views.block_unblock,name='block_unblock'),

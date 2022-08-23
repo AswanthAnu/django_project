@@ -1,12 +1,12 @@
 
 from django.contrib import messages
-from django.contrib.auth.models import auth, User
+from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from .form import RegistrationForm
 from .models import Account, profile
 from django.http import HttpResponse,JsonResponse
-from orders.models import Order  
+from orders.models import Order, OrderProduct  
 from carts.views import _cart_id
 from carts.models import Cart, CartItem
 import requests
@@ -193,10 +193,6 @@ def login(request):
                             for item in cart_item:
                                 item.user = user
                                 item.save()
-
-                #     for item in cart_item:
-                #         item.user = user
-                #         item.save()
                 except:
                     pass
                 request.session['email'] = email
@@ -229,7 +225,7 @@ def otp_view(request):
 
         if request.method == 'POST':
             phone_number = request.POST.get('phone_number')
-            print(phone_number,'-')
+         
             if Account.objects.filter(phone_number = phone_number).exists():
                 users = Account.objects.get(phone_number = phone_number)
                 print(users)
@@ -335,9 +331,9 @@ def dashboard(request):
 
 def my_orders(request):
 
-    orders = Order.objects.filter(user = request.user, is_ordered= True).order_by('-created_at')
+    orderproducts = OrderProduct.objects.filter(user = request.user).order_by('-created_at')
     context = {
-        'orders' : orders,
+        'orderproducts' : orderproducts,
     }
 
     return render(request, 'accounts/my_orders.html', context)

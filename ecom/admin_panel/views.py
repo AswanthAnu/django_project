@@ -1,19 +1,20 @@
-from cgi import print_environ
-from math import prod
 from multiprocessing import context
 from django.contrib import messages
 from django.contrib.auth.models import auth, User
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
+from .decorators import log
+from django.views.decorators.cache import cache_control
+from django.core.paginator import Paginator
+from django.http import JsonResponse, HttpResponse
+
+
+
 from accounts.models import Account
 from category.models import category
 from brand.models import brand
 from store.models import product, Variation
-from .decorators import log
-from django.views.decorators.cache import cache_control
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import JsonResponse
-
+from orders.models import Order, OrderProduct
 
 # Create your views here.
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
@@ -380,9 +381,43 @@ def delete_variation(request, id):
         }, safe= False)
 
         
-        
+def admin_order(request):
 
+    orderproducts = OrderProduct.objects.all() 
+    paginator = Paginator(orderproducts, 6)
+    page = request.GET.get('page')
+    paged_orderproducts = paginator.get_page(page)
+    total_orders_count= OrderProduct.objects.all().count()
+    orders_pending = Order.objects.filter(status__contains='New').count()
+    orders_deliverd = Order.objects.filter(status__contains='Completed').count()
 
+    context = {
+        'orderproducts': paged_orderproducts,
+        'total_orders_count': total_orders_count,
+        'orders_pending' : orders_pending,
+        'orders_deliverd' : orders_deliverd,
+    }
+    return render(request, 'admin/admin_order.html', context)       
+
+def change_order_status(request,st,oid,pid):
+    print(st)
+    print(oid)
+    print(pid)
+    # status_ordr = OrderProduct.objects.get(order_id = oid)
+    # print(status_ordr.status)
+    order_product_details = Order.objects.get(order_number=oid)
+    print(order_product_details)
+    # order_details = Order.objects.get(order_product_details.)
+    order_product_details.status = st
+    print(order_product_details.status )
+    order_product_details.save()
+    order_product_details=Order.objects.all().order_by('-created_at')
+    orders_pending = Order.objects.filter(status__contains='New').count()
+    # context={
+    #     'order_details':order_details
+    # }
+    return HttpResponse(orders_pending)
+    
 
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def admin_logout(request):

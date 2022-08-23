@@ -19,25 +19,37 @@
 						<table class="table">
 							<thead>
 								<tr>
-									<th>Order ID</th>
-									<th>Billing Name</th>
-									<th>Phone</th>
-									<th>Total Price</th>
-									<th>Date</th>
-									<th>Status</th>
-									<th>Action</th>
+									<th class="text-center" >Order ID</th>
+									<th class="text-center" >Billing Name</th>
+									<th class="text-center" >Product</th>
+									<th class="text-center" >Phone</th>
+									<th class="text-center" >Total Price</th>
+									<th class="text-center" >Date</th>
+									<th class="text-center" >Status</th>
+									<th class="text-center" >Action</th>
 								</tr>
 							</thead>
 							<tbody>
-								{% for order in orders %}
+								{% for orderproduct in orderproducts %}
 								<tr>
-									<td>{{ order.order_number}}</td>
-									<td>{{ order.full_name}}</td>
-									<td>{{ order.phone}}</td>
-									<td>USD.{{ order.order_total}}</td>
-									<td>{{ order.created_at}}</td>
-
-									<td><span class="label label-primary">Processing</span></td>
+									<td>{{    orderproduct.order.order_number }}</td>
+									<td>{{    orderproduct.order.full_name    }}</td>
+									<td>{{    orderproduct.product            }}</td>
+									<td>{{    orderproduct.order.phone        }}</td>
+									<td>Rs.{{ orderproduct.order.order_total  }}</td>
+									<td>{{    orderproduct.order.created_at   }}</td>
+									
+									{% if orderproduct.order.status == "New" %}
+									<td><div class="text-center"  style="width:100px; color:white; background-color:#3a5172;">New</div></td>
+									{% elif orderproduct.order.status == "Transist" %}
+									<td><div class="text-center"  style="width:100px; color:white; background-color:#a3913d;">Transist</div></td>
+									{% elif orderproduct.order.status == "Accepted" %}
+									<td><div class="text-center"  style="width:100px; color:white; background-color:#3b7367;">Accepted</div></td>
+									{% elif orderproduct.order.status == "Completed" %}
+									<td><div class="text-center"  style="width:100px; color:white; background-color:#3a723c;">Completed</div></td>
+									{% elif orderproduct.order.status == "Cancelled" %}
+									<td><div class="text-center"  style="width:100px; color:white; background-color:#b44b4b;">Cancelled</div></td>
+									{% endif %}
 									<td>Cancel</td>
 								</tr>
 								{% endfor %}
@@ -57,5 +69,6 @@
 		</div>
 	</div>
 </section>
+
 
 {% endblock %}

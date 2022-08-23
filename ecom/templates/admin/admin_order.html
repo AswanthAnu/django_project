@@ -1,0 +1,228 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+
+<div class="main-panel">
+    
+  
+    <div class="container">
+        <div class="table-wrapper ">
+            <div class="table-title "style="background-color:black;">
+                <div class="row">
+                    <div class="col-sm-6 ">
+						<h2>Products </h2>
+					</div>
+					<div class="col-sm-6">
+						
+											
+					</div>
+                </div>
+            </div>
+		<div style='overflow-x:auto'>
+           
+            <table class="table table-striped table-hover col-sm-6 col-12">
+                <thead>
+                    <tr>
+						<th>
+							<span class="custom-checkbox">
+								
+								
+							</span>
+						</th>
+                        <th  class="text-center"><h4>Order ID</h4></th>
+                        <th  class="text-center"><h4>Billing Name</h4></th>
+                        <th  class="text-center"><h4>Product</h4></th>
+                        <th  class="text-center"><h4>Phone</h4></th>
+                        <th  class="text-center"><h4>Total Price</h4></th>
+                        <th  class="text-center"><h4>Payment method</h4></th>
+                        <th  class="text-center"><h4>Date</h4></th>
+						<th  class="text-center"><h4>Status</h4></th>
+                        
+                        
+                    </tr>
+                </thead>
+                <tbody>
+				{% for orderproduct  in orderproducts%}
+                    <tr>
+						<td>
+							
+						</td>
+                        <td  class="text-center"><h5>{{orderproduct.order.order_number}}</h5></td>
+                        <td  class="text-center"><h5>{{orderproduct.order.full_name}}</h5></td>
+                        <td  class="text-center"><h5>{{orderproduct.product}}</h5></td>
+						<td  class="text-center"><h5>{{orderproduct.order.phone}}</h5></td>
+						<td  class="text-center"><h5>Rs. {{orderproduct.order.order_total}}</h5></td>
+                        <td  class="text-center"><h5>{{ orderproduct.payment.payment_method }}</h5></td>
+						<td  class="text-center"><h5>{{ orderproduct.order.created_at }}</h5></td>
+                       
+                        <td>
+                            <form>
+
+                                <select class="form-control text-center dark " style="background-color:#001737; color:white;" onchange="ChangeStatus(this.value)">
+
+                                    {% if orderproduct.order.status == "New" %}
+                                        <option class="label label-primary" value="New/{{  orderproduct.order.order_number}}/{{orderproduct.product_id}}" selected>New</option>
+                                        <option value="Accepted/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Accepted</option>
+                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Transist</option>
+                                        <option value="Completed/{{ orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Deliverd</option>
+                                        <option value="Cancelled/{{ orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Cancelled</option>
+                                    {% elif orderproduct.order.status == "Accepted" %}
+                                        <option value="Accepted/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}" selected>Accepted</option>
+                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Transist</option>
+                                        <option value="Completed/{{ orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Deliverd</option>
+                                        <option value="Cancelled/{{ orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Cancelled</option>
+                                    {% elif orderproduct.order.status == "Transist" %}
+     
+                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}" selected>Transist</option>
+                                        <option value="Completed/{{ orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Deliverd</option>
+                                        <option value="Cancelled/{{orderproduct.order.order_number  }}/{{ orderproduct.product_id }}">Cancelled</option>
+                                    {% elif orderproduct.order.status == "Completed" %}
+                   
+                                        <option value="Completed/{{orderproduct.order.order_number  }}/{{ orderproduct.product_id }}" selected>Deliverd</option>
+                                        <option value="Cancelled/{{orderproduct.order.order_number  }}/{{ orderproduct.product_id }}">Cancelled</option>
+                                    {% elif orderproduct.order.status == "Cancelled" %}
+                                        <option value="Cancelled/{{orderproduct.order.order_number  }}/{{ orderproduct.product_id }}" selected>Cancelled</option>
+                                    {% endif %}
+                                 
+                                    
+
+
+                                </select>
+                            </form>
+
+                        </td>
+						
+                    </tr>
+					</div>
+                {% endfor %}
+                </tbody>
+            </table>
+			<div class="clearfix">
+                
+             
+            </div>
+            
+		</div>
+		</div>
+		</div>
+        <div class="row">
+            <div class="offset-1 col-md-2">
+                <span class="adminheadstatus">Total No of Orders:&nbsp<b>{{ total_orders_count }}</b>
+                </span>
+            </div>
+			
+            <div class="col-md-2">
+                <span class="adminheadstatus">Orders Pending:&nbsp<b>
+                        <span id="orders_pending">{{ orders_pending }}</span>
+                    </b>
+                </span>
+            </div> 
+			<div class="col-md-2">
+				<span class="adminheadstatus">Orders Deliverd:&nbsp<b><span id="orders_deliverd">{{ orders_deliverd }}</span></b>
+				</span>
+			</div>
+        </div>
+        
+    </div>
+    
+	<div >
+        
+		<nav aria-label="Page navigation example" style="position: fixed; bottom:80px; right:70px;">
+		  {% if orderproducts.has_other_pages %}
+		  <ul class="pagination pg-black">
+			{% if orderproducts.has_previous %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ orderproducts.previous_page_number}}" tabindex="-1" style="color: black;">Previous</a>
+			</li>
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black; display:none;"></a>
+			</li>
+			{% endif %}
+			
+		   
+			{% for i in orderproducts.paginator.page_range %}
+			{% if orderproducts.number == i %}
+			
+			<li class="page-item active">
+			<a class="page-link" style="background-color: black;">{{i}}<span class="sr-only">{{i}}</span></a>
+			</li>
+			{% else %}
+			<li class="page-item" style="color: black;"><a class="page-link" href="?page={{i}}" style="color: black;">{{i}}</a></li>
+			{% endif %}
+			{% endfor %}
+		   
+		   
+			{% if orderproducts.has_next %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ orderproducts.next_page_number}}" tabindex="-1" style="color: black;">Next</a>
+			</li>
+		   
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black;display:none;"></a>
+			</li>
+			{% endif %}
+		  </ul>
+		  </nav>
+		  {% endif %}
+		</div>
+
+    
+<script>
+	function ChangeStatus(str) {
+        console.log(str)
+		st = str.split("/");
+
+		if (st[0] == "Accepted") {
+
+			console.log(st[0])
+
+			xhttp.onload = function () {
+				document.getElementById("orders_pending").innerHTML = this.responseText;
+				var re = this.responseText
+
+			}
+			xhttp.open("GET", "change_order_status/" + str);
+			xhttp.send();
+		}
+		else if (st[0] == "Transist") {
+
+			console.log(st[0])
+
+			xhttp.onload = function () {
+				document.getElementById("orders_pending").innerHTML = this.responseText;
+				var re = this.responseText
+
+			}
+			xhttp.open("GET", "change_order_status/" + str);
+			xhttp.send();
+		}
+		else if(st[0]=="Completed"){
+			xhttp.onload = function () {
+				document.getElementById("orders_pending").innerHTML = this.responseText;
+				var op = parseInt("{{orders_deliverd}}")+1
+				document.getElementById('orders_deliverd').innerHTML = op
+				var re = this.responseText
+
+			}
+			xhttp.open("GET", "change_order_status/" + str);
+			xhttp.send();
+		}
+		else if(st[0]=="Cancelled"){
+		   
+			xhttp.open("GET", "change_order_status/" + str);
+			xhttp.send();
+		}
+	}
+	const xhttp = new XMLHttpRequest();
+	// xhttp.onload = function() {
+	//     document.getElementById("txtHint").innerHTML = this.responseText;
+	// }
+</script>
+	
+{% endblock %}
