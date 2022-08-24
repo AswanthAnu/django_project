@@ -71,7 +71,7 @@
 					document.getElementById("phone_number").style.border = "solid red 1px";
 				}
         else if (responce.phone == true) {
-          window.location.replace('{{otp_login}}'+'/'+responce.phone_number)
+          window.location.replace("{% url 'otp_login' %}"+responce.phone_number)
 				}
 			}
 		})

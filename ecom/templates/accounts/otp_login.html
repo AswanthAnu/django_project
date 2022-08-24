@@ -20,7 +20,7 @@
             {% csrf_token %}
             <div class="form-group">
               <input type="text" class="form-control"  placeholder="Enter otp" name='otp' id='otp' value="">
-              <input type="text" class="form-control" style="dismiss:none;" placeholder="Enter otp" name='phone_number' id='phone_number' value="{{ phone_number }}">
+              <input type="text" class="form-control" style="display:none;" placeholder="Enter otp" name='phone_number' id='phone_number' value="{{ phone_number }}">
             </div>
             
             <div class="text-center">
@@ -48,7 +48,7 @@
 		$.ajax({
       
 			type: 'POST',
-			url: '{{otp_login}}'+phone_number,
+			url: '{{otp_login}}',
 			dataType: 'json',
 			data: {
         'otp' : otp,
@@ -60,17 +60,23 @@
 				console.log(responce)
 				if (responce.success == true) {
 					document.getElementById("otp").value="";
-					document.getElementById("otp").placeholder = "True";
+					document.getElementById("otp").placeholder = "Invalid OTP";
 					document.getElementById("otp").style.border = "solid red 1px";
-				}otp
+				}
         else if (responce.success == false) {
 					document.getElementById("otp").value="";
 					document.getElementById("otp").placeholder = "Invalid Phone Number";
 					document.getElementById("otp").style.border = "solid red 1px";
 				}
+        else if (responce.phone == false) {
+					document.getElementById("otp").value="";
+					document.getElementById("otp").placeholder = "Invalid OTP";
+					document.getElementById("otp").style.border = "solid red 1px";
+				}
         else if (responce.phone == true) {
+          console.log(responce)
           setTimeout(function(){
-            window.location.replace('{{home}}');
+            window.location.replace("{% url 'home' %}");
   
             }, 1500)
             

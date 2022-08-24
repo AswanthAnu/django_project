@@ -19,7 +19,7 @@
             </div>
           
           <h2 class="text-center">Create Your Account</h2>
-          <form class="text-left clearfix" action="{% url 'register' %}" method='POST'>
+          <form class="text-left clearfix"  method='POST' id='form_id'>
              {% csrf_token %}
             <div class="form-group">
              {{form.first_name}}
@@ -41,7 +41,7 @@
             </div>
             <div class="text-center">
               
-              <button type="submit" class="btn btn-main text-center" >Signup</button>
+              <input type="submit" class="btn btn-main text-center" .value="Signup" >
             </div>
             
           </form>
@@ -54,16 +54,76 @@
 </section>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
 <script>
-function Vanish(){
-  document.getElementById("message_time").style.display="none";
+  $(document).on('submit', '#form_id', function (e) {
+		e.preventDefault();
+		var first_name = $('#first_name_id').val()
+    var last_name = $('#last_name_id').val()
+    var phone_number = $('#phone_number_id').val()
+    var email = $('#email_id').val()
+    var password = $('#password_id').val()
+    var confirm_password = $('#confirm_password_id').val()
+		
+    console.log(first_name)
+    console.log(phone_number)
 
-}
+		$.ajax({
+      
+			type: 'POST',
+			url: '{{register}}',
+			dataType: 'json',
+			data: {
+        'first_name' : first_name,
+        'last_name' : last_name,
+        'phone_number' : phone_number,
+        'email' : email,
+        'password' : password,
+        'confirm_password' : confirm_password,
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.first_name == true) {
+					document.getElementById("first_name_id").value="";
+					document.getElementById("first_name_id").placeholder = "First name required";
+					document.getElementById("first_name_id").style.border = "solid red 1px";
+				}
+        else if (responce.first_name == false) {
+					document.getElementById("last_name_id").value="";
+					document.getElementById("last_name_id").placeholder = "Last name required";
+					document.getElementById("last_name_id").style.border = "solid red 1px";
+				}
+        else if (responce.phone_number == true) {
+					document.getElementById("otp").value="";
+					document.getElementById("otp").placeholder = "10 digits required";
+					document.getElementById("otp").style.border = "solid red 1px";
+				}
+        else if (responce.phone_number == false) {
+					document.getElementById("email_id").value="";
+					document.getElementById("email_id").placeholder = "Email already exists";
+					document.getElementById("email_id").style.border = "solid red 1px";
+				}
+        else if (responce.success == false) {
+					document.getElementById("phone_number_id").value="";
+					document.getElementById("phone_number_id").placeholder = "10 digits required";
+					document.getElementById("phone_number_id").style.border = "solid red 1px";
+				}
+        else if (responce.success == true) {
+          console.log(responce)
+          
+            window.location.replace("{% url 'otp_registration' %}"+ phone_number );
+  
+            
+				}
+			}
+		})
 
-    
-    
 
+	})
+	
 </script>
+
 
 
 {% endblock %}

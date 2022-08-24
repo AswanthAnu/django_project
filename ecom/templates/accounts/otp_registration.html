@@ -16,10 +16,11 @@
           {% include 'includes/alerts.html' %}
           <h5 class="text-bg-danger" style="display:none ;" id="warning">Invalid Credentials</h5>
           <h2 class="text-center"></h2>
-          <form class="text-left clearfix" action="{% url 'otp_registration' phone_number %}" method="POST" >
+          <form class="text-left clearfix" id="otp_reg" action="{% url 'otp_registration' phone_number %}" method="POST" >
             {% csrf_token %}
             <div class="form-group">
               <input type="text" class="form-control"  placeholder="Enter otp" name='otp' id='otp'>
+              <input type="text" class="form-control" style="display:none;" placeholder="Enter otp" name='phone_number' id='phone_number' value="{{ phone_number }}">
             </div>
             
             <div class="text-center">
@@ -34,6 +35,69 @@
   </div>
 </section>
 
+
+<script>
+  $(document).on('submit', '#otp_reg', function (e) {
+		e.preventDefault();
+		var otp = $('#otp').val()
+    var phone_number = $('#phone_number').val()
+		
+    console.log(otp)
+
+		$.ajax({
+      
+			type: 'POST',
+			url: '{{otp_registration}}',
+			dataType: 'json',
+			data: {
+				'otp' : otp,
+				
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+      success: function (responce) {
+				console.log(responce)
+				if (responce.phone == true) {
+					document.getElementById("otp").value="";
+					document.getElementById("otp").placeholder = "Invalid OTP";
+					document.getElementById("otp").style.border = "solid red 1px";
+				}
+        else if (responce.success == false) {
+					document.getElementById("otp").value="";
+					document.getElementById("otp").placeholder = "Invalid Phone Number";
+					document.getElementById("otp").style.border = "solid red 1px";
+				}
+        else if (responce.phone == false) {
+					document.getElementById("otp").value="";
+					document.getElementById("otp").placeholder = "Invalid OTP";
+					document.getElementById("otp").style.border = "solid red 1px";
+				}
+       
+        else if (responce.success == true) {
+          console.log(responce)
+          setTimeout(function(){
+            window.location.replace("{% url 'home' %}");
+  
+            }, 1500)
+            
+            Swal.fire({
+              toast: true,
+              icon: 'success',
+              title: 'Logged in successfully',
+              animation: false,
+              position: 'top-right',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+            })
+				}
+			}
+		})
+
+
+	})
+	
+	
+</script>
 
 
  

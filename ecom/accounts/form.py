@@ -22,6 +22,7 @@ class RegistrationForm(forms.ModelForm):
             'phone_number' : forms.TextInput (attrs={'id' : 'phone_number_id'}),
             'email' : forms.EmailInput (attrs={'id' : 'email_id'}),
             'password' : forms.PasswordInput (attrs={'id' : 'password_id'}),
+            'confirm_password' : forms.PasswordInput (attrs={'id' : 'confirm_password_id'}),
         }
 
   
@@ -43,6 +44,11 @@ class RegistrationForm(forms.ModelForm):
         self.fields['last_name'].widget.attrs['placeholder'] = 'Last Name'
         self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone Number'
         self.fields['email'].widget.attrs['placeholder'] = 'Email Address'
+
+        self.fields['first_name'].widget.attrs['value'] = ''
+        self.fields['last_name'].widget.attrs['value'] = ''
+        self.fields['phone_number'].widget.attrs['value'] = ''
+        self.fields['email'].widget.attrs['value'] = ''
 
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'

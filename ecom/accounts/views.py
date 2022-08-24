@@ -29,15 +29,31 @@ def register(request):
 
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
+        print(form.is_valid())
+        print(form.errors)
         if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             email = form.cleaned_data['email']
             phone_number = form.cleaned_data['phone_number']
             password = form.cleaned_data['password']
+            
 
             username = email.split('@')[0]
 
+            if len(first_name.strip()) == 0:
+
+                return JsonResponse({'first_name' : True}, safe= False)
+
+            elif len(last_name.strip()) == 0:
+                
+                return JsonResponse({'first_name' : False}, safe= False)
+
+            elif len(phone_number.strip()) == 0:
+
+                return JsonResponse({'phone_number' : True}, safe= False)
+
+            
             if len(phone_number) == 10:
 
                 user = Account.objects.create_user(first_name = first_name, last_name = last_name, email = email, username = username, password = password)
@@ -67,11 +83,13 @@ def register(request):
                 
                 
                 messages.success(request,'OTP has been sent to ' + str(phone_num))
+                return JsonResponse({'success': True, 'phone_number': phone_number}, safe=True)
                 return render(request, 'accounts/otp_registration.html', {'phone_number': phone_number,  'username' : username})
                 
             
             else: 
                 messages.error(request, '10 digits number required')
+                return JsonResponse({'success': False}, safe=True)
                
 
             
@@ -79,6 +97,7 @@ def register(request):
         else:
             
             messages.error(request, "")
+            return JsonResponse({'phone_number' : False}, safe= False)
                 
             
             
@@ -90,6 +109,8 @@ def register(request):
             'form' : form,
             }
     return render(request, 'accounts/register.html', context)
+def otp_registration(request):
+     return render(request, 'accounts/otp_registration.html')
 
 def otp_registration(request, phone_number):
 
@@ -102,37 +123,39 @@ def otp_registration(request, phone_number):
         phone_num = "+91"+ str(phone_number)
         otp_input = request.POST['otp']
 
-
-        if len(otp_input)  >0:
-
-
-                account_sid= settings.ACCOUNT_SID
-                auth_token= settings.TOKEN_SID
-                
-                client = Client(account_sid, auth_token)
-
-                otp_check = client.verify \
-                                    .services(settings.SERVICES) \
-                                    .verification_checks \
-                                    .create(to= phone_num, code= otp_input)
+        try:
+            if len(otp_input)  >0:
 
 
-                if otp_check.status == "approved":
-                    user = Account.objects.get(phone_number =phone_number )
-                    print(user)
-                    user.is_active = True   
-                    user.Phone_number = phone_number        
-                    user.save()          
-                    auth.login(request,user)
-                    return redirect('home')
-                else:
-                    messages.success(request, "Invalid OTP")
-                    print("inside otp")
-                    return redirect("otp_registration", phone_number)
-        else:
-            messages.success(request, "Invalid OTP")
-            print("outside otp")
-            return redirect("otp_registration", phone_number)
+                    account_sid= settings.ACCOUNT_SID
+                    auth_token= settings.TOKEN_SID
+                    
+                    client = Client(account_sid, auth_token)
+
+                    otp_check = client.verify \
+                                        .services(settings.SERVICES) \
+                                        .verification_checks \
+                                        .create(to= phone_num, code= otp_input)
+
+
+                    if otp_check.status == "approved":
+                        user = Account.objects.get(phone_number =phone_number )
+                        print(user)
+                        user.is_active = True   
+                        user.Phone_number = phone_number        
+                        user.save()          
+                        auth.login(request,user)
+                        return JsonResponse({"success" :True }, safe= False)
+                    else:
+                        #messages.success(request, "Invalid OTP")
+                        print("inside otp")
+                        return JsonResponse({"success" :False }, safe= False)
+            else:
+            # messages.success(request, "Invalid OTP")
+                print("outside otp")
+                return JsonResponse({"phone" : True }, safe= False)
+        except:
+            return JsonResponse({"phone" : False }, safe= False)
 
     else:
         print("out")
@@ -244,7 +267,7 @@ def otp_view(request):
                 
                 #messages.success(request,'OTP has been sent to ' + str(phone_num))
                
-                return JsonResponse({'phone': True,  'phone_number':phone_number,'user':users}, safe=False)
+                return JsonResponse({'phone': True,  'phone_number':phone_number}, safe=False)
 
             elif  len(phone_number) < 10 or len(phone_number) > 10 :
                  
@@ -265,10 +288,10 @@ def otp_view(request):
 def otp_login(request, phone_number):
 
 
-    if 'email' in request.session:
-        return redirect('home')
+    
     
     if request.method == 'POST':
+        print(phone_number)
         if Account.objects.filter(phone_number= phone_number).exists():
             user = Account.objects.get(phone_number= phone_number)
 
@@ -278,7 +301,7 @@ def otp_login(request, phone_number):
 
             if len(otp_input)  >0:
 
-
+                
                 account_sid= settings.ACCOUNT_SID
                 auth_token= settings.TOKEN_SID
                 
@@ -296,14 +319,14 @@ def otp_login(request, phone_number):
 
                 else:
                     #messages.error(request, "Invalid OTP")
-                    return JsonResponse({"success" :True }, safe= False)
+                    return JsonResponse({"phone" :False }, safe= False)
             else:
                 #messages.error(request, "Invalid OTP")
-                return JsonResponse({"success" :True }, safe= False)
+                return JsonResponse({"success" : True }, safe= False)
 
         else:
             #messages.error(request, "Invalid Phone Number")
-            return JsonResponse({"success" :False }, safe= False)
+            return JsonResponse({"success" : False }, safe= False)
 
     print(phone_number)
     return render(request, 'accounts/otp_login.html',{'phone_number':phone_number})

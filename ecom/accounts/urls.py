@@ -8,6 +8,7 @@ urlpatterns = [
     path('otp_login/<int:phone_number>/',views.otp_login, name='otp_login'),
     path('otp_login/',views.otp_login, name='otp_login'),
     path('otp_registration/<int:phone_number>/',views.otp_registration, name='otp_registration'),
+     path('otp_registration/',views.otp_registration, name='otp_registration'),
     # path('otp_registration/',views.otp_registration, name='otp_registration'),
     path('logout/',views.logout, name='logout'),
     path('dashboard/',views.dashboard, name='dashboard'),
