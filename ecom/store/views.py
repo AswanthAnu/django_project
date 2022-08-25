@@ -1,6 +1,9 @@
 
-from django.shortcuts import render, get_object_or_404
 
+from ast import keyword
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from .models import product
 from category.models import SubCategory, category
@@ -106,3 +109,16 @@ def product_detail(request, category_slug, subcategory_slug,  product_slug):
     }
 
     return render(request, 'store/product_detail.html', context)
+
+
+def search(request):
+    if 'keyword' in request.GET:
+        keyword = request.GET['keyword']
+        if keyword:
+            products = product.objects.order_by('-create_date').filter(Q(description__icontains = keyword) | Q(product_name__icontains = keyword))
+            products_count = products.count()
+    context = {
+        'products' : products,
+        'products_count' : products_count,
+    }
+    return render(request, 'store/store.html', context)

@@ -19,7 +19,7 @@ import random
 
 
 # Create your views here.
-cart_value = 10
+
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def payments_cod(request):
 
@@ -28,7 +28,7 @@ def payments_cod(request):
         return redirect('cart')
 
     try: 
-        if cart_value == 10:
+        
     
             print('entering into payments_cod')
             if request.method == "POST":

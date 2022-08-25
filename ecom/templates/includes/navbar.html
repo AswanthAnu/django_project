@@ -68,12 +68,13 @@
 					</li><!-- / Cart -->
 
 					<!-- Search -->
+					
 					<li class="dropdown search dropdown-slide">
 						<a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"><i
 								class="tf-ion-ios-search-strong"></i> Search</a>
 						<ul class="dropdown-menu search-dropdown">
 							<li>
-								<form action="post"><input type="search" class="form-control" placeholder="Search..."></form>
+								<form action="{% url 'search' %}" method="GET" class="search"><input type="search" class="form-control" placeholder="Search..." name="keyword"></form>
 							</li>
 						</ul>
 					</li><!-- / Search -->

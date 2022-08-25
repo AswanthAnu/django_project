@@ -343,6 +343,7 @@ def add_variation(request):
             return JsonResponse({
                 'success' : True} ,
                   safe= False  )
+
     return render(request,'admin/admin_variation.html')
 
 
@@ -388,17 +389,85 @@ def delete_variation(request, id):
         }, safe= False)
 
 
-def admin_subcategoroy(request):
+def admin_subcategory(request):
 
     subcategory = SubCategory.objects.all()
-    paginator = Paginator(subcategory, 1)
+    categories = category.objects.all()
+    paginator = Paginator(subcategory, 6)
     page = request.GET.get('page')
     paged_subcategory = paginator.get_page(page)
-    context={'subcategory' : paged_subcategory }
+    context={'subcategory' : paged_subcategory, 'categories' : categories  }
 
 
     return render(request, 'admin/admin_subcategory.html', context)
+
+def add_subcategory(request):
+
+    if request.method == "POST":
+
+        category_id = request.POST.get('category')
+        subcategory_name = request.POST.get('subcategory_name')
+        print(subcategory_name)
+        description = request.POST.get('description')
+        slug = subcategory_name.replace(" ", "-").lower()
+        print(slug)
+
+        if len(subcategory_name.strip()) == 0:
+            print('inside  subcateg')
+            return JsonResponse({
+                'success' : False} ,
+                  safe= False  )
+        else:
+            subcategory = SubCategory( category_id = category_id,  sub_category_name = subcategory_name, slug = slug  )   
+            subcategory.save()
+            return JsonResponse({
+                'success' : True} ,
+                  safe= False  )
+
+    return render(request,'admin/admin_category.html')
+
+
+
+def edit_subcategory(request):
+    subcategory = SubCategory.objects.all()
+    
+    context = { 'subcategory' : subcategory}
+
+    return render(request, "admin/admin_variation.html", context)
+
+def update_subcategory(request, id):
+    if request.method == "POST":
+
+        subcategory = SubCategory.objects.get(id = id)
+        print(id)
+        print(subcategory)
+        subcategory.subcategory_name = request.POST['subcategory_name']
+        print(subcategory.subcategory_name)
         
+        subcategory.slug = subcategory.subcategory_name.replace(" ", "-").lower()
+        print(subcategory.slug)
+
+        if len(subcategory.subcategory_name.strip()) == 0:
+            print('inside  subcateg')
+            return JsonResponse({
+                'success' : False} ,
+                  safe= False  )
+        else:
+            print(subcategory,";-;-;-;")
+            subcategory.save()
+            return JsonResponse({
+                'success' : True} ,
+                  safe= False  )
+
+    return render(request,'admin/admin_subcategory.html')
+
+def delete_subcategory (request, id):
+        subcategory = SubCategory.objects.filter(id = id)
+        subcategory.delete()
+        return JsonResponse({
+            'success': True
+        }, safe= False)
+
 def admin_order(request):
 
     orderproducts = OrderProduct.objects.all() 
