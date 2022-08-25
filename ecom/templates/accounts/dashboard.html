@@ -15,46 +15,42 @@
     <li><a href="{% url 'edit_profile' %}">Edit Profile</a></li>
     <li><a href="{% url 'change_password' %}">Change Password</a></li>
 </ul>
-				<div class="dashboard-wrapper user-dashboard">
-					<div class="media">
-						<div class="pull-left">
-							<img class="media-object user-img" src="https://www.w3schools.com/howto/img_avatar.png" alt="User Profile Pictures" width="50" height="120" style="border-radius:50%;" class="avatar">
-						</div>
-						<div class="media-body" >
-							<h2 class="media-heading" style="margin-left:60px ;">Welcome </h2>
-							
-							<div class="col-md-6">
-								<h2 class="media-heading"  style="text-align:center;">{{user.full_name}}</h2>
-                                <div class="card" style="text-align:center;">
-                                    <div class="card-body">
-                                        <p class="mb-0">{{user.email}}</p>
-                                        <p>{{ user.phone_number }}</p>
-                                    </div>
-
-                                </div>
-                            </div>
-						</div>
-					</div>
-					<div class="total-order mt-100">
-						<h4 style="margin-top:60px ; text-align:center;">Total Orders</h4>
-						<div class="table-responsive">
-                            <div class="col-md-12">
-                                <div class="card" style="text-align:center;">
-                                    <div class="card-body">
-                                        <h4>{{orders_count}}</h4>
-                                        <a href="{% url 'my_orders'%}">View Orders</a>
-                                    </div>
-                                </div>
-                            </div>
-						
+		  <div class=" dashboard-wrapper dashboard-user-profile">
+			<div class="media">
+			  <div class="pull-left text-center" href="#!">
+				<img class="media-object user-img" src="https://www.w3schools.com/howto/img_avatar.png" alt="Image">
+				{% comment %} <a href="#x" class="btn btn-transparent mt-20">Change Image</a> {% endcomment %}
+			  </div>
+			  <div class="media-body">
+				<ul class="user-profile-list">
+					
+				  <li><span>Full Name:</span>{{user.full_name}}</li>
+				  <li><span>Email:</span>{{user.email}}</li>
+				  <li><span>Phone:</span>+91 {{ user.phone_number }}</li>
+				  <li><span>Date of Birth:</span>Dec , 22 ,1991</li>
+				</ul>
+			  </div>
+			</div>
+			<div class=" total-order mt-">
+				<h4 style="margin-top:60px ; text-align:center;">Total Orders</h4>
+				<div class="table-responsive">
+					<div class="col-md-12">
+						<div class="card" style="text-align:center;">
+							<div class="card-body">
+								<h4>{{orders_count}}</h4>
+								<button  class="btn btn-info" ><a href="{% url 'my_orders'%}">View Orders</a></button>
+							</div>
 						</div>
 					</div>
-				</div>
+				
+		  </div>
+		 
 			</div>
 		</div>
+		</div>
+	  </div>
 	</div>
-</section>
-
+  </section>
 
 
 

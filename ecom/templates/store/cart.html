@@ -100,7 +100,7 @@
                                    {% else %}
                                    <span class="input-group-btn ">
                                      
-                                     <a href="" class="btn btn-default bootstrap-touchspin-down block" type="button" class="disabled">-</a>
+                                     <a href="" class="btn btn-default bootstrap-touchspin-down block disabled" type="button" >-</a>
                                    </span>
                                    {% endif %}
  
@@ -137,7 +137,7 @@
                           </td>
                         <td class="">
                           {% comment %} <a class="product-remove" href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}">Remove</a> {% endcomment %}
-                          <a class="product-remove" ><button type="button" value="" onclick="remove_cart('{{ cart_item.product.id }}', '{{ cart_item.id }}')" >Remove</button></a>
+                          <a class="product-remove" ><button type="button" value="" class="btn" onclick="remove_cart('{{ cart_item.product.id }}', '{{ cart_item.id }}')" >Remove</button></a>
                         </td>
                       </tr>
                       {% endfor %}
