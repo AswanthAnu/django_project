@@ -359,7 +359,7 @@ def dashboard(request):
 def my_orders(request):
 
 
-    if 'email' in request.session:
+    if 'email' not in request.session:
         return redirect('home')
 
     orderproducts = OrderProduct.objects.filter(user = request.user).order_by('-created_at')

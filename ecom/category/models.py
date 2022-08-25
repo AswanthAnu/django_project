@@ -20,3 +20,22 @@ class category(models.Model):
 
     def __str__(self):
         return self.category_name
+
+
+class SubCategory(models.Model):
+    category = models.ForeignKey(category, on_delete=models.CASCADE)
+    sub_category_name = models.CharField(max_length=100, unique= True)
+    slug = models.SlugField(max_length=100, unique=True, null=True, )
+    
+
+
+    class Meta:
+        verbose_name = 'SubCategory'
+        verbose_name_plural = 'SubCategories'
+
+    def get_url(self):
+            return reverse('products_by_sub_category',args=[self.category.slug, self.slug] )
+
+
+    def __str__(self):
+        return self.sub_category_name

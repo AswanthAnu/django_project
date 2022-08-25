@@ -12,7 +12,7 @@ from django.urls import reverse
 
 
 from accounts.models import Account
-from category.models import category
+from category.models import category, SubCategory
 from brand.models import brand
 from store.models import product, Variation
 from orders.models import Order, OrderProduct
@@ -387,6 +387,17 @@ def delete_variation(request, id):
             'success': True
         }, safe= False)
 
+
+def admin_subcategoroy(request):
+
+    subcategory = SubCategory.objects.all()
+    paginator = Paginator(subcategory, 1)
+    page = request.GET.get('page')
+    paged_subcategory = paginator.get_page(page)
+    context={'subcategory' : paged_subcategory }
+
+
+    return render(request, 'admin/admin_subcategory.html', context)
         
 def admin_order(request):
 
