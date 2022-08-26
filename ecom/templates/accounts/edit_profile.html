@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+
+
+{% block content%}
+
+<section class="user-dashboard page-wrapper">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<ul class="list-inline dashboard-menu text-center">
+					<li><a  href="{% url 'dashboard' %}">Dashboard</a></li>
+					<li><a  href="{% url 'my_orders' %}">My Orders</a></li>
+					<li><a class="active" href="{% url 'edit_profile' %}">Edit Profile</a></li>
+					<li><a href="{% url 'change_password' %}">Change Password</a></li>
+				</ul>
+	
+<div class="page-wrapper">
+    <div class="checkout shopping">
+       <div class="container">
+       
+        {% include 'includes/alerts.html' %}
+          <div class="row">
+             <div class="col-md-12">
+              
+                <div class="block billing-details">
+                  <div class="text-right ">
+                    <img src="{{ userprofile.profile_picture.url}}" alt="Profile Picture" width="150"  style="border:solid 2px black;border-radius : 100px; ">
+                  </div>
+                   <h4 class="widget-title">User Profile</h4>
+                  
+                  <div class="block billing-details">
+                  <form class="checkout-form" action="{% url 'edit_profile' %}" method='POST' enctype="multipart/form-data" >
+                    
+                     {% csrf_token %}
+                   
+                     <div class="checkout-country-code clearfix">
+                        <div class="form-group">
+                           <label >First Name</label>
+                          {{user_form.first_name}}
+                        </div>
+                        <div class="form-group" >
+                           <label >last Name</label>
+                           {{user_form.last_name}}
+                        </div>
+                     </div>
+                     <div class="checkout-country-code clearfix">
+                        <div class="form-group">
+                           <label >Phone Number</label>
+                           {{user_form.phone_number}}
+                        </div>
+                        <div class="form-group" >
+                           
+                           {{profile_form.profile_picture}}
+                        </div>
+                     </div>
+                      <div class="form-group">
+                         <label >Address Line 1</label>
+                         {{profile_form.address_line_1}}
+                      </div>
+                      <div class="form-group">
+                        <label >Address Line 2</label>
+                        {{profile_form.address_line_2}}
+                     </div>
+                      <div class="  checkout-country-code clearfix">
+                         <div class=" form-group">
+                            <label >City</label>
+                            {{profile_form.city}}
+                         </div>
+                         <div class=" form-group" >
+                            <label >State</label>
+                            {{profile_form.state}}
+                         </div>
+                          <div class="form-group">
+                            <label >Country</label>
+                            {{profile_form.country}}
+                          </div>
+                          </div>
+                          <button type='submit'  class="btn btn-main mt-20">Save</button >
+                    </form>
+                 
+                </div>
+ 
+	</div>
+</section>
+<script type="text/javascript">
+
+	// cancel order
+	function cancel_order(order_no, order_prdt, order_qnty) {
+        console.log(typeof(order_no, order_prdt, order_qnty ))
+        swal({
+          title: "Are you sure?",
+          text: "Do you want to cancel the Order  " ,
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        }).then((willDelete) => {
+          if (willDelete) {
+            // swal("Order cancelled successfully", {
+            //   icon: "success",
+            //   timer: 2000,
+            // })
+            
+            console.log("cancel order");
+             $.ajax({
+              url: 'cancel_order/'+order_no +"/"+order_prdt+"/"+order_qnty,
+              data: {
+                
+              },
+              method: "GET",
+              success: (response) => {
+                if (response.success= true) {
+					swal(" Order cancelled successfuly",{
+						
+						icon : "success",
+						button : false,
+						timer : 2000, 
+
+					})
+                  
+				  setTimeout(function(){
+					location.reload();
+
+				  }, 1900)
+                }
+                console.log(response)
+              },
+            }); 
+              
+          } else {
+            // swal("");
+          }
+        });
+      
+        
+           }
+
+
+
+
+		   //return order
+		   function return_order(order_no, order_prdt, order_qnty) {
+			console.log(typeof(order_no, order_prdt, order_qnty ))
+			swal({
+			  title: "Are you sure?",
+			  text: "Do you want to return the Order  " ,
+			  icon: "warning",
+			  buttons: true,
+			  dangerMode: true,
+			}).then((willDelete) => {
+			  if (willDelete) {
+				// swal("Order cancelled successfully", {
+				//   icon: "success",
+				//   timer: 2000,
+				// })
+				
+				console.log("return order");
+				 $.ajax({
+				  url: 'cancel_order/'+order_no +"/"+order_prdt+"/"+order_qnty,
+				  data: {
+					
+				  },
+				  method: "GET",
+				  success: (response) => {
+					if (response.success= true) {
+						swal(" Order returned successfuly",{
+							
+							icon : "success",
+							button : false,
+							timer : 2000, 
+	
+						})
+					  
+					  setTimeout(function(){
+						location.reload();
+	
+					  }, 1900)
+					}
+					console.log(response)
+				  },
+				}); 
+				  
+			  } else {
+				// swal("");
+			  }
+			});
+		  
+			
+			   }
+	</script>
+
+
+{% endblock %}

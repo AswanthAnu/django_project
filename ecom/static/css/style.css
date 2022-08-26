@@ -2012,7 +2012,7 @@ input[type=email]:focus, input[type=password]:focus, input[type=text]:focus, inp
   font-weight: 400;
   text-transform: uppercase;
   opacity: 1 !important;
-  width: 85px;
+  
 }
 .checkout-form .form-group input {
   border-radius: 0;

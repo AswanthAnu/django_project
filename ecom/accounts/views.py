@@ -1,11 +1,12 @@
 
+from multiprocessing import context
 from pickle import FALSE
 from django.contrib import messages
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
-from django.shortcuts import render, redirect
-from .form import RegistrationForm
-from .models import Account, profile
+from django.shortcuts import render, redirect, get_object_or_404
+from .form import RegistrationForm, UserForm, UserProfileForm
+from .models import Account, UserProfile
 from django.http import JsonResponse
 from django.urls import reverse
 from orders.models import Order, OrderProduct  
@@ -17,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 from twilio.rest import Client
 from django.conf import settings
 from django.core.paginator import Paginator
+
 
 
 
@@ -344,6 +346,7 @@ def dashboard(request):
 
     orders = Order.objects.order_by('-created_at').filter(user_id = request.user.id, is_ordered=True)
     orders_count = orders.count()
+    userprofile = get_object_or_404(UserProfile, user=request.user)
 
     
 
@@ -351,11 +354,12 @@ def dashboard(request):
         
        
         'orders_count' : orders_count,
+        'userprofile'  : userprofile,
     }
 
     return render(request, 'accounts/dashboard.html', context )
 
-@login_required(login_url = 'login')
+
 def my_orders(request):
 
 
@@ -393,8 +397,51 @@ def cancel_order(request, order_no, order_prdt, order_qnty ):
 
 @login_required(login_url = 'login')
 def edit_profile(request):
-    return render(request, 'accounts/my_orders.html')
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile )
 
-@login_required(login_url = 'login')
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Your profile has been updated.')
+            return redirect('edit_profile')
+
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=userprofile)
+    context = {
+        'user_form' : user_form, 
+        'profile_form' : profile_form,
+        'userprofile'  : userprofile,
+    }
+
+    return render(request, 'accounts/edit_profile.html', context)
+
+
 def change_password(request):
-    return render(request, 'accounts/my_orders.html')
+
+    if request.method == 'POST':
+        current_password = request.POST['current_password']
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+
+        user = Account.objects.get(username__exact = request.user.username)
+
+        if new_password == confirm_password:
+            success  = user.check_password(current_password)
+            if success:
+                user.set_password(new_password)
+                user.save()
+                auth.logout(request)
+                messages.success(request, 'Password updated successfully.')
+                return redirect('change_password')
+            else:
+                messages.error(request, 'Your password is in correct.')
+                return redirect('change_password')
+
+        else:
+            messages.error(request, 'Password does not match!')
+            return redirect('change_password')
+    return render(request, 'accounts/change_password.html' )
