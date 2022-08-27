@@ -93,7 +93,11 @@ def store(request,category_slug= None, brand_slug= None, sub_category_slug=None 
 
 
 def product_detail(request, category_slug, subcategory_slug,  product_slug):
+
+
     try:
+        categories = category.objects.get(slug = category_slug)
+        products = product.objects.get(slug = product_slug)
         single_product = product.objects.get(category__slug = category_slug, subcategory__slug = subcategory_slug, slug = product_slug)
         in_cart = CartItem.objects.filter(cart__cart_id = _cart_id(request), product = single_product).exists()
         
@@ -105,6 +109,8 @@ def product_detail(request, category_slug, subcategory_slug,  product_slug):
     context = {
         'single_product' : single_product, 
         'in_cart'        : in_cart,
+        'categories'     : categories,
+        'products'       : products,
 
     }
 

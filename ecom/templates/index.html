@@ -99,7 +99,7 @@
 						<div class="preview-meta">
 							<ul>
 								<li>
-									<span  data-toggle="modal" data-target="{{ product.get_url }}">
+									<span  data-toggle="modal" data-target="#product-modal">
 										<i class="tf-ion-ios-search-strong"></i>
 									</span>
 								</li>
@@ -122,9 +122,8 @@
 					</div>
 				</div>
 			</div>
-			{% endfor %}
 			
-		
+			
 		<!-- Modal -->
 		<div class="modal product-modal fade" id="product-modal">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -146,16 +145,16 @@
 			        				<p class="product-short-description">
 			        					
 			        				</p>
-			        				<a href="" class="btn btn-main">Add To Cart</a>
-			        				<a href="product-single.html" class="btn btn-transparent">View Product Details</a>
-			        			</div>
-			        		</div>
+			        				<a href="{{ product.get_url }}" class="btn btn-main">View Product details</a>
+			        v>
 			        	</div>
 			        </div>
 		    	</div>
+			        			</div>
+			        		</di
 		  	</div>
 		</div><!-- /.modal -->
-
+		{% endfor %}
 		</div>
 	</div>
 </section>

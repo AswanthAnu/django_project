@@ -4,4 +4,86 @@
 
 {% block content %}
 
+<div class="row ">
+    <div class="offset-3 col-md-12 col-sm-12 col-12">
+        <canvas id="user_chart" width="300" height="300"></canvas>
+    </div>
+</div>
+
+
+
+<script>
+var xValues = ["Active users", "Blocked users"];
+var yValues = ["{{ active_users }}", '{{ blocked_users }}'];
+
+
+
+var barColors = [
+  "#66841b",
+  "#1b8563",
+  "#2b5797",
+  "#e8c3b9",
+  "#1e7145"
+];
+
+new Chart("user_chart", {
+  type: "pie",
+  data: {
+    labels: xValues,
+    datasets: [{
+      backgroundColor: barColors,
+      data: yValues
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+      text: "Users status"
+    }
+  }
+});
+</script>
+
+
+
+
+<div class="row ">
+    <div class="offset-3 col-md-12 col-sm-12 col-12">
+        <canvas id="pay" width="300" height="300"></canvas>
+    </div>
+</div>
+
+
+
+<script>
+var paymeth = [{% for i in pay_method %}'{{i}}', {% endfor %}];
+var payval = [{% for i in pay_count %}'{{i}}', {% endfor %}];
+
+var barColors = [
+  "#66841b",
+  "#1b8563",
+  "#2b5797",
+  "#e8c3b9",
+  "#1e7145"
+];
+
+new Chart("pay", {
+  type: "bar",
+  data: {
+    labels: paymeth,
+    datasets: [{
+      backgroundColor: barColors,
+      data:  payval,
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+      text: "Sales on different payment method"
+    }
+  }
+});
+</script>
+
+
 {% endblock %}

@@ -8,14 +8,16 @@ from django.views.decorators.cache import cache_control
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-
+import pandas as pd
+from django.db.models import Q
+from django.db.models import Count
 
 
 from accounts.models import Account
 from category.models import category, SubCategory
 from brand.models import brand
 from store.models import product, Variation
-from orders.models import Order, OrderProduct
+from orders.models import Order, OrderProduct, Payment
 
 # Create your views here.
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
@@ -23,6 +25,9 @@ def admin_login(request):
 
     if 'is_admin' in request.session:
         return redirect('admin_dashboard')
+    
+   
+
 
     if request.method == 'POST':
         email = request.POST['email']
@@ -54,7 +59,41 @@ def admin_login(request):
 def admin_dashboard(request):
     if 'is_admin' not in request.session:
         return redirect('admin_login')
-    return render(request, 'admin/admin_dashboard.html')
+
+    user = Account.objects.filter(~Q(is_admin=True)).count()
+    active_user = Account.objects.filter(Q(is_active = True) & Q(is_admin = False)).count()
+    blocked_user = Account.objects.filter(Q(is_active = False) & Q(is_admin = False)).count()
+    
+
+    total_orders = Order.objects.all().count()
+    
+    pay = Payment.objects.values('payment_method').annotate(count = Count('payment_method'))
+  
+    pay_method = []
+    pay_count = []
+    for i in pay:
+        pay_method.append(i['payment_method'])
+    for i in pay:
+        pay_count.append(i['count'])
+
+    
+
+    
+    
+
+    context = {
+        'active_users' : active_user,
+        'blocked_users' : blocked_user,
+        'pay_method' : pay_method,
+        'pay_count' : pay_count
+
+  
+
+    }
+
+
+    
+    return render(request, 'admin/admin_dashboard.html', context)
 
 
 def admin_user(request):
@@ -192,11 +231,12 @@ def admin_product(request):
     categories = category.objects.all()
     brands = brand.objects.all()
     products = product.objects.all()
+    subcategories = SubCategory.objects.all()
     paginator = Paginator(products, 1)
     page = request.GET.get('page')
     paged_products = paginator.get_page(page)
    
-    context={'products' : paged_products, 'brands': brands, 'categories': categories }
+    context={'products' : paged_products, 'brands': brands, 'categories': categories, 'subcategories' : subcategories }
    
     return render (request, 'admin/admin_product.html' ,  context)
 
@@ -209,6 +249,7 @@ def add_product(request):
     products = product()
     categ = category.objects.all()
     bran = brand.objects.all()  
+    subcatd = SubCategory.objects.all()
 
 
     if request.method == "POST":
@@ -218,9 +259,11 @@ def add_product(request):
         products.description = request.POST.get('description')
         products.price = request.POST.get('price')
         products.stock = request.POST.get('stock')
-        
+        sl =  request.POST.get('product_name')
+        products.slug = sl.replace(" ", "-").lower()
         brands = request.POST.get('brand')
         categories= request.POST.get('category')
+        subcategories = request.POST.get('subcategory')
         print('below  categ')
         print(categories)
         print(brands)
@@ -235,6 +278,7 @@ def add_product(request):
 
         products.category   = category.objects.get(id = categories)
         products.brand   =  brand.objects.get(id = brands)   
+        products.subcategory = SubCategory.objects.get(id = subcategories)
         print('below  brand')
         if len(request.FILES) != 0:
             print('inside images')
@@ -244,6 +288,8 @@ def add_product(request):
             print('inside images')
         
             products.save()
+            
+          
             return redirect('admin_product')
     return render(request,'admin/admin_product.html')
 

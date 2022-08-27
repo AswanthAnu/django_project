@@ -9,15 +9,17 @@
 		<div class="row">
 			<div class="col-md-6">
 				<ol class="breadcrumb">
-					<li><a href="index.html">Home</a></li>
-					<li><a href="shop.html">Shop</a></li>
-					<li class="active">Single Product</li>
+					<li><a href="{% url 'home' %}">Home</a></li>
+					
+					<li><a href="{{category.get_url}}">{{ single_product.category.category_name }}</a></li>
+					<li><a href="{{subcategory.get_url}}">{{ single_product.subcategory.sub_category_name }}</a></li>
+					<li><a href="{{ product.get_url }}">{{ single_product.product_name }}</a></li>
+					
 				</ol>
 			</div>
 			<div class="col-md-6">
 				<ol class="product-pagination text-right">
-					<li><a href="blog-left-sidebar.html"><i class="tf-ion-ios-arrow-left"></i> Next </a></li>
-					<li><a href="blog-left-sidebar.html">Preview <i class="tf-ion-ios-arrow-right"></i></a></li>
+					
 				</ol>
 			</div>
 		</div>

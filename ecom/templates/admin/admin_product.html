@@ -34,7 +34,7 @@
                         <th><h4>Product</h4></th>
                         <th><h4>Brand</h4></th>
                         <th><h4>Category</h4></th>
-                        
+                        <th><h4>Sub Category</h4></th>
                         <th><h4>Price</h4></th>
 						<th><h4>Stock</h4></th>
 						<th><h4>Images</h4></th>
@@ -51,6 +51,7 @@
                         <td><h5>{{product.product_name}}</h5></td>
                         <td><h5>{{product.brand}}</h2></td>
 						<td><h5>{{product.category}}</h2></td>
+						<td><h5>{{product.subcategory}}</h2></td>
 						<td><h5>Rs. {{product.price}}</h2></td>
 						<td><h5>{{product.stock}}</h2></td>
 						<td><img src="{{product.images.url}}" class="img-thumbnail "></td>
@@ -144,6 +145,15 @@
 							<option value="" selected>---------</option>
 							{% for category in categories %}
 							<option data-style="btn-dark"value="{{category.id}}">{{category.category_name}}</option>
+							{% endfor %}
+						    </select>
+						</div>
+						<div class="form-group">
+							<label>Sub Category</label>
+							<select  name="subcategory" type="text" class="form-control" required>
+							<option value="" selected>---------</option>
+							{% for subcategory in subcategories %}
+							<option data-style="btn-dark"value="{{subcategory.id}}">{{subcategory.sub_category_name}}</option>
 							{% endfor %}
 						    </select>
 						</div>
@@ -248,8 +258,17 @@ var cropper = $image.data('cropper');
 						    </select>
 						</div>
 						<div class="form-group">
+							<label>Sub Category</label>
+							<select  name="subcategory" type="text" class="form-control" required>
+							<option value="" selected>{{product.subcategory}}</option>
+							{% for subcategory in subcategories %}
+							<option data-style="btn-dark"value="{{subcategory.id}}">{{subcategory.sub_category_name}}</option>
+							{% endfor %}
+						    </select>
+						</div>
+						<div class="form-group">
 							<label>Description</label>
-							<input name="description" value="description" type="text" class="form-control" required>
+							<input name="description" value="{{product.description}}" type="text" class="form-control" required>
 						</div>
 						<div class="form-group">
 							<label>Price</label>
