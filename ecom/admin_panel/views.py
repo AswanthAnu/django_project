@@ -10,7 +10,7 @@ from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 import pandas as pd
 from django.db.models import Q
-from django.db.models import Count
+from django.db.models import Count, Sum
 
 
 from accounts.models import Account
@@ -66,9 +66,7 @@ def admin_dashboard(request):
     
 
     total_orders = Order.objects.all().count()
-    
     pay = Payment.objects.values('payment_method').annotate(count = Count('payment_method'))
-  
     pay_method = []
     pay_count = []
     for i in pay:
@@ -76,19 +74,29 @@ def admin_dashboard(request):
     for i in pay:
         pay_count.append(i['count'])
 
+    status = Order.objects.values('status').annotate(count = Count('status'))
+    pay_status = []
+    status_count = []
+    for i in status:
+        pay_status.append(i['status'])
     
+    for i in status:
+        status_count.append(i['count'])
+        
 
     
-    
+    order_product_count_graph = OrderProduct.objects.filter().values('created_at__date').order_by('created_at__date')[:7].annotate(count=Count('quantity'))
+    order_graph =Order.objects.filter().values('created_at__date').order_by('created_at__date')[:1].annotate(sum=Sum('order_total'))
+
+    print(order_product_count_graph, '-----')
 
     context = {
         'active_users' : active_user,
         'blocked_users' : blocked_user,
         'pay_method' : pay_method,
-        'pay_count' : pay_count
-
-  
-
+        'pay_count' : pay_count,
+        'pay_status' : pay_status,
+        'status_count' : status_count,
     }
 
 

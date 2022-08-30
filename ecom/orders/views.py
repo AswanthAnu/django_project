@@ -12,9 +12,11 @@ from openexchangerate import OpenExchangeRates
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 import string
 import random
+import razorpay
+from django.views.decorators.csrf import csrf_exempt
 
 
 
@@ -125,7 +127,7 @@ def payments(request):
         return redirect('cart')
 
     try:
-        if cart_value == 10:
+        
 
             body = json.loads(request.body)
             order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
@@ -195,6 +197,135 @@ def payments(request):
     except:
         return redirect('cart')
 
+# authorize razorpay client with API Keys.
+
+
+def payments_razor(request):
+
+    response = request.POST
+    order_number = request.POST['order_number']
+    print(response, 'response')
+    print(order_number, 'order_number-----')
+
+    params_dict = {
+        'razorpay_order_id' : response['razorpay_order_id'],
+        'razorpay_payment_id' : response['razorpay_payment_id'],
+        'razorpay_signature' : response['razorpay_signature']
+    }
+
+    client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+    order = Order.objects.get(user=request.user, is_ordered=False, order_number=order_number)
+    
+    status = client.utility.verify_payment_signature(params_dict)
+    payment = Payment.objects.get(payment_id = response['razorpay_order_id'])
+    payment.status = 'COMPLETED'
+    payment.save()
+
+    order.payment = payment
+    order.is_ordered = True
+    order.save()
+
+    cart_items = CartItem.objects.filter(user=request.user)
+    for item in cart_items:
+            orderproduct = OrderProduct()
+            orderproduct.order_id = order.id
+            orderproduct.payment = payment
+            orderproduct.user_id = request.user.id
+            orderproduct.product_id = item.product_id
+            orderproduct.quantity = item.quantity
+            orderproduct.product_price = item.product.price
+            orderproduct.ordered = True
+            orderproduct.save()
+
+            cart_item = CartItem.objects.get(id=item.id)
+            product_variation = cart_item.variation.all()
+            orderproduct = OrderProduct.objects.get(id=orderproduct.id)
+            orderproduct.variations.set(product_variation)
+            orderproduct.save()
+
+            prod = product.objects.get(id=item.product_id)
+            prod.stock -= item.quantity
+            prod.save()
+
+            CartItem.objects.filter(user=request.user).delete()
+
+            try:
+                order = Order.objects.get(order_number=order_number, is_ordered=True)
+                ordered_products = OrderProduct.objects.filter(order_id=order.id)
+
+                subtotal = 0
+                for i in ordered_products:
+                    subtotal += i.product_price * i.quantity
+                context = {
+                    'order': order,
+                    'ordered_products': ordered_products,
+                    'order_number': order.order_number,
+                    'transID': payment.payment_id,
+                    'payment': payment,
+                    'subtotal': subtotal,
+                }
+            except:
+                pass
+
+
+            return render(request, 'orders/order_success.html', context )
+
+
+
+    return render(request, 'orders/payments_razor.html')
+
+
+# we need to csrf_exempt this url as
+# POST request will be made by Razorpay
+# and it won't have the csrf token.
+@csrf_exempt
+def paymenthandler(request):
+ 
+   # only accept POST request.
+    if request.method == "POST":
+        try:
+           
+            # get the required parameters from post request.
+            payment_id = request.POST.get('razorpay_payment_id', '')
+            razorpay_order_id = request.POST.get('razorpay_order_id', '')
+            signature = request.POST.get('razorpay_signature', '')
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature
+            }
+            razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+            # verify the payment signature.
+            result = razorpay_client.utility.verify_payment_signature(
+                params_dict)
+            if result is None:
+                amount = 20000  # Rs. 200
+                try:
+ 
+                    # capture the payemt
+                    razorpay_client.payment.capture(payment_id, amount)
+ 
+                    # render success page on successful caputre of payment
+                    return render(request, 'paymentsuccess.html')
+                except:
+ 
+                    # if there is an error while capturing payment.
+                    return render(request, 'paymentfail.html')
+            else:
+ 
+                # if signature verification fails.
+                return render(request, 'paymentfail.html')
+        except:
+ 
+            # if we don't find the required parameters in POST data
+            return HttpResponseBadRequest()
+    else:
+       # if other than POST request is made.
+        return HttpResponseBadRequest()
+
+
+
+
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def place_order(request, total=0, quantity=0, ):
 
@@ -217,8 +348,9 @@ def place_order(request, total=0, quantity=0, ):
     for cart_item in cart_items:
         total += (cart_item.product.price * cart_item.quantity)
         quantity += cart_item.quantity
-    tax = (2 * total)/100
+    tax = (12 * total)/100
     grand_total = total + tax
+    print(grand_total, '===place order')
     
     
     if request.method == 'POST':
@@ -233,7 +365,7 @@ def place_order(request, total=0, quantity=0, ):
             data.user = current_user
             data.first_name = request.POST['first_name']
             data.last_name = request.POST['last_name']
-            data.phone = request.POST['phone']
+            data.phone = request.POST['phone_number']
             data.email = request.POST['email']
             data.address_line_1 = request.POST['address_line_1']
             data.address_line_2 = request.POST['address_line_2']
@@ -257,6 +389,7 @@ def place_order(request, total=0, quantity=0, ):
             order_number = current_date + str(data.id)
             data.order_number = order_number
             data.save()
+            request.session['order_number'] = order_number
 
             # converting indian rupee intto dollar
             
@@ -283,6 +416,62 @@ def place_order(request, total=0, quantity=0, ):
 
                 #return render(request, 'orders/payments_cod.html', context)
                 return render(request, 'orders/payments_cod.html', context)
+
+            elif "razor_method" == payment_method:
+
+
+                currency = 'INR'
+                amount = int(grand_total) * 100 # Rs. 200
+
+                razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+                # Create a Razorpay Order
+                razorpay_order = razorpay_client.order.create(dict(amount=amount,
+                                                                currency=currency,
+                                                                payment_capture='0'))
+                
+            
+                # order id of newly created order.
+                razorpay_order_id = razorpay_order['id']
+                razorpay_order_status = razorpay_order['status']
+
+                if razorpay_order_status == 'created':
+                    user = current_user
+                    payment = Payment(
+                        user_id = user.id,
+                        payment_id = razorpay_order_id,
+                        amount_paid = amount/100,
+                        payment_method = 'Rayzor Pay'
+
+
+                    )
+                    payment.save()
+
+
+                callback_url = 'paymenthandler/'
+                print(order_number, 'order number')
+            
+                # we need to pass these details to frontend.
+                context = {
+                'order_number' : order_number,
+                'order': order,
+                'cart_items': cart_items,
+                'total': total,
+                'tax': tax,
+                'grand_total': grand_total,
+                'grand_dollar':grand_dollar,
+                'razorpay_order_id' : razorpay_order_id,
+                'razorpay_merchant_key' : settings.RAZOR_KEY_ID,
+                'razorpay_amount' : amount,
+                'currency' : currency,
+                'callback_url' : callback_url
+                }
+
+
+
+               
+                
+                return render(request, 'orders/payments_razor.html', context )
+
 
             else:
                 return render(request, 'orders/payments.html', context)
@@ -312,7 +501,6 @@ def order_success(request):
                     subtotal += i.product_price * i.quantity
 
                 payment = Payment.objects.get(payment_id=transID)
-                cart_value = 9
                 context = {
                     'order': order,
                     'ordered_products': ordered_products,

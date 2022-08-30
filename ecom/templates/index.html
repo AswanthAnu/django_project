@@ -123,7 +123,8 @@
 				</div>
 			</div>
 			
-			
+			{% endfor %}
+			{%for product in products%}
 		<!-- Modal -->
 		<div class="modal product-modal fade" id="product-modal">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -146,12 +147,12 @@
 			        					
 			        				</p>
 			        				<a href="{{ product.get_url }}" class="btn btn-main">View Product details</a>
-			        v>
+			    
 			        	</div>
 			        </div>
 		    	</div>
 			        			</div>
-			        		</di
+			        		
 		  	</div>
 		</div><!-- /.modal -->
 		{% endfor %}

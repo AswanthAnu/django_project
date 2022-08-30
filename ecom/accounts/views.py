@@ -1,12 +1,12 @@
 
-from multiprocessing import context
+from multiprocessing import Value, context
 from pickle import FALSE
 from django.contrib import messages
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from .form import RegistrationForm, UserForm, UserProfileForm
-from .models import Account, UserProfile
+from .models import Account, UserProfile, Address
 from django.http import JsonResponse
 from django.urls import reverse
 from orders.models import Order, OrderProduct  
@@ -341,14 +341,19 @@ def logout(request):
     request.session.flush() 
 
     return redirect('home')
-@login_required(login_url = 'login')
+
 def dashboard(request):
 
-    orders = Order.objects.order_by('-created_at').filter(user_id = request.user.id, is_ordered=True)
-    orders_count = orders.count()
-    userprofile = get_object_or_404(UserProfile, user=request.user)
-
-    
+    try:
+        orders = Order.objects.order_by('-created_at').filter(user_id = request.user.id, is_ordered=True)
+        orders_count = orders.count()
+        userprofile = get_object_or_404(UserProfile, user=request.user)
+    except:
+        orders = Order.objects.order_by('-created_at').filter(user_id = request.user.id)
+        userprofile = get_object_or_404(Account, email=request.user.email)
+        return render(request, 'accounts/dashboard.html' )
+        
+        
 
     context = {
         
@@ -363,8 +368,7 @@ def dashboard(request):
 def my_orders(request):
 
 
-    if 'email' not in request.session:
-        return redirect('home')
+
 
     orderproducts = OrderProduct.objects.filter(user = request.user).order_by('-created_at')
     paginator = Paginator(orderproducts, 6)
@@ -380,37 +384,80 @@ def my_orders(request):
   
 def cancel_order(request, order_no, order_prdt, order_qnty ):
     print(order_no)
-    print("yeah s")
+    
     order_cancel = Order.objects.get(order_number=order_no)
-    print(order_cancel)
+    
     order_product = product.objects.get(product_name = order_prdt)
-    print(order_product)
+    
     order_cancel.status = 'Cancelled'
-    print(order_product.stock, "before")
+    
     order_product.stock += int(order_qnty)
-    print(order_qnty)
-    print(order_product.stock)
+    
+    
     order_cancel.save()
     order_product.save()
 
     return JsonResponse({'success': True},safe= False)
 
-@login_required(login_url = 'login')
+def address(request):
+
+
+    user = request.user
+    addresses = []
+    us = user.id
+    try:
+        if request.method == 'POST':
+            first_name = request.POST['first_name']
+            last_name = request.POST['last_name']
+            email = request.POST['email']
+            phone_number = request.POST['phone_number']
+            address_line_1 = request.POST['address_line_1']
+            address_line_2 = request.POST['address_line_2']
+            city = request.POST['city']
+            state = request.POST['state']
+            country = request.POST['country']
+
+            address = Address(user_id = us ,first_name = first_name, last_name = last_name, email = email, phone_number = phone_number, address_line_1 = address_line_1, address_line_2 = address_line_2, city = city, state = state, country = country )
+
+            address.save()
+            
+            addresses = Address.objects.get(user_id = us)
+            messages.success(request, 'New Address added to the list...')
+            return redirect('address')
+    except:
+        return redirect('address')
+
+    addresses = Address.objects.filter(user_id = us)
+    context = {
+        'addresses' : addresses,
+    }
+    return render(request, 'accounts/address.html', context)
+
 def edit_profile(request):
-    userprofile = get_object_or_404(UserProfile, user=request.user)
-    if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile )
+    try:
+        userprofile = get_object_or_404(UserProfile, user=request.user)
+        if request.method == 'POST':
+            user_form = UserForm(request.POST, instance=request.user)
+            profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile )
 
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success(request, 'Your profile has been updated.')
-            return redirect('edit_profile')
+            if user_form.is_valid() and profile_form.is_valid():
+                user_form.save()
+                profile_form.save()
+                messages.success(request, 'Your profile has been updated.')
+                return redirect('edit_profile')
 
-    else:
-        user_form = UserForm(instance=request.user)
-        profile_form = UserProfileForm(instance=userprofile)
+        else:
+            user_form = UserForm(instance=request.user)
+            profile_form = UserProfileForm(instance=userprofile)
+    except:
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+        context = {
+        'user_form' : user_form, 
+        'profile_form' : profile_form,
+    }
+
+        return render(request, 'accounts/edit_profile.html', context)
     context = {
         'user_form' : user_form, 
         'profile_form' : profile_form,

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.contrib.auth.admin import UserAdmin
-from . models import Account,profile, UserProfile
+from . models import Account,profile, UserProfile, Address
 
 # Register your models here.
 class AccountAdmin(UserAdmin):
@@ -26,4 +26,5 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 admin.site.register(Account, AccountAdmin)
 admin.site.register(profile)
+admin.site.register(Address)
 admin.site.register(UserProfile, UserProfileAdmin)

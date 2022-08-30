@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Cart, CartItem
+from accounts.models import Address
 from store.models import product, Variation
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
@@ -20,6 +21,7 @@ def _cart_id(request):        # creating to session to get cart_id
 def add_cart(request, product_id):
 
     current_user = request.user
+    print('---')
 
     prod = product.objects.get(id = product_id)  #fetching the product
     # if the user is authenticated
@@ -31,6 +33,7 @@ def add_cart(request, product_id):
             for item in request.POST:
                 key = item
                 value = request.POST[key]
+
 
                 try:
                     varia = Variation.objects.get(product = prod, variation_category__iexact = key, variation_value__iexact = value)
@@ -81,9 +84,11 @@ def add_cart(request, product_id):
                 cart_item.variation.clear()
                 cart_item.variation.add(*product_variation)
             cart_item.save()
+
         
 
         return redirect('cart')
+     
 
    # if the user is not auth
 
@@ -162,6 +167,63 @@ def add_cart(request, product_id):
         
 
         return redirect('cart')
+     
+
+                    
+def update_cart(request,product_id ):
+
+    current_user = request.user
+    print('---')
+    print("add_cart_from_cart")
+    # product = Product.objects.get(id=product_id)
+    # print(type(product))
+  
+     
+    #fetching the product
+    # if the user is authenticated
+    if current_user.is_authenticated:
+        
+        product_variation = []
+
+      
+
+        cart_id = product_id
+        print(cart_id)
+
+
+        cart_ite = CartItem.objects.get(id = cart_id)
+        cart_ite.quantity += 1
+        cart_ite.save()
+
+        cart_q = cart_ite.quantity
+        print(cart_q, "cart quantity")
+        
+
+        return HttpResponse(cart_q)
+     
+
+   # if the user is not auth
+
+    else:
+
+        if request.method == 'POST':
+
+            cart_id = request.POST['cart_id']
+            print(cart_id)
+
+
+            cart_ite = CartItem.objects.filter(id = cart_id)
+            cart_ite.quantity += 1
+            cart_ite.save()
+
+            cart_q = cart_ite.quantity
+
+        return HttpResponse(cart_q)
+     
+
+
+
+
 
 
 def cart(request, total = 0, quantity = 0 , cart_items = None):
@@ -180,7 +242,7 @@ def cart(request, total = 0, quantity = 0 , cart_items = None):
             print(total)
             quantity += cart_item.quantity
 
-        gst = (17 * total)/100
+        gst = (12 * total)/100
         grand_total = total + gst
     except ObjectDoesNotExist:
         pass
@@ -210,13 +272,16 @@ def remove_cart(request, product_id, cart_item_id):
         if cart_item.quantity > 1:
             cart_item.quantity -= 1
             cart_item.save()
+            cart_q =  cart_item.quantity
+            print(cart_q)
         else:
             cart_item.delete()
 
     except:
         pass
 
-    return redirect('cart')
+    #return redirect('cart')
+    return HttpResponse(cart_q)
 
 
 def remove_cart_item(request, product_id, cart_item_id):
@@ -243,6 +308,7 @@ def checkout(request, total = 0, quantity = 0 , cart_items = None):
         grand_total = 0
         if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+            addresses = Address.objects.filter(user = request.user)
         else:
             cart = Cart.objects.get(cart_id=_cart_id(request))
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
@@ -251,8 +317,9 @@ def checkout(request, total = 0, quantity = 0 , cart_items = None):
             
             quantity += cart_item.quantity
 
-        gst = (2 * total)/100
+        gst = (12 * total)/100
         grand_total = total + gst
+        request.session["grand_total"] = grand_total
         
     except ObjectDoesNotExist:
         pass
@@ -264,6 +331,7 @@ def checkout(request, total = 0, quantity = 0 , cart_items = None):
         'cart_items' : cart_items,
         'gst' : gst,
         'grand_total' : grand_total,
+        'addresses' : addresses,
     }
     
     return render(request, 'store/checkout.html', context )

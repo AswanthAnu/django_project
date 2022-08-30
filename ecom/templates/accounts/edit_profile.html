@@ -12,6 +12,7 @@
 					<li><a  href="{% url 'dashboard' %}">Dashboard</a></li>
 					<li><a  href="{% url 'my_orders' %}">My Orders</a></li>
 					<li><a class="active" href="{% url 'edit_profile' %}">Edit Profile</a></li>
+          <li><a href="{% url 'address' %}">Address</a></li>
 					<li><a href="{% url 'change_password' %}">Change Password</a></li>
 				</ul>
 	
@@ -25,7 +26,11 @@
               
                 <div class="block billing-details">
                   <div class="text-right ">
+                    {% if userprofile.profile_picture %}
                     <img src="{{ userprofile.profile_picture.url}}" alt="Profile Picture" width="150"  style="border:solid 2px black;border-radius : 100px; ">
+                      {% else %}
+                      <h6>No profile picture uploaded</h6>
+                      {% endif %}
                   </div>
                    <h4 class="widget-title">User Profile</h4>
                   

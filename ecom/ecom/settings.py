@@ -132,7 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE =  'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -171,7 +171,10 @@ ACCOUNT_SID = config("ACCOUNT_SID")
 TOKEN_SID = config("TOKEN_SID")
 SERVICES = config("SERVICES")
 
+#razor pay
 
+RAZOR_KEY_ID = config('RAZOR_KEY_ID')
+RAZOR_KEY_SECRET = config('RAZOR_KEY_SECRET')
 
 # SMTP configuration
 EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'

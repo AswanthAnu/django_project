@@ -5,6 +5,34 @@
 {% block content%}
 
 
+<div class="container mt-3">
+   <h4 class="widget-title">Select Address</h4>
+    <form>
+    
+      {% for address in addresses%}
+      <div class="form-check">
+         
+         <input class="form-check-input" type="radio"  name="address" id="flexRadioDefault{{address.id}}" value="{{address.id}}" onclick="handleChange({{ address.id}})" >
+         <label class="form-check-label" for="flexRadioDefault1">
+            {{address.first_name}}.{{address.last_name}} : {{ address.full_address}}
+            <input type="text" style="display: none;" value="{{address.first_name}}" id ="f_name{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.last_name}}" id ="l_name{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.email}}" id ="emaill{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.phone_number}}" id ="p_number{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.address_line_1}}" id ="address1{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.address_line_2}}" id ="address2{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.state}}" id ="f_state{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.city}}" id ="f_city{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.country}}" id ="f_country{{address.id}}">
+         </label>
+       
+      </div>
+      {% endfor %}
+  
+
+   </form>    
+ </div>
+ 
 <div class="page-wrapper">
     <div class="checkout shopping">
        <div class="container">
@@ -19,11 +47,11 @@
                      <div class="checkout-country-code clearfix">
                         <div class="form-group">
                            <label >First Name</label>
-                           <input type="text" class="form-control" id="first_name" name="first_name"  value="">
+                           <input type="text" class="form-control" id="first_name" name="first_name"  value="{{addresses.first_name}}">
                         </div>
                         <div class="form-group" >
                            <label >last Name</label>
-                           <input type="text" class="form-control" name="last_name" id="last_name"  value="">
+                           <input type="text" class="form-control" name="last_name" id="last_name"  value="{{addresses.last_name}}">
                         </div>
                      </div>
                      <div class="checkout-country-code clearfix">
@@ -33,7 +61,7 @@
                         </div>
                         <div class="form-group" >
                            <label >Phone Number</label>
-                           <input type="text" class="form-control" name="phone" id="phone_number" value="">
+                           <input type="text" class="form-control" name="phone_number" id="phone_number" value="">
                         </div>
                      </div>
                       <div class="form-group">
@@ -75,6 +103,12 @@
                         <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault2" value="paypal_method" checked>
                         <label class="form-check-label" for="flexRadioDefault2">
                           PayPal
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault3" value="razor_method" >
+                        <label class="form-check-label" for="flexRadioDefault3">
+                          Razor Pay
                         </label>
                       </div>
                  
@@ -119,14 +153,14 @@
                            
                          <li>
                                 
-                            <span>TAX:</span>
-                            <span>Rs.{{ gst }}0</span>
+                            <span>GST:</span>
+                            <span>Rs.{{ gst }}00</span>
                          </li>
                          
                       </ul>
                       <div class="summary-total">
                          <span>Total</span>
-                         <span>Rs.{{ grand_total}}0</span>
+                         <span>Rs.{{ grand_total}}.00</span>
                       </div>
 
                       <button type='submit'  class="btn btn-main mt-20">Place Order</button >
@@ -143,19 +177,37 @@
     </div>
  </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="coupon-modal" tabindex="-1" role="dialog">
-       <div class="modal-dialog" role="document">
-          <div class="modal-content">
-             <div class="modal-body">
-                <form>
-                   <div class="form-group">
-                      <input class="form-control" type="text" placeholder="Enter Coupon Code">
-                   </div>
-                   <button type="submit" class="btn btn-main">Apply Coupon</button>
-                </form>
-             </div>
-          </div>
-       </div>
-    </div>
+ <script>
+   function handleChange(src) {
+   
+   var f_name = document.getElementById("f_name" + src).value
+   var l_name = document.getElementById("l_name" + src).value
+   var emaill = document.getElementById("emaill" + src).value
+   var p_number = document.getElementById("p_number" + src).value
+   var address1 = document.getElementById("address1" + src).value
+   var address2 = document.getElementById("address2" + src).value
+   var f_state = document.getElementById("f_state" + src).value
+   var f_city = document.getElementById("f_city" + src).value
+   var f_country = document.getElementById("f_country" + src).value
+   
+   
+       //default saved home address
+       if(src){
+       document.getElementById("first_name").value=f_name;
+       document.getElementById("last_name").value=l_name;
+       document.getElementById("email").value=emaill;
+       document.getElementById("phone_number").value=p_number;
+       document.getElementById("address_line_1").value=address1;
+       document.getElementById("address_line_2").value=address2;
+       document.getElementById("state").value=f_state;
+       document.getElementById("city").value=f_city;
+       document.getElementById("country").value=f_country;
+     }
+    
+   }
+     
+ </script>
+
+
+
     {% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content%}
+
+<section class="user-dashboard page-wrapper">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<ul class="list-inline dashboard-menu text-center">
+					<li><a  href="{% url 'dashboard' %}">Dashboard</a></li>
+					<li><a  href="{% url 'my_orders' %}">My Orders</a></li>
+          <li><a  href="{% url 'edit_profile' %}">Edit Profile</a></li>
+					<li><a class="active" href="{% url 'edit_profile' %}">Address</a></li>
+					<li><a href="{% url 'change_password' %}">Change Password</a></li>
+				</ul>
+	
+<div class="page-wrapper">
+    <div class="checkout shopping">
+       <div class="container">
+       
+        {% include 'includes/alerts.html' %}
+          <div class="row">
+             <div class="col-md-12">
+              
+<div class="page-wrapper">
+  <div class="checkout shopping">
+     <div class="container">
+        <div class="row">
+           <div class="col-md-8">
+              <div class="block billing-details">
+                 <h4 class="widget-title">Add Address</h4>
+                 <form class="checkout-form" action="{% url 'address' %}" method='POST'>
+                  
+                   {% csrf_token %}
+                 
+                   <div class="checkout-country-code clearfix">
+                      <div class="form-group">
+                         <label >First Name</label>
+                         <input type="text" class="form-control" id="first_name" name="first_name"  value="">
+                      </div>
+                      <div class="form-group" >
+                         <label >last Name</label>
+                         <input type="text" class="form-control" name="last_name" id="last_name"  value="">
+                      </div>
+                   </div>
+                   <div class="checkout-country-code clearfix">
+                      <div class="form-group">
+                         <label >Email</label>
+                         <input type="email" class="form-control" name="email" id="email"  value=""> 
+                      </div>
+                      <div class="form-group" >
+                         <label >Phone Number</label>
+                         <input type="text" class="form-control" name="phone_number" id="phone_number" value="">
+                      </div>
+                   </div>
+                    <div class="form-group">
+                       <label >Address Line 1</label>
+                       <input type="text" class="form-control" name="address_line_1" id="address_line_1"  value="">
+                    </div>
+                    <div class="form-group">
+                      <label >Address Line 2</label>
+                      <input type="text" class="form-control" name="address_line_2" id="address_line_2"  value="">
+                   </div>
+                    <div class="checkout-country-code clearfix">
+                       <div class="form-group">
+                          <label >state</label>
+                          <input type="text" class="form-control" id="state" name="state" value="">
+                       </div>
+                       <div class="form-group" >
+                          <label >City</label>
+                          <input type="text" class="form-control" id="city" name="city" value="">
+                       </div>
+                    </div>
+                    <div class="form-group">
+                       <label >Country</label>
+                       <input type="text" class="form-control" id="country" name="country" value="">
+                    </div>
+                  
+                    <button type='submit'  class="btn btn-main mt-20">Add Address</button >
+                    </form>
+                    </div>
+             
+           </div>
+           <div class="col-md-4">
+              <div class="product-checkout-details">
+                 <div class="block">
+                    <h4 class="widget-title">Current Addresses</h4>
+                    {% for address in addresses %}
+                    <div class="checkout-country-code clearfix">
+                      <div class="form-group">
+                        <label >{{address.first_name}}. {{address.last_name}}</label>
+                        <input type="text" class="form-control " name="current_password" id="current_password"  value="{{address.full_address}}" disabled>
+                     </div>
+                     {% endfor %}
+                    </div>
+                 </div>
+              </div>
+           </div>
+        </div>
+     </div>
+  </div>
+</div>
+
+              
+
+</section>
+
+
+
+{% endblock %}

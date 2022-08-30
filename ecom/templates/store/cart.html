@@ -19,10 +19,13 @@
                         <th class="">Product</th> 
                         <th class=""></th>
                         <th class=""></th>
+                        <th class=""></th>
                         <th class="">Quantity</th>
+                        <th class=""></th>
                         <th class=""></th>
                         <th class="">Item Price</th>
                         <th class=""></th>
+                        
                         <th class="">Actions</th>
                       </tr>
                     </thead>
@@ -36,6 +39,7 @@
                           </div>
                         </td>
                         
+                        
                         <td >
                           <a href="{{ cart_item.product.get_url }}">{{ cart_item.product.product_name}}</a>
                           <p class="text-muted small"></p>
@@ -46,46 +50,7 @@
                           {% endif %}
                         </td>
                        
-                        
-                        <td >
-                           <div class="product-quantity" style="width: 1px; display:none;">
-                           
-                            <div class="product-quantity-slider " style="width: 100px; height:10px; display:hidden;">
-                                <div class="input-group bootstrap-touchspin block">
-                                  {% if cart_item.quantity > 1%}
-                                  <span class="input-group-btn " style="display:hidden;">
-                                    
-                                    <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}" class="btn btn-default bootstrap-touchspin-down block"  type="button">-</a>
-                                  </span>
-                                  {% else %}
-                                  <span class="input-group-btn "style="display:hidden;">
-                                    
-                                    <a href="" class="btn btn-default bootstrap-touchspin-down block" type="button" class="disabled">-</a>
-                                  </span>
-                                  {% endif %}
-
-                                  <span class="input-group-addon bootstrap-touchspin-prefix b" style="display: none; "></span>
-                                  
-                                  <input id="product-quantity" value="{{ cart_item.quantity }}" class="form-control " style="display: block; height:34px; width:34px;">
-                                  {% for item in cart_item.variation.all %}
-                                  <span class="input-group-addon bootstrap-touchspin-postfix" style="display: none;">
-                                  </span>
-                                  <span class="input-group-btn">
-                                    <form action="{% url 'add_cart' cart_item.product.id %}" method="POST">
-                                     
-                                      {% csrf_token %}
-                                           <input  type="hidden" value="{{ item.variation_value | capfirst }}" name="{{ item.variation_category | lower }}">
-                                    {% endfor %}
-                                    <button class="btn btn-default bootstrap-touchspin-up" type="submit">+</button>
-                                  </span>
-                                </form>  
-                                </div>
-                            </div>
-                            </div> 
-                          </td>
-                          </td>
-
-
+                        <td ></td>
 
                           <td >
                             <div class="product-quantity" style="width: 1px;">
@@ -95,8 +60,9 @@
                                    {% if cart_item.quantity > 1%}
                                    <span class="input-group-btn ">
                                      
-                                     <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}" class="btn btn-default bootstrap-touchspin-down block"  type="button">-</a>
-                                   </span>
+                                  
+                                     <input type="button" style="display: hidden;" id="div_id" class="btn btn-default bootstrap-touchspin-up" onclick="removefromCart('{{ cart_item.id }}','{{cart_item.product.id}}')" value="-">
+                                    </span>
                                    {% else %}
                                    <span class="input-group-btn ">
                                      
@@ -106,30 +72,46 @@
  
                                    <span class="input-group-addon bootstrap-touchspin-prefix b" style="display: none; "></span>
                                    
-                                   <input id="product-quantity" value="{{ cart_item.quantity }}" class="form-control " style="display: block; height:34px; width:34px;">
+                                   <input id="product_quantity{{ cart_item.id }}" value="{{ cart_item.quantity }}" class="form-control " style="display: block; height:34px; width:34px;">
                                    {% for item in cart_item.variation.all %}
                                    <span class="input-group-addon bootstrap-touchspin-postfix" style="display: none;">
                                    </span>
                                    <span class="input-group-btn">
-                                     <form action="{% url 'add_cart' cart_item.product.id %}" method="POST">
-                                      
-                                       {% csrf_token %}
-                                            <input  type="hidden" value="{{ item.variation_value | capfirst }}" name="{{ item.variation_category | lower }}">
+                                      <input  type="hidden" value="{{ item.variation_value | capfirst }}" name="{{ item.variation_category | lower }}">
                                      {% endfor %}
-                                     <button class="btn btn-default bootstrap-touchspin-up" type="submit">+</button>
+                                     <input type="button" class="btn btn-default bootstrap-touchspin-up" onclick="addtoCart('{{ cart_item.id }}')" value="+">
                                    </span>
-                                 </form>  
+                                   
                                  </div>
                              </div>
                              </div> 
                            </td>
+
+
+
+
+
+
+                                 </div>
+                               
+                             </div>
+                             </div> 
                            </td>
+                           </td>
+                           <td ></td>
+                           <td ></td>
+                          
                           <td>
                           </td>
                           <td class="">
-                            <div class="price-wrap ">
-                              <p class="price fw-500">Rs.{{ cart_item.sub_total }}</p>
-                              <small class="text-muted">Rs.{{ cart_item.product.price}} each</small>
+                            <div class="price-wrap text-center d-flex ">
+                              
+                              <p class="price fw-500" >
+                                <input id="sub_total{{ cart_item.id }}" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{{ cart_item.sub_total }}" disabled>
+                              </p>
+                              <small class="text-muted text-center">
+                                <input  id="each_total{{ cart_item.id }}" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{{ cart_item.product.price}}" disabled>
+                                 </small>
                             </div>
                             <td>
                             </td>
@@ -157,18 +139,24 @@
                         <ul class="list-group list-group-flush">
                           <li
                             class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0" ">
-                            <span  >Total Price :</span> <span style="margin-left :40px; ">Rs.{{ total }}.00</span>
+                            <span  >Total Price :         Rs.</span> <span style="margin-left :40px; ">
+                              <input  id="total_price" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{{ total }}" disabled>
+                            </span>
                            
                           </li>
                           <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span  >Gst :</span><span style="margin-left :88px; ">Rs.{{ gst }}0</span>
+                            <span  >Gst : Rs.</span><span style="margin-left :88px; ">
+                              <input  id="gst" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{{ gst }}" disabled>
+                            </span>
                           </li>
                           <li
                             class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
-                            <div>
-                              <strong >Total amount</strong>
+                            <div >
+                              <strong >Total amount : Rs.</strong>
                               <strong>
-                                <span style="margin-left :25px;  "><strong>Rs.{{ grand_total}}0</strong></span>
+                                <span style="margin-left :25px; " ><strong>
+                                  <input  id="total_amount" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{{ grand_total}}" disabled>
+                                </strong></span>
                               </strong>
                             </div>
                            
@@ -180,7 +168,7 @@
                     
                   <a href="{% url 'checkout' %}" class="btn btn-main pull-right">Checkout</a>
                 </div>
-                </form>
+              </form>
               </div>
             </div>
           </div>
@@ -208,7 +196,8 @@
     </div>
   </div>
 </section>
- {% endif %}
+{% endif %}
+
  <script type="text/javascript">
 
 	// cancel order
@@ -261,5 +250,130 @@
         
            }
 </script>
+
+
+
+<script type="text/javascript">
+
+	// remove cart
+	function remo_cart(prdct_id, cart_id) {
+        console.log(typeof(prdct_id, cart_id ))
+            // swal("Order cancelled successfully", {
+            //   icon: "success",
+            //   timer: 2000,
+            // })
+            
+            console.log("remove cart");
+             $.ajax({
+              url: 'remove_cart/'+prdct_id +"/"+cart_id,
+              data: {
+                
+              },
+              method: "GET",
+              success: (response) => {
+                if (response.success= true) {
+                  cart_q = response.cart_q
+                  document.getElementById("product_quantity").value=cart_q ;
+                }
+                console.log(response)
+              },
+            }); 
+              
+          }
+      
+  
+          
+
+</script>
+
+   
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+        function addtoCart(pid){
+            // pid -product id
+            console.log(pid)
+            xhttp.onload = function () {
+              var re = this.responseText
+        console.log(re)
+        document.getElementById("product_quantity"+pid).value= this.responseText;
+        p_price= document.getElementById("each_total"+pid).value;
+        
+        console.log(p_price, 'each price')
+        p_price=parseInt(p_price);
+        sub_total=p_price*this.responseText;
+        console.log(sub_total, 'total price')
+        document.getElementById("sub_total"+pid).value=sub_total;
+        total_price = document.getElementById("total_price").value;
+        totall_price = parseInt(total_price) + parseInt(p_price);
+        console.log(totall_price);
+        gst = totall_price * (2/100) ;
+        total_amount = totall_price + gst;
+        document.getElementById("total_price").value=totall_price;
+        document.getElementById("gst").value=gst;
+        document.getElementById("total_amount").value=total_amount;
+
+        qn = document.getElementById("product_quantity"+pid).value= this.responseText;
+
+        if(qn < 1){
+          document.getElementById("product_quantity"+pid).style.display= hidden;
+        }
+        
+        
+        
+
+
+        }
+
+        xhttp.open("GET", "update_cart/" + pid);
+        xhttp.send();
+
+
+          }
+    const xhttp = new XMLHttpRequest();
+
+</script>
+
+
+<script>
+  function removefromCart(pid, cart_pd_id){
+      // pid -product id
+      console.log(pid, cart_pd_id)
+      xhttps.onload = function () {
+        var re = this.responseText
+  console.log(re)
+  document.getElementById("product_quantity"+pid).value= this.responseText;
+  p_price= document.getElementById("each_total"+pid).value;
+  console.log(p_price, 'each price')
+  p_price=parseInt(p_price);
+  sub_total=p_price*this.responseText;
+  console.log(sub_total, 'total price')
+  document.getElementById("sub_total"+pid).value=sub_total;
+  total_price = document.getElementById("total_price").value;
+  totall_price = parseInt(total_price) - parseInt(p_price);
+  console.log(totall_price);
+  gst = totall_price * (12/100) ;
+  total_amount = totall_price + gst;
+  document.getElementById("total_price").value=totall_price;
+  document.getElementById("gst").value=gst;
+  document.getElementById("total_amount").value=total_amount;
+  
+  
+  
+
+
+  }
+
+  xhttps.open("GET", "remove_cart/" + cart_pd_id + '/' +  pid);
+  xhttps.send();
+
+
+    }
+const xhttps = new XMLHttpRequest();
+
+</script>
+
 
 {% endblock %}

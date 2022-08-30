@@ -58,7 +58,7 @@
                         
                          <div class="media-body">
                             <h4 class="media-heading"><p >{{ cart_item.product.product_name}}</p></h4>
-                            <p class="price">{{ cart_item.quantity}} x USD.{{ cart_item.product.price }}.00</p>
+                            <p class="price">{{ cart_item.quantity}} x Rs.{{ cart_item.product.price }}.00</p>
                             
                          </div>
                       </div>
@@ -81,7 +81,7 @@
                          <li>
                                 
                             <span>GST:</span>
-                            <span>USD.{{ tax }}0</span>
+                            <span>Rs.{{ tax }}0</span>
                          </li>
                          
                       </ul>
@@ -158,141 +158,5 @@
      
      
 
-{% comment %}     
-   
-    <script>
-
-      function getCookie(name) {
-         let cookieValue = null;
-         if (document.cookie && document.cookie !== '') {
-             const cookies = document.cookie.split(';');
-             for (let i = 0; i < cookies.length; i++) {
-                 const cookie = cookies[i].trim();
-                 // Does this cookie string begin with the name we want?
-                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                     break;
-                 }
-             }
-         }
-         return cookieValue;
-     }
-     
-	$(document).on('submit', '#pay_cod', function (e) {
-		e.preventDefault();
-        var amount = "{{ grand_total }}"
-        var csrftoken = getCookie('csrftoken');
-        var orderID = "{{order.order_number}}"
-        var payment_method = 'COD'
-        var redirect_url = "{% url 'order_success' %}"
-        // Render the PayPal button into #paypal-button-container
-        
-         
-         $.ajax({
-           type:'POST',
-           url:'{% url 'payments_cod'  %}',
-           dataType:'json',
-           data:{
-            'orderID': orderID,
-            'payment_method': payment_method,
-            'status': 'COD',
-            csrfmiddlewaretoken: csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-           },
-           success: function (responce) {
-				console.log(responce)
-				if (responce.success == true) {
-					window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
-				} 
-				
-				else {
-					document.getElementById("variation_value").value="";
-					document.getElementById("variation_value").placeholder = "Type value here..";
-					document.getElementById("variation_value").style.border = "solid red 1px";
-				}
-         }
-         });
-         
-      })
-         {% endcomment %}
-        
-        
-        
-        
-        
-        
-        
-      
-
-
-      {/* function getCookie(name) {
-         let cookieValue = null;
-         if (document.cookie && document.cookie !== '') {
-             const cookies = document.cookie.split(';');
-             for (let i = 0; i < cookies.length; i++) {
-                 const cookie = cookies[i].trim();
-                 // Does this cookie string begin with the name we want?
-                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                     break;
-                 }
-             }
-         }
-         return cookieValue;
-     }
-
-      var amount = "{{ grand_total }}"
-      var url = "{% url 'payments' %}"
-      var csrftoken = getCookie('csrftoken');
-      var orderID = "{{order.order_number}}"
-      var payment_method = 'PayPal'
-      var redirect_url = "{% url 'order_success' %}"
-      paypal.Buttons({
-        // Sets up the transaction when a payment button is clicked
-        createOrder: (data, actions) => {
-          return actions.order.create({
-            purchase_units: [{
-              amount: {
-                value: amount // Can also reference a variable or function
-              }
-            }]
-          });
-        },
-        // Finalize the transaction after payer approval
-        onApprove: (data, actions) => {
-          return actions.order.capture().then(function(orderData) {
-            // Successful capture! For dev/demo purposes:
-            console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
-            const transaction = orderData.purchase_units[0].payments.captures[0];
-            alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
-            // When ready to go live, remove the alert and show a success message within this page. For example:
-            // const element = document.getElementById('paypal-button-container');
-            // element.innerHTML = '<h3>Thank you for your payment!</h3>';
-            // Or go to another URL:  actions.redirect('thank_you.html');
-           
-				// Show a success message to the buyer
-				console.log(orderData);
-				sendData();
-				function sendData(){
-					fetch(url, {
-						method : "POST",
-						headers: {
-							"Content-type": "application/json",
-							"X-CSRFToken": csrftoken,
-						},
-						body: JSON.stringify({
-							orderID: orderID,
-							transID: sendData.id,
-							payment_method: payment_method,
-							status: sendData.status,
-						}),
-					}) */}
-				  //.then((response) => response.json())
-				 // .then((data) => {
-					//	window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
-					//});
-		// 		}
-      //    });
-      //   }
-      // }).render('#paypal-button-container');
     </script>
     {% endblock %}

@@ -13,14 +13,19 @@
     <li><a class="active" href="{% url 'dashboard' %}">Dashboard</a></li>
     <li><a href="{% url 'my_orders' %}">My Orders</a></li>
     <li><a href="{% url 'edit_profile' %}">Edit Profile</a></li>
+	<li><a href="{% url 'address' %}">Address</a></li>
     <li><a href="{% url 'change_password' %}">Change Password</a></li>
 </ul>
 		  <div class=" dashboard-wrapper dashboard-user-profile">
 			<div class="media">
 			  <div class="pull-left text-center" href="#!">
+				{% if userprofile.profile_picture %}
 				<img class="media-object user-img" src="{{ userprofile.profile_picture.url}}" alt="Profile Image" style="border-radius:150px;">
 				{% comment %} <a href="#x" class="btn btn-transparent mt-20">Change Image</a> {% endcomment %}
-			  </div>
+				{% else %}
+				<h6> No profile picture uploaded </h6>
+			</div>
+			{% endif %}
 			  <div class="media-body">
 				<ul class="user-profile-list">
 					
