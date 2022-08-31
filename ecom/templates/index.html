@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
+{% load price_custom_tags %}
+
 {% load static %}
+
 
 {% block content %}
 <div class="hero-slider">
@@ -94,7 +97,15 @@
 			<div class="col-md-4">
 				<div class="product-item">
 					<div class="product-thumb">
-						<span class="bage">Sale</span>
+						{% if product.discount > product.category.discount %}
+							{%if product.discount > 1%}
+								<span class="bage">Save {{product.discount}} %</span>
+							{% endif %}
+						{% else %}
+							{%if product.category.discount > 1%}
+								<span class="bage">Save {{product.category.discount}} %</span>
+							{% endif %}
+						{% endif %}
 						 <a href="{{ product.get_url }}" class="img-wrap"><img  src="{{product.images.url}}" ></a>
 						<div class="preview-meta">
 							<ul>
@@ -118,7 +129,29 @@
 					</div>
 					<div class="product-content">
 						<h4><a href="{{ product.get_url }}">{{product.product_name}}</a></h4>
-						<p class="price">Rs.{{product.price}}</p>
+
+						{% if product.discount > product.category.discount %}
+							{% if product.discount > 1%}
+								<span class="price">Rs. <del>{{product.price}}</del>
+									&nbsp; &nbsp;
+								<span >{% sell_price product.price product.discount  %}</span>
+								</span>
+							{% else %}
+								<span class="price">Rs.{{product.price}}</span>
+							{% endif %}
+						{% else %}
+							{% if product.category.discount > 1%}
+								<span class="price">Rs. <del>{{product.price}}</del>
+									&nbsp; &nbsp;
+								<span >{% sell_price product.price product.category.discount  %}</span>
+								</span>
+							{% else %}
+								<span class="price">Rs.{{product.price}}</span>
+							{% endif %}
+						{% endif %}
+
+								
+
 					</div>
 				</div>
 			</div>

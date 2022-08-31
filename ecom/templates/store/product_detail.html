@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load price_custom_tags %}
 {% load static %}
 
 {% block content%}
@@ -64,8 +64,25 @@
 					{% csrf_token %}
 					<div class="single-product-details">
 						<h2>{{single_product.product_name}}</h2>
-						<p class="product-price">Rs.{{single_product.price}}</p>
-						
+						{% if product.discount > product.category.discount %}
+							{% if products.discount > 1%}
+								<span class="price">Rs. <del>{{single_product.price}}</del>
+									&nbsp; &nbsp;
+								<span >{% sell_price single_product.price products.discount  %}</span>
+								</span>
+							{% else %}
+								<span class="price">Rs.{{single_product.price}}</span>
+							{% endif %}
+						{% else %}
+							{% if products.category.discount > 1%}
+								<span class="price">Rs. <del>{{single_product.price}}</del>
+									&nbsp; &nbsp;
+								<span >{% sell_price single_product.price products.category.discount  %}</span>
+								</span>
+							{% else %}
+								<span class="price">Rs.{{single_product.price}}</span>
+							{% endif %}
+						{% endif %}
 						<p class="product-description mt-20">
 							{{single_product.description}}
 						</p>

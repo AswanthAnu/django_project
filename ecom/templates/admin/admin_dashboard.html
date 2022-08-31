@@ -4,11 +4,68 @@
 
 {% block content %}
 
-<div class="row ">
-    <div class="offset-3 col-md-12 col-sm-12 col-12">
-        <canvas id="user_chart" width="300" height="350"></canvas>
-    </div>
+<div class="container">
+  <div class="row">
+     <div class="col-12">
+
+  <div class=" offset-1 col-12">
+      <canvas id="sale_chart_date" style="width:100%;max-width:1000px"></canvas>
+  </div>
+
+<div class="  col-md-12"></div>
+
+  <div class=" col-md-3">
+          <canvas id="user_chart" width="200" height="380"></canvas>
+  </div>
+
+  <div class="  col-md-3">
+        <canvas id="pay" width="200" height="380"></canvas>
+  </div>
+
+<div class="  col-md-6 ">
+      <canvas id="paystst" width="200" height="150"></canvas>
 </div>
+</div>
+ 
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script>
+var xdate = [{% for i in date %}'{{i}}', {% endfor %}];
+var ysale_count = [{% for i in sale_count %}'{{i}}', {% endfor %}];
+
+new Chart("sale_chart_date", {
+  type: "line",
+  data: {
+    labels: xdate,
+    datasets: [{
+      fill: false,
+      lineTension: 0,
+      backgroundColor: "rgba(0,0,255,1.0)",
+      borderColor: "rgba(0,0,255,0.1)",
+      data: ysale_count
+    }]
+  },
+  options: {
+    legend: {display: false},
+    scales: {
+      yAxes: [{ticks: {min: 0, max:50}}],
+    },
+    title: {
+      display: true,
+      text: "Sales of last 7 days"
+    }
+  }
+});
+</script>
+
 
 
 
@@ -47,11 +104,7 @@ new Chart("user_chart", {
 
 
 
-<div class="row ">
-    <div class="offset-4 col-md-12 col-sm-12 col-12">
-        <canvas id="pay" width="300" height="350"></canvas>
-    </div>
-</div>
+
 
 
 
@@ -87,11 +140,6 @@ new Chart("pay", {
 </script>
 
 
-<div class="row ">
-  <div class="offset-3 col-md-12 col-sm-12 col-12">
-      <canvas id="paystst" width="500" height="350"></canvas>
-  </div>
-</div>
 
 
 
@@ -124,5 +172,7 @@ options: {
 }
 });
 </script>
+
+
 
 {% endblock %}

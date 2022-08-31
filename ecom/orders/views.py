@@ -61,15 +61,21 @@ def payments_cod(request):
 
                 # Adding cart item to product table
                 cart_items = CartItem.objects.filter(user=request.user)
+                
 
                 for item in cart_items:
+                    product_pri = 0
+                    if item.product.discount > item.product.category.discount:
+                        product_pri += (int(item.product.price - (item.product.price * item.product.discount * 0.01 )))
+                    else:
+                        product_pri += (int(item.product.price - (item.product.price * item.product.category.discount * 0.01 )))
                     orderproduct = OrderProduct()
                     orderproduct.order_id = order.id
                     orderproduct.payment = payment
                     orderproduct.user_id = request.user.id
                     orderproduct.product_id = item.product_id
                     orderproduct.quantity = item.quantity
-                    orderproduct.product_price = item.product.price
+                    orderproduct.product_price = product_pri
                     orderproduct.ordered = True
                     orderproduct.save()
 
@@ -150,13 +156,18 @@ def payments(request):
             cart_items = CartItem.objects.filter(user=request.user)
 
             for item in cart_items:
+                product_pri = 0
+                if item.product.discount > item.product.category.discount:
+                    product_pri += (int(item.product.price - (item.product.price * item.product.discount * 0.01 )))
+                else:
+                    product_pri += (int(item.product.price - (item.product.price * item.product.category.discount * 0.01 )))
                 orderproduct = OrderProduct()
                 orderproduct.order_id = order.id
                 orderproduct.payment = payment
                 orderproduct.user_id = request.user.id
                 orderproduct.product_id = item.product_id
                 orderproduct.quantity = item.quantity
-                orderproduct.product_price = item.product.price
+                orderproduct.product_price = product_pri
                 orderproduct.ordered = True
                 orderproduct.save()
 
@@ -227,13 +238,18 @@ def payments_razor(request):
 
     cart_items = CartItem.objects.filter(user=request.user)
     for item in cart_items:
+            product_pri = 0
+            if item.product.discount > item.product.category.discount:
+                product_pri += (int(item.product.price - (item.product.price * item.product.discount * 0.01 )))
+            else:
+                product_pri += (int(item.product.price - (item.product.price * item.product.category.discount * 0.01 )))
             orderproduct = OrderProduct()
             orderproduct.order_id = order.id
             orderproduct.payment = payment
             orderproduct.user_id = request.user.id
             orderproduct.product_id = item.product_id
             orderproduct.quantity = item.quantity
-            orderproduct.product_price = item.product.price
+            orderproduct.product_price = product_pri
             orderproduct.ordered = True
             orderproduct.save()
 
@@ -346,10 +362,14 @@ def place_order(request, total=0, quantity=0, ):
     grand_total = 0
     tax = 0
     for cart_item in cart_items:
-        total += (cart_item.product.price * cart_item.quantity)
+        if cart_item.product.discount > cart_item.product.category.discount:
+            total += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.discount * 0.01 ))* cart_item.quantity)
+        else:
+            total += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.category.discount * 0.01 ))* cart_item.quantity)
+        
         quantity += cart_item.quantity
-    tax = (12 * total)/100
-    grand_total = total + tax
+    tax = int((12 * total)/100)
+    grand_total = int(total + tax)
     print(grand_total, '===place order')
     
     

@@ -40,6 +40,14 @@ urlpatterns = [
     path('admin_order', views.admin_order, name='admin_order'),
     path('change_order_status/<str:st>/<int:oid>/<int:pid>',views.change_order_status,name="order_status_change"),
     path('admin_cancel_order/<int:oid>', views.admin_cancel_order, name='admin_cancel_order'),
+
+    path('admin_offer', views.admin_offer, name='admin_offer'),
+    path('add_offer', views.add_offer, name='add_offer'),
+    path('delete_offer/<str:id>', views.delete_offer, name='delete_offer'),
+
+    path('admin_offer_cat', views.admin_offer_cat, name='admin_offer_cat'),
+    path('add_offer_cat', views.add_offer_cat, name='add_offer_cat'),
+    path('delete_offer_cat/<str:id>', views.delete_offer_cat, name='delete_offer_cat'),
     
 
     path('block_unblock/<int:id>',views.block_unblock,name='block_unblock'),

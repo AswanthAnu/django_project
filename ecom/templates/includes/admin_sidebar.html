@@ -58,15 +58,23 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="index.html">
+            <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-              <span class="menu-title"><h5>Coupons</h5></span>
+              <span class="menu-title"><h5>Offers</h5></span>
+              <i class="menu-arrow"></i>
             </a>
+            <div class="collapse" id="ui-basic">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="{% url 'admin_offer' %}"><h5>Product Offers</h5></a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'admin_offer_cat' %}"><h5>Category Offers</h5></a></li>
+                
+              </ul>
+            </div>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="index.html">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-              <span class="menu-title"><h5>Offers</h5></span>
+              <span class="menu-title"><h5>Coupons</h5></span>
             </a>
           </li>
           <li class="nav-item">

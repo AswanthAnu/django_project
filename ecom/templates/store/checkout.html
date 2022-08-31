@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load price_custom_tags %}
 
 {% load static %}
 
@@ -128,7 +129,11 @@
                         
                          <div class="media-body">
                             <h4 class="media-heading"><a href="{{ cart_item.product.get_url }}">{{ cart_item.product.product_name}}</a></h4>
-                            <p class="price">{{ cart_item.quantity}} x Rs.{{ cart_item.product.price }}.00</p>
+                            {% if cart_item.product.discount > cart_item.product.category.discount %}
+                            <p class="price">{{ cart_item.quantity}} x Rs.{% sell_price cart_item.product.price cart_item.product.discount %}.00</p>
+                            {% else %}
+                            <p class="price">{{ cart_item.quantity}} x Rs.{% sell_price cart_item.product.price cart_item.product.category.discount %}.00</p>
+                            {% endif %}
                             <span class="remove" > <a href="{% url 'remove_cart'  cart_item.product.id cart_item.id %}">Remove</a> </span>
                          </div>
                       </div>
@@ -154,7 +159,7 @@
                          <li>
                                 
                             <span>GST:</span>
-                            <span>Rs.{{ gst }}00</span>
+                            <span>Rs.{{ gst }}.00</span>
                          </li>
                          
                       </ul>
@@ -176,6 +181,22 @@
        </div>
     </div>
  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="coupon-modal" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-body">
+            <form>
+               <div class="form-group">
+                  <input class="form-control" type="text" placeholder="Enter Coupon Code">
+               </div>
+               <button type="submit" class="btn btn-main">Apply Coupon</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
 
  <script>
    function handleChange(src) {

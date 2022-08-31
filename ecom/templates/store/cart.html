@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load price_custom_tags %}
 {% load static %}
 
 {% block content%}
@@ -61,12 +61,12 @@
                                    <span class="input-group-btn ">
                                      
                                   
-                                     <input type="button" style="display: hidden;" id="div_id" class="btn btn-default bootstrap-touchspin-up" onclick="removefromCart('{{ cart_item.id }}','{{cart_item.product.id}}')" value="-">
+                                     <input type="button"  id="div_id" class="btn btn-default bootstrap-touchspin-up" onclick="removefromCart('{{ cart_item.id }}','{{cart_item.product.id}}')" value="-">
                                     </span>
                                    {% else %}
                                    <span class="input-group-btn ">
                                      
-                                     <a href="" class="btn btn-default bootstrap-touchspin-down block disabled" type="button" >-</a>
+                                     <a href="" class="btn btn-default bootstrap-touchspin-down block " type="button" >-</a>
                                    </span>
                                    {% endif %}
  
@@ -107,11 +107,22 @@
                             <div class="price-wrap text-center d-flex ">
                               
                               <p class="price fw-500" >
-                                <input id="sub_total{{ cart_item.id }}" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{{ cart_item.sub_total }}" disabled>
+                                {% if cart_item.product.discount > cart_item.product.category.discount%}
+                                <input id="sub_total{{ cart_item.id }}" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{% sell_price cart_item.sub_total cart_item.product.discount %}" disabled>
+                                {% else %}
+                                <input id="sub_total{{ cart_item.id }}" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{% sell_price cart_item.sub_total cart_item.product.category.discount %}" disabled>
+                                {% endif %}
                               </p>
                               <small class="text-muted text-center">
-                                <input  id="each_total{{ cart_item.id }}" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{{ cart_item.product.price}}" disabled>
+                                <span  class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="" disabled><del>{{ cart_item.product.price }}</del></span>
                                  </small>
+                              <small class="text-muted text-center">
+                                {% if cart_item.product.discount > cart_item.product.category.discount%}
+                                <input  id="each_total{{ cart_item.id }}" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{% sell_price cart_item.product.price cart_item.product.discount %}" disabled>
+                                {% else %}
+                                <input  id="each_total{{ cart_item.id }}" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{% sell_price cart_item.product.price cart_item.product.category.discount %}" disabled>
+                                {% endif %}
+                              </small>
                             </div>
                             <td>
                             </td>
@@ -303,14 +314,14 @@
         
         console.log(p_price, 'each price')
         p_price=parseInt(p_price);
-        sub_total=p_price*this.responseText;
+        sub_total=parseInt(p_price*this.responseText);
         console.log(sub_total, 'total price')
         document.getElementById("sub_total"+pid).value=sub_total;
         total_price = document.getElementById("total_price").value;
         totall_price = parseInt(total_price) + parseInt(p_price);
         console.log(totall_price);
-        gst = totall_price * (2/100) ;
-        total_amount = totall_price + gst;
+        gst = parseInt(totall_price * (12/100)) ;
+        total_amount = parseInt(totall_price + gst);
         document.getElementById("total_price").value=totall_price;
         document.getElementById("gst").value=gst;
         document.getElementById("total_amount").value=total_amount;
@@ -348,14 +359,14 @@
   p_price= document.getElementById("each_total"+pid).value;
   console.log(p_price, 'each price')
   p_price=parseInt(p_price);
-  sub_total=p_price*this.responseText;
+  sub_total=parseInt(p_price*this.responseText);
   console.log(sub_total, 'total price')
   document.getElementById("sub_total"+pid).value=sub_total;
   total_price = document.getElementById("total_price").value;
   totall_price = parseInt(total_price) - parseInt(p_price);
   console.log(totall_price);
-  gst = totall_price * (12/100) ;
-  total_amount = totall_price + gst;
+  gst = parseInt(totall_price * (12/100)) ;
+  total_amount = parseInt(totall_price + gst);
   document.getElementById("total_price").value=totall_price;
   document.getElementById("gst").value=gst;
   document.getElementById("total_amount").value=total_amount;

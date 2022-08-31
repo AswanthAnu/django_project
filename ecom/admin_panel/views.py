@@ -55,7 +55,6 @@ def admin_login(request):
     return render(request, 'admin/admin_login.html')
 
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
-
 def admin_dashboard(request):
     if 'is_admin' not in request.session:
         return redirect('admin_login')
@@ -86,9 +85,20 @@ def admin_dashboard(request):
 
     
     order_product_count_graph = OrderProduct.objects.filter().values('created_at__date').order_by('created_at__date')[:7].annotate(count=Count('quantity'))
-    order_graph =Order.objects.filter().values('created_at__date').order_by('created_at__date')[:1].annotate(sum=Sum('order_total'))
+    order_graph =Order.objects.filter().values('created_at__date').order_by('created_at__date')[:7].annotate(sum=Sum('order_total'))
 
-    print(order_product_count_graph, '-----')
+    date = []
+    sale_count = []
+    for i in order_product_count_graph:
+        date.append(i['created_at__date'])
+    
+    print(date)
+   
+    for i in order_product_count_graph:
+        sale_count.append(i['count'])
+    print(sale_count)
+
+
 
     context = {
         'active_users' : active_user,
@@ -97,24 +107,23 @@ def admin_dashboard(request):
         'pay_count' : pay_count,
         'pay_status' : pay_status,
         'status_count' : status_count,
+        'date' : date,
+        'sale_count' : sale_count,
     }
 
 
     
     return render(request, 'admin/admin_dashboard.html', context)
 
-
 def admin_user(request):
 
     if 'is_admin' not in request.session:
         return redirect('admin_login')
-    user = Account.objects.all()
+    user = Account.objects.all().order_by('id')
     paginator = Paginator(user, 4)
     page = request.GET.get('page')
     paged_user = paginator.get_page(page)
     return render(request, 'admin/admin_user.html', {'users' : paged_user})
-
-
 
 @log(admin_login)
 def block_unblock(request,id):
@@ -131,11 +140,9 @@ def block_unblock(request,id):
         user.save()
         return redirect(admin_user)
 
-
-
 @log(admin_login)   
 def admin_category(request):
-    categ = category.objects.all()
+    categ = category.objects.all().order_by('id')
     paginator = Paginator(categ, 1)
     page = request.GET.get('page')
     paged_categ = paginator.get_page(page)
@@ -172,20 +179,17 @@ def update_category(request, id):
         return redirect('admin_category')
     return render(request,'admin/admin_category.html')
 
-
-
 def delete_category(request,id):
 
     categ = category.objects.filter(id = id)
     categ.delete()
     return redirect('admin_category')
     
-
 @log(admin_login)  
 def admin_brand(request):
     if 'is_admin' not in request.session:
         return redirect('admin_login')
-    brandd = brand.objects.all()
+    brandd = brand.objects.all().order_by('id')
     paginator = Paginator(brandd, 1)
     page = request.GET.get('page')
     paged_brandd = paginator.get_page(page)
@@ -193,7 +197,6 @@ def admin_brand(request):
     context={'brandd' : paged_brandd}
    
     return render (request, 'admin/admin_brand.html' , context)
-
 
 @log(admin_login)
 def add_brand(request):
@@ -230,16 +233,15 @@ def delete_brand(request,id):
     brands.delete()
     return redirect('admin_brand')
     
-
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 @log(admin_login)    
 def admin_product(request):
     if 'is_admin' not in request.session:
         return redirect('admin_login')
-    categories = category.objects.all()
-    brands = brand.objects.all()
-    products = product.objects.all()
-    subcategories = SubCategory.objects.all()
+    categories = category.objects.all().order_by('id')
+    brands = brand.objects.all().order_by('id')
+    products = product.objects.all().order_by('id')
+    subcategories = SubCategory.objects.all().order_by('id')
     paginator = Paginator(products, 1)
     page = request.GET.get('page')
     paged_products = paginator.get_page(page)
@@ -247,9 +249,6 @@ def admin_product(request):
     context={'products' : paged_products, 'brands': brands, 'categories': categories, 'subcategories' : subcategories }
    
     return render (request, 'admin/admin_product.html' ,  context)
-
-
-
 
 def add_product(request):
 
@@ -353,12 +352,11 @@ def delete_product(request,id):
     products.delete()
     return redirect('admin_product')
 
-
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 @log(admin_login)
 def admin_variation(request):
-    products = product.objects.all()
-    variations = Variation.objects.all()
+    products = product.objects.all().order_by('id')
+    variations = Variation.objects.all().order_by('id')
 
     
     paginator = Paginator(variations, 6)
@@ -400,15 +398,12 @@ def add_variation(request):
 
     return render(request,'admin/admin_variation.html')
 
-
-
 def edit_variation(request):
     variations = Variation.objects.all()
     products = product.objects.all()
     context = { 'variations' : variations, 'products' : products}
 
     return render(request, "admin/admin_variation.html", context)
-
 
 def update_variation(request, id):
 
@@ -442,11 +437,10 @@ def delete_variation(request, id):
             'success': True
         }, safe= False)
 
-
 def admin_subcategory(request):
 
-    subcategory = SubCategory.objects.all()
-    categories = category.objects.all()
+    subcategory = SubCategory.objects.all().order_by('id')
+    categories = category.objects.all().order_by('id')
     paginator = Paginator(subcategory, 6)
     page = request.GET.get('page')
     paged_subcategory = paginator.get_page(page)
@@ -479,8 +473,6 @@ def add_subcategory(request):
                   safe= False  )
 
     return render(request,'admin/admin_category.html')
-
-
 
 def edit_subcategory(request):
     subcategory = SubCategory.objects.all()
@@ -524,7 +516,7 @@ def delete_subcategory (request, id):
 
 def admin_order(request):
 
-    orderproducts = OrderProduct.objects.all() 
+    orderproducts = OrderProduct.objects.all().order_by('id')
     paginator = Paginator(orderproducts, 6)
     page = request.GET.get('page')
     paged_orderproducts = paginator.get_page(page)
@@ -558,8 +550,7 @@ def change_order_status(request,st,oid,pid):
     #     'order_details':order_details
     # }
     return HttpResponse(orders_pending)
-
-   
+ 
 def admin_cancel_order(request,oid):
     print(oid)
     print("yeah s")
@@ -568,7 +559,106 @@ def admin_cancel_order(request,oid):
     print(order_cancel.status )
     order_cancel.save()
     return HttpResponseRedirect(reverse('index'))
-    
+
+def admin_offer(request):
+
+    products = product.objects.all().order_by('id')
+    paginator = Paginator(products, 1)
+    page = request.GET.get('page')
+    paged_products = paginator.get_page(page)
+
+    context = {
+        'productss' : paged_products,
+        'products'  : products
+    }
+
+
+    return render(request, 'admin/admin_offer.html', context)
+
+def add_offer(request):
+
+    if request.method == "POST":
+        product_id = request.POST.get('product_id')
+        prdct_ofer = request.POST.get('prdct_offer')
+        prdct_offer = int(prdct_ofer)
+
+        if prdct_offer < 0 or prdct_offer > 100  :
+            return JsonResponse({
+                'success' : False} ,
+                  safe= False  )
+
+        else:
+            products = product.objects.get(id = product_id)
+            
+            products.discount = prdct_offer
+            
+            products.save()
+            return JsonResponse({
+                'success' : True} ,
+                  safe= False  )
+
+    return render(request,'admin/admin_offer.html')
+
+def delete_offer(request, id):
+
+    products = product.objects.get(id = id )
+    products.discount = 0
+    products.save()
+    return JsonResponse({
+            'success': True
+        }, safe= False)
+
+def admin_offer_cat(request):
+
+    categories = category.objects.all().order_by('id')
+    paginator = Paginator(categories, 1)
+    page = request.GET.get('page')
+    paged_categories = paginator.get_page(page)
+
+    context = {
+        'categoriess' : paged_categories,
+        'categories'  : categories,
+    }
+
+    return render(request, 'admin/admin_offer_cat.html', context)
+
+def add_offer_cat(request):
+
+    if request.method == "POST":
+        category_id = request.POST.get('category_id')
+        categ_ofer = request.POST.get('categ_offer')
+        categ_offer = int(categ_ofer)
+        print(categ_offer, '----offer cat')
+
+        if categ_offer < 0 or categ_offer > 100  :
+
+            return JsonResponse({
+                'success' : False} ,
+                  safe= False  )
+
+        else:
+            categories = category.objects.get(id = category_id)
+            
+            categories.discount = categ_offer
+            
+            categories.save()
+            return JsonResponse({
+                'success' : True} ,
+                  safe= False  )
+
+
+    return render(request, 'admin/admin_offer_cat.html' )
+
+def delete_offer_cat(request, id):
+
+    cateogries = category.objects.get(id = id)
+    cateogries.discount = 0
+    cateogries.save()
+    return JsonResponse({
+            'success': True
+        }, safe= False)
+
+
 
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def admin_logout(request):

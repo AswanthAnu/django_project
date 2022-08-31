@@ -238,12 +238,15 @@ def cart(request, total = 0, quantity = 0 , cart_items = None):
             cart =  Cart.objects.get(cart_id = _cart_id(request))
             cart_items = CartItem.objects.filter(cart = cart , is_active = True)
         for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
-            print(total)
+            if cart_item.product.discount > cart_item.product.category.discount:
+                total += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.discount * 0.01 ))* cart_item.quantity)
+            else:
+                total += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.category.discount * 0.01 ))* cart_item.quantity)
+
             quantity += cart_item.quantity
 
-        gst = (12 * total)/100
-        grand_total = total + gst
+        gst = int((12 * total)/100)
+        grand_total = int(total + gst)
     except ObjectDoesNotExist:
         pass
 
@@ -313,12 +316,15 @@ def checkout(request, total = 0, quantity = 0 , cart_items = None):
             cart = Cart.objects.get(cart_id=_cart_id(request))
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
         for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
+            if cart_item.product.discount > cart_item.product.category.discount:
+                total += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.discount * 0.01 ))* cart_item.quantity)
+            else:
+                total += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.category.discount * 0.01 ))* cart_item.quantity)
             
             quantity += cart_item.quantity
 
-        gst = (12 * total)/100
-        grand_total = total + gst
+        gst = int((12 * total)/100)
+        grand_total = int(total + gst)
         request.session["grand_total"] = grand_total
         
     except ObjectDoesNotExist:

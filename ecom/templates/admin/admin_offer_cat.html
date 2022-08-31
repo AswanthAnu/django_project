@@ -1,0 +1,377 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="main-panel">
+    
+  
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title "style="background-color:black;">
+                <div class="row">
+                    <div class="col-sm-6 ">
+						<h2>Category Offers </h2>
+					</div>
+					<div class="col-sm-6">
+						<a href="#addEmployeeModal" class="btn  btn-dark " data-toggle="modal"><span>Add</span></a>
+											
+					</div>
+                </div>
+            </div>
+			<div style='overflow-x:auto'>
+            <table class="table table-striped table-hover ">
+                <thead>
+                    <tr>
+						<th>
+							<span class="custom-checkbox">
+								
+								
+							</span>
+						</th>
+                        <th><h4>Category Name </h4></th>
+                        <th><h4>Discount</h4></th>
+                        <th><h4>Action</h4></th>
+                    </tr>
+                </thead>
+                <tbody>
+				{% for category in categoriess%}
+                    <tr>
+						<td>
+							
+						</td>
+                        <td><h5>{{ category.category_name }}</h5></td>
+                        <td><h5>{{ category.discount}}</h5></td>
+						
+                        
+                        <td>
+                            {% comment %} <a href="#editEmployeeModal-{{forloop.counter}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Edit</span></a> {% endcomment %}
+							
+							<a href="#deleteEmployeeModal-{{category.id}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Delete</span></a>
+							
+						</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+		</div>
+			<div class="clearfix">
+            
+            </div>
+        </div>
+    </div>
+	<div >
+		<nav aria-label="Page navigation example" style="position: fixed; bottom:80px; right:70px;">
+		  {% if categoriess.has_other_pages %}
+		  <ul class="pagination pg-black">
+			{% if categoriess.has_previous %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ categoriess.previous_page_number}}" tabindex="-1" style="color: black;">Previous</a>
+			</li>
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black; display:none;"></a>
+			</li>
+			{% endif %}
+			
+		   
+			{% for i in categoriess.paginator.page_range %}
+			{% if categoriess.number == i %}
+			
+			<li class="page-item active">
+			<a class="page-link" style="background-color: black;">{{i}}<span class="sr-only">{{i}}</span></a>
+			</li>
+			{% else %}
+			<li class="page-item" style="color: black;"><a class="page-link" href="?page={{i}}" style="color: black;">{{i}}</a></li>
+			{% endif %}
+			{% endfor %}
+		   
+		   
+			{% if categoriess.has_next %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ categoriess.next_page_number}}" tabindex="-1" style="color: black;">Next</a>
+			</li>
+		   
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black;display:none;"></a>
+			</li>
+			{% endif %}
+		  </ul>
+		  </nav>
+		  {% endif %}
+		</div>
+	<!--Add Modal HTML -->
+	<div id="addEmployeeModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form  method="POST" id='add_offer'>
+					{% csrf_token %}
+					<div class="modal-header">						
+						<h4 class="modal-title">Add Offer to Category</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						<div class="form-group">
+							<label>Category Name</label>
+							<select id="category_add"  name="category_add" type="text" class="form-control" required>
+								<option value="" selected>---------</option>
+								{% for category in categories %}
+								<option data-style="btn-dark"  value="{{category.id}}">{{category.category_name}}</option>
+								{% endfor %}
+								</select>
+						</div>
+					</div>
+					<div class="modal-body">					
+						<div class="form-group">
+							<label>Offer</label>
+							<input name="categ_offer"  id="categ_offer" value="" placeholder="Offer in percentage" type="number" class="form-control" required>
+						</div>
+									
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-dark" value="Add">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+		
+
+<script>
+
+	$(document).on('submit', '#add_offer', function (e) {
+		e.preventDefault();
+		var category_id = $('#category_add').val()
+		var categ_offer = $('#categ_offer').val()
+		
+		
+
+		$.ajax({
+			method: "POST",
+			url: "{% url 'add_offer_cat'%}",
+			dataType: 'json',
+			data: {
+				'category_id' :category_id,
+				'categ_offer': categ_offer,
+				
+				
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					window.location.replace('admin_offer_cat')
+				} 
+				
+				else {
+					document.getElementById("categ_offer").value="";
+					document.getElementById("categ_offer").placeholder = "Discount must be between 0-100";
+					document.getElementById("categ_offer").style.border = "solid red 1px";
+				}
+			}
+		})
+
+
+	})
+	
+
+
+</script>
+
+
+	<!-- Edit Modal HTML -->
+	{% for subcateg in subcategory %}
+	<div id="editEmployeeModal-{{forloop.counter}}" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				
+					<div class="modal-header">						
+						<h4 class="modal-title">Edit Sub Category</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						<div class="form-group">
+							<label>Category Name</label>
+							<select id="cat_id"  name="category" type="text" class="form-control disabled" >
+								<option value="{{ subcateg.cat.id}}" selected>{{subcateg.category.category_name}}</option>
+								
+								</select>
+						</div>
+						<div class="form-group">
+							<label>Description</label>
+							<input  name = "Description" id="descri" type="type"  value="{{ subcateg.category.description}}" class="form-control" required>
+						</div>
+						<form  id="edit_subcategory" method = "POST" >
+							{% csrf_token %}
+						<div class="form-group">
+							<label>Sub Category Name</label>
+							<input name="subcategory_name"  id="subcateg_name" value="{{ subcateg.sub_category_name}}" placeholder="sub category name" type="text" class="form-control " required>
+						</div>
+						<div class="form-group" style="display: none;" >
+							<label>Sub Category id</label>
+							<input id="subc_id"  name="sub_id" type="text" class="form-control" value="{{subcateg.id}}" placeholder="category value" >
+						</div>
+						
+										
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-dark" value="Save">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+
+	
+
+<script>
+
+	$(document).on('submit', '#edit_subcategory', function (e) {
+		e.preventDefault();
+		var subcategory_name = $('#subcateg_name').val()
+		var sub_id = $('#subc_id').val()
+		var cat_id = $('#cat_id').val()
+		console.log(subcategory_name, '----')
+		console.log(sub_id)
+		
+
+		$.ajax({
+			method: "POST",
+			url: "update_subcategory/"+sub_id,
+			dataType: 'json',
+			data: {
+		
+				'subcategory_name' : subcategory_name,
+				'cat_id': cat_id,
+	
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					window.location.replace('admin_subcategory')
+				} 
+				
+				else {subcategory_name
+					document.getElementById("subcategory_name").value="";
+					document.getElementById("subcategory_name").placeholder = "Type value here..";
+					document.getElementById("subcategory_name").style.border = "solid red 1px";
+				}
+			}
+		})
+
+
+	})
+	
+
+
+</script>
+
+
+
+
+	<!-- Delete Modal HTML -->
+	{% for category in categories %}
+	<div id="deleteEmployeeModal-{{category.id}}" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="delete_offer_cat" method="POST" >
+					<div class="modal-header">						
+						<h4 class="modal-title">Delete Category Offer</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						<p><h5>Are you sure you want to delete the offer of {{category.category_name}} ?</h5></p>
+						<p class="text-warning"><small>This action cannot be undone </small></p>
+				
+					</div>
+					<div class="form-group" style="display: none;" >
+						<label>Sub id</label>
+						<input id="catg_id"  name="catg_id" type="text" class="form-control" value="{{category.id}}" placeholder="category value" >
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<button type="submit" class="btn btn-dark" >Delete</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+
+
+	
+
+<script>
+
+	$(document).on('submit', '#delete_offer_cat', function (e) {
+		e.preventDefault();
+		var catg_id = $('#catg_id').val()
+		$.ajax({
+			method: "POST",
+			url: "delete_offer_cat/"+catg_id,
+			dataType: 'json',
+			data: {
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					window.location.replace('admin_offer_cat')
+				} 
+				
+				
+			}
+		})
+
+
+	})
+	
+
+
+</script>
+
+
+
+
+
+
+
+
+    <script>
+        $(document).ready(function(){
+            // Activate tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Select/Deselect checkboxes
+            var checkbox = $('table tbody input[type="checkbox"]');
+            $("#selectAll").click(function(){
+                if(this.checked){
+                    checkbox.each(function(){
+                        this.checked = true;                        
+                    });
+                } else{
+                    checkbox.each(function(){
+                        this.checked = false;                        
+                    });
+                } 
+            });
+            checkbox.click(function(){
+                if(!this.checked){
+                    $("#selectAll").prop("checked", false);
+                }
+            });
+        });
+    </script>
+
+
+
+
+{% endblock %}

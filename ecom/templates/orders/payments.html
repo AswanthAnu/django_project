@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load price_custom_tags %}
+
 {% load static %}
 
 {% block content%}
@@ -57,7 +59,11 @@
                         
                          <div class="media-body">
                             <h4 class="media-heading"><p >{{ cart_item.product.product_name}}</p></h4>
-                            <p class="price">{{ cart_item.quantity}} x Rs.{{ cart_item.product.price }}.00</p>
+                            {% if cart_item.product.discount > cart_item.product.category.discount%}
+                            <p class="price">{{ cart_item.quantity}} x Rs.{% sell_price cart_item.product.price cart_item.product.discount %}.00</p>
+                            {% else %}
+                            <p class="price">{{ cart_item.quantity}} x Rs.{% sell_price cart_item.product.price cart_item.product.category.discount %}.00</p>
+                           {% endif %}
                             
                          </div>
                       </div>
@@ -80,7 +86,7 @@
                          <li>
                                 
                             <span>GST:</span>
-                            <span>Rs.{{ tax }}</span>
+                            <span>Rs.{{ tax }}.00</span>
                          </li>
                          
                       </ul>

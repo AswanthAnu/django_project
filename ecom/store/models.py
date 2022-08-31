@@ -16,6 +16,7 @@ class product(models.Model):
     image2 = models.ImageField(upload_to = 'photo/products', null = True)
     image3 = models.ImageField(upload_to = 'photo/products', null = True)
     stock = models.IntegerField()
+    discount = models.IntegerField(null= False, default= 0 )
     is_available = models.BooleanField(default=True)
     category = models.ForeignKey(category, on_delete=models.CASCADE)
     brand = models.ForeignKey(brand, on_delete=models.CASCADE)
