@@ -1,23 +1,35 @@
 from multiprocessing import context
+from pickle import TRUE
+from re import template
+from urllib import response
 from django.contrib import messages
 from django.contrib.auth.models import auth, User
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
+from homeapp.models import banner
 from .decorators import log
 from django.views.decorators.cache import cache_control
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-import pandas as pd
 from django.db.models import Q
 from django.db.models import Count, Sum
+
+from cgi import print_arguments
+import os
+import datetime as dt
+from datetime import datetime
+
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import xlwt
 
 
 from accounts.models import Account
 from category.models import category, SubCategory
 from brand.models import brand
-from store.models import product, Variation
-from orders.models import Order, OrderProduct, Payment
+from store.models import product, Variation, Coupon
+from orders.models import Order, OrderProduct, Payment, ReturnProduct
 
 # Create your views here.
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
@@ -81,23 +93,39 @@ def admin_dashboard(request):
     
     for i in status:
         status_count.append(i['count'])
-        
+      
+    try: 
+        day = 7 
+        day = int(request.GET.get('days'))
+        print(day,'===98')
+        order_product_count_graph = OrderProduct.objects.filter().values('created_at__date').order_by('-created_at__date')[:day].annotate(count=Count('quantity'))
+    except:
+        order_product_count_graph = OrderProduct.objects.filter().values('created_at__date').order_by('-created_at__date')[:7].annotate(count=Count('quantity'))
 
     
-    order_product_count_graph = OrderProduct.objects.filter().values('created_at__date').order_by('created_at__date')[:7].annotate(count=Count('quantity'))
-    order_graph =Order.objects.filter().values('created_at__date').order_by('created_at__date')[:7].annotate(sum=Sum('order_total'))
+
 
     date = []
     sale_count = []
+    order_total =[]
     for i in order_product_count_graph:
         date.append(i['created_at__date'])
     
-    print(date)
    
     for i in order_product_count_graph:
         sale_count.append(i['count'])
     print(sale_count)
 
+    payments = Payment.objects.values('amount_paid').all()
+    total_sales = 0
+    for i in payments:
+        total_sales = int( total_sales + float(i['amount_paid']))
+        print(total_sales, '---123')
+    no_of_sales = 0
+    no_of_sale = OrderProduct.objects.aggregate(Sum('quantity'))
+    no_of_sales = no_of_sale['quantity__sum']
+
+    print(no_of_sales,'---127')
 
 
     context = {
@@ -109,6 +137,10 @@ def admin_dashboard(request):
         'status_count' : status_count,
         'date' : date,
         'sale_count' : sale_count,
+        'day' : day,
+        'no_of_sales':no_of_sales,
+        'total_sales':total_sales,
+
     }
 
 
@@ -252,15 +284,12 @@ def admin_product(request):
 
 def add_product(request):
 
-
     products = product()
     categ = category.objects.all()
     bran = brand.objects.all()  
     subcatd = SubCategory.objects.all()
 
-
     if request.method == "POST":
-
 
         products.product_name = request.POST.get('product_name')
         products.description = request.POST.get('description')
@@ -295,7 +324,6 @@ def add_product(request):
             print('inside images')
         
             products.save()
-            
           
             return redirect('admin_product')
     return render(request,'admin/admin_product.html')
@@ -327,7 +355,6 @@ def update_product(request, id):
             if product_detail.image2: product_detail.image2 = request.FILES.get('image2')
              
             if product_detail.image3: product_detail.image3  = request.FILES.get('image3')
-                
                
 
         product_detail.product_name = request.POST.get('product_name')
@@ -658,6 +685,395 @@ def delete_offer_cat(request, id):
             'success': True
         }, safe= False)
 
+def admin_coupon(request):
+
+    coupons = Coupon.objects.all().order_by('id')
+    paginator = Paginator(coupons, 1)
+    page = request.GET.get('page')
+    paged_coupons = paginator.get_page(page)
+
+    context = {
+        'couponss' : paged_coupons,
+        'coupons'  : coupons,
+    }
+
+    return render(request, 'admin/admin_coupon.html', context )
+
+def add_coupon(request):
+
+    if request.method == "POST":
+        coupon_cod = request.POST.get('coupon_code')
+        discount = int(request.POST.get('add_discount'))
+        maximum_amount = int(request.POST.get('add_maximum'))
+        minimum_amount = int(request.POST.get('add_minimum'))
+        coupon_code = coupon_cod.replace(" ", "")
+        print(coupon_code)
+        try:
+            coupon = Coupon.objects.get(coupon_code = coupon_code)
+            if coupon.coupon_code == coupon_code:
+                return JsonResponse(
+                    { 'coupon_exist' : True}, safe= False
+                )
+        except:
+            if discount < 0 or discount > 100:
+                return JsonResponse(
+                    {'discount' : False }, safe= False
+                )
+
+            elif minimum_amount < 0 or minimum_amount > 1000 :
+                return JsonResponse(
+                    { 'minimum' : False}, safe= False
+                )
+            elif maximum_amount < 1000 :
+                return JsonResponse(
+                    {'maximum' : False }
+                )
+            else:
+
+                coupons = Coupon.objects.create(coupon_code = coupon_code, disccount = discount,minimum_amount = minimum_amount, maximum_amount = maximum_amount  )
+                coupons.save()
+                return JsonResponse(
+                    {'success' : True}, safe= False
+                )   
+
+    return render(request, 'admin/admin_coupon.html', context )
+
+
+def expire_coupon(request , id ):
+    coupons = Coupon.objects.get(id = id )
+    coupons.is_expired = True
+    coupons.save()
+    return JsonResponse({
+            'success': True
+        }, safe= False)
+
+def admin_return(request):
+    return_product = ReturnProduct.objects.all()
+    paginator = Paginator(return_product, 4)
+    page = request.GET.get('page')
+    paged_return_product = paginator.get_page(page)
+
+    context = {
+        'return_products' : paged_return_product,
+        'return_product'  : return_product,
+    }
+    return render(request, 'admin/admin_return.html', context)
+
+def admin_sales(request, *args, **kwargs):
+
+    products = product.objects.all()
+    
+    total_with_offer=0
+      
+    dates_date =OrderProduct.objects.values('created_at__date').distinct().order_by('created_at__date')
+    
+   
+    dates=[]
+    for dd in dates_date:
+        
+       
+        dates.append(dd['created_at__date'].strftime("%Y-%m-%d"))
+    
+    try:
+            
+        dates_max=dates[-1]
+        salesdate=dates[-1]
+    except:
+        dates_max=''
+        salesdate=''
+    current_date =dates_max
+    dates_len =len(dates)
+    dates_len-=dates_len
+    print(dates_len)
+  
+    try:
+        sales = OrderProduct.objects.filter(created_at__date=dates[-1]).values('product_id').annotate(qty=Sum('quantity'))
+        grandtotalfind=OrderProduct.objects.filter(created_at__date=dates[-1]).all()
+        print(grandtotalfind)
+        total_without_discount=0
+        for t in grandtotalfind:
+            total_without_discount+=(t.product.price)*(t.quantity)
+            print(t.product.price)
+    except:
+        sales=[]
+    # get total money earned in day qty*productprice
+        try:
+            total_earn= Payment.objects.filter(created_at=dates[-1]).aggregate(Sum('amount_paid'))
+        except:
+            pass
+    try:
+                
+              total_earn= Payment.objects.filter(created_at=salesdate).all()
+              total=0
+              for t in total_earn:
+                total+=float(t.amount_paid)
+              print("total")
+              print(total,'---784')
+    except:
+            total="calculating"
+    if request.method=="POST":
+        try:
+            salesdate =request.POST['salesdate']
+            print("Ssssss")
+            print(salesdate, '---783--')
+
+            sales = OrderProduct.objects.filter(created_at__date=salesdate).values('product_id').annotate(qty=Sum('quantity'))
+            grandtotalfind=OrderProduct.objects.filter(created_at__date=salesdate).all()
+            print(grandtotalfind, '----787')
+            total_without_discount=0
+            total_with_offer=0
+            for t in grandtotalfind:
+                total_without_discount+=(t.product.price)*(t.quantity)
+                total_with_offer+=(t.product_price)*(t.quantity)
+                print(t.product_price, '----791')
+                print(t.quantity)
+            
+            
+            print(sales)
+            for s in sales:
+                    pass
+            current_date=salesdate
+        except KeyError:
+            pass
+            salesdate=dates_max
+      
+        try:
+              total_payment= Payment.objects.filter(created_at__date=salesdate).all()
+              print(total_payment,'=total_earn--804')
+              total=0
+              for t in total_payment:
+                total+=float(t.amount_paid)
+                print("total")
+                print(total)
+        except:
+            total="calculating"    
+    context= {
+      'dates':dates,
+      'dates_max':dates_max,
+      'current_date':current_date,
+      'sales':sales,
+        'products':products,
+        'salesdate':salesdate,
+        'total':total,
+        'total_without_discount':total_without_discount,
+        'total_with_offer' : total_with_offer,
+
+    }
+
+
+
+
+
+    return render( request, 'admin/admin_sales.html', context)
+
+def export_pdf(request):
+
+
+    # response = HttpResponse(content_type ='application/pdf')
+    # response['Content-Disposition']='attachment;filemame=Export'+ \
+    # str(dt.datetime.now())+'.pdf'
+    # response['Content-Transfer-Encoding']='binary'
+    # path = r"ecom/templates/export/sales_pdf.html"
+    # assert os.path.isfile(path)
+    # html_string = render_to_string(
+    #     path,{'expenses':[], 'total': 0}
+    # )
+    # html =HTML(string = html_string)
+    # result = html.write_pdf()
+
+
+    
+
+    # with tempfile.NamedTemporaryFile(delete=True) as output:
+    #     output.write(result)
+    #     output.flush()
+
+    #     output = open(output.name, 'rb')
+    #     response.write(output.read())
+    # return response
+    products = product.objects.all()
+    
+    
+    dates_date =OrderProduct.objects.values('created_at__date').distinct().order_by('created_at__date')
+    
+   
+    dates=[]
+    for dd in dates_date:
+        
+       
+        dates.append(dd['created_at__date'].strftime("%Y-%m-%d"))
+    
+    try:
+            
+        dates_max=dates[-1]
+        salesdate=dates[-1]
+    except:
+        dates_max=''
+        salesdate=''
+    current_date =dates_max
+    dates_len =len(dates)
+    dates_len-=dates_len
+    print(dates_len)
+  
+    try:
+        sales = OrderProduct.objects.filter(created_at__date=dates[-1]).values('product_id').annotate(qty=Sum('quantity'))
+        grandtotalfind=OrderProduct.objects.filter(created_at__date=dates[-1]).all()
+        print(grandtotalfind)
+        total_without_discount=0
+        for t in grandtotalfind:
+            total_without_discount+=(t.product.price)*(t.quantity)
+            print(t.product.price, '----899')
+    except:
+        sales=[]
+    # get total money earned in day qty*productprice
+        try:
+            total_earn= Payment.objects.filter(created_at=dates[-1]).aggregate(Sum('amount_paid'))
+        except:
+            pass
+    try:
+                
+              total_earn= Payment.objects.filter(created_at=salesdate).all()
+              total=0
+              for t in total_earn:
+                total+=float(t.amount_paid)
+              print("total---913")
+              print(total)
+    except:
+            total="calculating"
+    if request.method=="POST":
+        try:
+            salesdate =request.POST['salesdate_pdf_id']
+            print("Ssssss")
+            print(salesdate, '---783--')
+
+            sales = OrderProduct.objects.filter(created_at__date=salesdate).values('product_id').annotate(qty=Sum('quantity'))
+            grandtotalfind=OrderProduct.objects.filter(created_at__date=salesdate).all()
+            print(grandtotalfind, '----787')
+            total_without_discount=0
+            total_with_offer=0
+            for t in grandtotalfind:
+                total_without_discount+=(t.product.price)*(t.quantity)
+                total_with_offer+=(t.product_price)*(t.quantity)
+                print(t.product_price, '----791')
+                print(t.quantity)
+            
+            
+            print(sales)
+            for s in sales:
+                    pass
+            current_date=salesdate
+        except KeyError:
+            pass
+            salesdate=dates_max
+      
+        try:
+              total_payment= Payment.objects.filter(created_at__date=salesdate).all()
+              print(total_payment,'=total_earn--804')
+              total=0
+              for t in total_payment:
+                total+=float(t.amount_paid)
+                print("total")
+                print(total)
+        except:
+            total="calculating"    
+
+    template_path = 'export/sales_pdf.html'  
+    context= {
+      'dates':dates,
+      'dates_max':dates_max,
+      'current_date':current_date,
+      'sales':sales,
+        'products':products,
+        'salesdate':salesdate,
+        'total':total,
+        'total_without_discount':total_without_discount,
+        'total_with_offer' : total_with_offer,
+
+    }
+
+
+
+    response = HttpResponse(content_type ='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="sales_report.pdf"'
+   
+    template = get_template(template_path)
+
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+       html, dest=response)
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
+
+def export_excel(request):
+    if request.method=='POST':
+        salesdate=request.POST['salesdate_excel']
+    response = HttpResponse(content_type = 'application/ms-excel')
+    response['Content-Disposition'] = 'attachement; filename=SalesReport' +str(dt.datetime.now())+'.xls'
+    wb = xlwt.Workbook(encoding = 'utf-8')
+    ws = wb.add_sheet('SalesReport')
+    row_num = 0
+    font_style =xlwt.XFStyle()
+    font_style.font.bold =True
+
+    columns = ['order number','name ','amount ','tax','date']
+
+    for col_num in range(len(columns)):
+        ws.write(row_num,col_num, columns[col_num],font_style)
+    
+    font_style= xlwt.XFStyle()
+
+    rows = Order.objects.filter(Q(created_at__date=salesdate) & Q(is_ordered=True)).values_list('order_number','first_name','order_total','tax','created_at__date')
+
+    for row in rows:
+        row_num+=1
+
+        for col_num in range(len(row)):
+            ws.write(row_num,col_num, str(row[col_num]),font_style)
+
+    wb.save(response)
+
+    return response
+
+def admin_banner(request):
+    banners = banner.objects.all().order_by('id')
+    paginator = Paginator(banners, 1)
+    page = request.GET.get('page')
+    paged_banners = paginator.get_page(page)
+   
+
+    context={
+        'banners':paged_banners,
+    }
+
+    return render(request, 'admin/admin_banner.html', context)
+
+def banner_select(request, id):
+    print(id)
+
+    banners = banner.objects.get(id = id)
+    if banners.is_selected == True:
+        banners.is_selected = False
+    else:
+        banners.is_selected = True
+    banners.save()
+
+    return redirect('admin_banner')
+
+def add_banner(request):
+    banners = banner()
+    if request.method == "POST":
+        banners.banner_image = request.FILES['images']
+        print(  '==1076')
+        banners.save()
+        print(banners.banner_image , '==1079===')
+
+        return redirect('admin_banner')
+        
 
 
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)

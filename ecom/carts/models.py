@@ -1,6 +1,6 @@
 
 from django.db import models
-from store.models import product, Variation
+from store.models import product, Variation, Coupon
 from accounts.models import Account
 
 
@@ -22,6 +22,7 @@ class CartItem(models.Model):
     product = models.ForeignKey(product, on_delete=models.CASCADE)
     variation = models.ManyToManyField(Variation, blank = True)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE,null=True)
+    coupon = models.CharField(max_length=10, null= True, blank= True)
     quantity= models.IntegerField()
     is_active = models.BooleanField(default=True)
 

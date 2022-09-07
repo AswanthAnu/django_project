@@ -12,4 +12,6 @@ urlpatterns = [
 
 
     path('checkout/', views.checkout , name='checkout'),
+    path('checkout/coupon', views.coupon , name='coupon'),
+    path('checkout/remove_coupon', views.remove_coupon , name='remove_coupon'),
 ]

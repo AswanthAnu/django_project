@@ -13,7 +13,7 @@
       {% for address in addresses%}
       <div class="form-check">
          
-         <input class="form-check-input" type="radio"  name="address" id="flexRadioDefault{{address.id}}" value="{{address.id}}" onclick="handleChange({{ address.id}})" >
+         <input class="form-check-input" type="radio"  name="address" id="flexRadioDefault{{address.id}}" value="{{address.id}}" onclick="handleChange({{address.id}})" >
          <label class="form-check-label" for="flexRadioDefault1">
             {{address.first_name}}.{{address.last_name}} : {{ address.full_address}}
             <input type="text" style="display: none;" value="{{address.first_name}}" id ="f_name{{address.id}}">
@@ -140,16 +140,37 @@
                       
                     {% endfor %}
 
+                     {% if coupon_code == None or coupon_code == 0 %}
+                     <div class="discount-code">
+                        <p>Have a Coupon ? <a data-toggle="modal" data-target="#coupon-modal" href="#!">enter it here</a></p>
+                     </div>
+
+                     {% else %}
+
+                     <div class="discount-code">
+                        <p style="color: green;">Coupon Applied  &nbsp; &nbsp;&nbsp; &nbsp;<a data-toggle="modal" data-target="#coupon-modal" href="#!">Try another one ?</a></p>
+                     </div>
                      
-                      <div class="discount-code">
-                         <p>Have a discount ? <a data-toggle="modal" data-target="#coupon-modal" href="#!">enter it here</a></p>
-                      </div>
+                     <div class="discount-code">
+                        <button type="button" style="color:red;" class="btn" onclick="remo_coupons()">Remove coupon</button>
+
+                     </div>
+                     
+
+                      {% endif %}
                       <ul class="summary-prices">
                          <li>
                             <span>Subtotal:</span>
-                            <span class="price">Rs.{{ total }}.00 </span>
+                            <span class="price">Rs.{{ totals }}.00 </span>
                          </li>
+                         {% if coupon_code == None or coupon_code == 0 %}
                          
+                        {% else %}
+                        <li>
+                           <span>Discount:</span>
+                           <span class="price">-Rs.{{ coupon_discount_total }}.00 </span>
+                        </li>
+                        {% endif %}
                          <li>
                                 
                             <span>Shipping:</span>
@@ -187,11 +208,12 @@
    <div class="modal-dialog" role="document">
       <div class="modal-content">
          <div class="modal-body">
-            <form>
+            <form id="couponss" method='POST'>
+               {% csrf_token %}
                <div class="form-group">
-                  <input class="form-control" type="text" placeholder="Enter Coupon Code">
+                  <input class="form-control" id='coupon_code' type="text" placeholder="Enter Coupon Code" value="">
                </div>
-               <button type="submit" class="btn btn-main">Apply Coupon</button>
+               <input type="submit"  class="btn btn-main" value='Apply Coupon'>
             </form>
          </div>
       </div>
@@ -226,9 +248,128 @@
      }
     
    }
-     
- </script>
 
 
+	$(document).on('submit', '#couponss', function (e) {
+		e.preventDefault();
+		var coupon_code = $('#coupon_code').val()
+		
 
-    {% endblock %}
+		$.ajax({
+			method: "GET",
+			url: "coupon",
+			dataType: 'json',
+			data: {
+		
+            'coupon_code' : coupon_code,
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					setTimeout(function(){
+                  window.location.replace('{{checkout}}');
+        
+                  }, 1500)
+                  
+                  Swal.fire({
+                    toast: true,
+                    icon: 'success',
+                    title: 'Coupon Applied Successfully',
+                    animation: false,
+                    position: 'top-right',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                  })
+				} 
+            else if (responce.coupon_valid == false) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "Not a valid coupon";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+				
+				else if (responce.success == false) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "Coupon expired";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+            else if (responce.coupon_valid == true) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "Not Post";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+            else if (responce.coupon_exist == true) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "This coupon is currently applied";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+            else if (responce.coupon_exist == false) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "This coupon is currently applied";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+            else if (responce.already == true) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "Coupon applied once";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+			}
+		})
+
+
+	});
+</script>
+<script>
+
+   function remo_coupons() {
+         $.ajax({
+         method: 'GET',
+         url: 'remove_coupon',
+         dataType: 'json',
+         data: {
+         
+         },
+        
+         success: function (responce) {
+            console.log('where')
+         if (responce.success == true) {
+            setTimeout(function(){
+               window.location.replace('{{checkout}}');
+      
+               }, 1500)
+               
+               Swal.fire({
+                  toast: true,
+                  icon: 'success',
+                  title: 'Coupon removed successfully',
+                  animation: false,
+                  position: 'top-right',
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true,
+               })
+
+
+            
+            
+         }
+         else if (responce.success == false) {
+            window.location.replace('{{checkout}}');
+         }
+      
+         },
+      
+   })}
+           
+            
+               
+   
+
+</script>
+ 
+ 
+ 
+
+
+ {% endblock %}

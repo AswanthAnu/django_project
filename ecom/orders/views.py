@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from carts.models import CartItem
 from .forms import OrderForm
 from .models import Order, Payment, OrderProduct
-from store.models import product
+from store.models import product, Coupon
 import datetime
 import json
 from django.views.decorators.cache import cache_control
@@ -17,7 +17,7 @@ import string
 import random
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
-
+from django.db.models import Q,F
 
 
 # Create your views here.
@@ -85,11 +85,12 @@ def payments_cod(request):
                     orderproduct = OrderProduct.objects.get(id=orderproduct.id)
                     orderproduct.variations.set(product_variation)
                     orderproduct.save()
-                    print(orderproduct, '-----------67')
 
                 # Reduce the quantity of the stock
                     prod = product.objects.get(id=item.product_id)
+                    print('stock before',prod.stock )
                     prod.stock -= item.quantity
+                    print('stock after',prod.stock )
                     prod.save()
                 
                 # clear the cart item
@@ -179,7 +180,9 @@ def payments(request):
 
             # Reduce the quantity of the stock
                 prod = product.objects.get(id=item.product_id)
+                print('stock before',prod.stock )
                 prod.stock -= item.quantity
+                print('stock after',prod.stock )
                 prod.save()
             
             # clear the cart item
@@ -215,9 +218,6 @@ def payments_razor(request):
 
     response = request.POST
     order_number = request.POST['order_number']
-    print(response, 'response')
-    print(order_number, 'order_number-----')
-
     params_dict = {
         'razorpay_order_id' : response['razorpay_order_id'],
         'razorpay_payment_id' : response['razorpay_payment_id'],
@@ -260,7 +260,9 @@ def payments_razor(request):
             orderproduct.save()
 
             prod = product.objects.get(id=item.product_id)
+            print('stock before',prod.stock )
             prod.stock -= item.quantity
+            print('stock after',prod.stock )
             prod.save()
 
             CartItem.objects.filter(user=request.user).delete()
@@ -343,7 +345,7 @@ def paymenthandler(request):
 
 
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
-def place_order(request, total=0, quantity=0, ):
+def place_order(request, totals=0, quantity=0, ):
 
     if CartItem.quantity == 0:
         print(CartItem.quantity)
@@ -353,21 +355,51 @@ def place_order(request, total=0, quantity=0, ):
     current_user = request.user
     print('entering into place_order')
 
-    
+    coupon_discount_total=0
+    cart_ii=[]
+    cart_item_id = 0
     
     # if the cart count is less than 0 return back to shop
     cart_items  = CartItem.objects.filter(user = current_user)
     cart_count = cart_items.count()
-     
+    cart_ii = CartItem.objects.values().filter(user=request.user).order_by('id')[:1]
+    coupon_discount_total=0
     grand_total = 0
     tax = 0
     for cart_item in cart_items:
         if cart_item.product.discount > cart_item.product.category.discount:
-            total += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.discount * 0.01 ))* cart_item.quantity)
+            totals += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.discount * 0.01 ))* cart_item.quantity)
         else:
-            total += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.category.discount * 0.01 ))* cart_item.quantity)
+            totals += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.category.discount * 0.01 ))* cart_item.quantity)
         
         quantity += cart_item.quantity
+        for i in cart_ii:
+                cart_item_id = (i['id'])
+
+        cart_i = CartItem.objects.get(id =cart_item_id)
+        print(cart_i)
+        coupon_code = cart_i.coupon
+        print(coupon_code, '---381---coupon_code')
+        try:
+            print(coupon_code, '-----coupon_code')
+            coupon_code_ = Coupon.objects.get(coupon_code = coupon_code)
+            print(coupon_code_, '-----coupon_code_')
+
+            coupon_discount = coupon_code_.disccount
+            
+            print(coupon_discount, '-------coupon_discount')
+
+            coupon_discount_total = int((totals * (coupon_discount/100)))
+            if coupon_discount_total > coupon_code_.maximum_amount:
+                coupon_discount_total = coupon_code_.maximum_amount
+            elif coupon_discount_total < coupon_code_.minimum_amount:
+                coupon_discount_total = coupon_code_.minimum_amount
+
+            total = totals - coupon_discount_total
+            print(total, "=====total")
+
+        except:
+            total = totals
     tax = int((12 * total)/100)
     grand_total = int(total + tax)
     print(grand_total, '===place order')
@@ -381,6 +413,8 @@ def place_order(request, total=0, quantity=0, ):
             print('entering if')
             data = Order()
             pay_method = Payment()
+            coupon = Coupon.objects.get(coupon_code = coupon_code)
+            print(coupon , '-------415.........')
             
             data.user = current_user
             data.first_name = request.POST['first_name']
@@ -395,6 +429,7 @@ def place_order(request, total=0, quantity=0, ):
             data.order_note = request.POST['order_note']
             data.order_total = grand_total
             data.tax = tax
+            data.coupon = coupon
             data.ip = request.META.get('REMOTE_ADDR')
             data.save()
             payment_method = request.POST['payment_method']
@@ -425,8 +460,11 @@ def place_order(request, total=0, quantity=0, ):
             context = {
                 'order': order,
                 'cart_items': cart_items,
+                'totals': totals,
                 'total': total,
                 'tax': tax,
+                'coupon_code' : coupon_code,
+                'coupon_discount_total': coupon_discount_total,
                 'grand_total': grand_total,
                 'grand_dollar':grand_dollar
 
@@ -476,7 +514,10 @@ def place_order(request, total=0, quantity=0, ):
                 'order': order,
                 'cart_items': cart_items,
                 'total': total,
+                'totals': totals,
                 'tax': tax,
+                'coupon_code' : coupon_code,
+                'coupon_discount_total': coupon_discount_total,
                 'grand_total': grand_total,
                 'grand_dollar':grand_dollar,
                 'razorpay_order_id' : razorpay_order_id,
@@ -521,6 +562,8 @@ def order_success(request):
                     subtotal += i.product_price * i.quantity
 
                 payment = Payment.objects.get(payment_id=transID)
+                discount_total = ((subtotal + order.tax)-order.order_total )
+                print(discount_total, 'discount_total....')
                 context = {
                     'order': order,
                     'ordered_products': ordered_products,
@@ -528,6 +571,7 @@ def order_success(request):
                     'transID': payment.payment_id,
                     'payment': payment,
                     'subtotal': subtotal,
+                    'discount_total': discount_total,
                 }
             
                 return render(request, 'orders/order_success.html', context )

@@ -75,8 +75,16 @@
                       <ul class="summary-prices">
                          <li>
                             <span>Subtotal:</span>
-                            <span class="price">Rs.{{ total }}.00 </span>
+                            <span class="price">Rs.{{ totals }}.00 </span>
                          </li>
+                         {% if coupon_code == None or coupon_code == 0 %}
+                         
+                        {% else %}
+                        <li>
+                           <span>Discount:</span>
+                           <span class="price">-Rs.{{ coupon_discount_total }}.00 </span>
+                        </li>
+                        {% endif %}
                          
                          <li>
                                 
@@ -87,17 +95,17 @@
                          <li>
                                 
                             <span>GST:</span>
-                            <span>Rs.{{ tax }}0</span>
+                            <span>Rs.{{ tax }}.00</span>
                          </li>
                          
                       </ul>
                       <div class="summary-total">
                          <span>Total</span>
-                         <span>Rs.{{ grand_total}}0</span>
+                         <span>Rs.{{ grand_total}}.00</span>
                       </div>
-                      <div>
+                      <div class="btn btn-main mt-20" >
                       
-                        <form action="{% url 'payments_razor' %}" method="POST">
+                        <form action="{% url 'payments_razor' %}" method="POST" >
                            {% csrf_token %}
 
 

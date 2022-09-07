@@ -16,8 +16,8 @@ urlpatterns = [
     path('admin_subcategory',views.admin_subcategory, name='admin_subcategory'),
     path('add_subcategory',views.add_subcategory, name='add_subcategory'),
     path('edit_subcategory',views.edit_subcategory, name='edit_subcategory'),
-     path('update_subcategory/<str:id>', views.update_subcategory, name="update_subcategory"),
-      path('delete_subcategory/<str:id>', views.delete_subcategory, name='delete_subcategory'),
+    path('update_subcategory/<str:id>', views.update_subcategory, name="update_subcategory"),
+    path('delete_subcategory/<str:id>', views.delete_subcategory, name='delete_subcategory'),
 
     path('admin_brand', views.admin_brand, name='admin_brand'),
     path('add_brand', views.add_brand, name='add_brand'),
@@ -48,11 +48,24 @@ urlpatterns = [
     path('admin_offer_cat', views.admin_offer_cat, name='admin_offer_cat'),
     path('add_offer_cat', views.add_offer_cat, name='add_offer_cat'),
     path('delete_offer_cat/<str:id>', views.delete_offer_cat, name='delete_offer_cat'),
+
+    path('admin_coupon', views.admin_coupon, name='admin_coupon'),
+    path('add_coupon', views.add_coupon, name='add_coupon'),
+    path('expire_coupon/<str:id>', views.expire_coupon, name='expire_coupon'),
+
+
+    path('admin_sales', views.admin_sales, name='admin_sales'),
+    path('export_pdf', views.export_pdf, name='export_pdf'),
+    path('export_excel', views.export_excel, name='export_excel'),
+
+    path('admin_return', views.admin_return, name="admin_return"),
+
+    path('admin_banner', views.admin_banner, name="admin_banner"),
+    path('banner_select/<str:id>', views.banner_select, name="banner_select"),
+    path('add_banner', views.add_banner, name="add_banner"), 
+
     
 
     path('block_unblock/<int:id>',views.block_unblock,name='block_unblock'),
-
-
-  
 
 ]

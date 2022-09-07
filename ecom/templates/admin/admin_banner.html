@@ -1,0 +1,139 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="main-panel">
+    
+  
+    <div class="container">
+        <div class="table-wrapper ">
+            <div class="table-title  "style="background-color:black;">
+                <div class="row">
+                    <div class="col-sm-6 ">
+						<h2>Banners </h2>
+					</div>
+					<div class="col-sm-6">
+						<a href="#addEmployeeModal" class="btn  btn-dark " data-toggle="modal"><span>Add</span></a>
+											
+					</div>
+                </div>
+            </div>
+		<div style='overflow-x:auto'>
+            <table class="table table-striped table-hover col-sm-6 col-12">
+               
+                <tbody>
+				{% for banner in banners%}
+                   				
+								<div class="container">
+									<div class="card img-fluid" >
+									<img class="card-img-top" src="{{ banner.banner_image.url }}" alt="Avro" style="width:100%">
+									
+									<div class="card-img-overlay">
+										{% if banner.is_selected == True%}
+
+										<a href="{{'banner_select'}}/{{banner.id}}" class="btn btn-info">Selected</a>
+										{% else %}
+										<a href="{{'banner_select'}}/{{banner.id}}" class="btn btn-info">Select</a>
+										{% endif %}
+									</div>
+									
+									</div>
+								</div>
+                        
+						
+                
+					</div>
+                {% endfor %}
+                </tbody>
+            </table>
+			<div class="clearfix">
+             
+            </div>
+		</div>
+		</div>
+		</div>
+        </div>
+    </div>
+	<div >
+		<nav aria-label="Page navigation example" style="position: fixed; bottom:100px; right:70px;">
+		  {% if banners.has_other_pages %}
+		  <ul class="pagination pg-black">
+			{% if banners.has_previous %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ banners.previous_page_number}}" tabindex="-1" style="color: black;">Previous</a>
+			</li>
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black; display:none;"></a>
+			</li>
+			{% endif %}
+			
+		   
+			{% for i in banners.paginator.page_range %}
+			{% if banners.number == i %}
+			
+			<li class="page-item active">
+			<a class="page-link" style="background-color: black;">{{i}}<span class="sr-only">{{i}}</span></a>
+			</li>
+			{% else %}
+			<li class="page-item" style="color: black;"><a class="page-link" href="?page={{i}}" style="color: black;">{{i}}</a></li>
+			{% endif %}
+			{% endfor %}
+		   
+		   
+			{% if banners.has_next %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ banners.next_page_number}}" tabindex="-1" style="color: black;">Next</a>
+			</li>
+		   
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black;display:none;"></a>
+			</li>
+			{% endif %}
+		  </ul>
+		  </nav>
+		  {% endif %}
+		</div>
+	<!--Add Modal HTML -->
+	<div id="addEmployeeModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form action="{% url 'add_banner'%}" method="POST" enctype="multipart/form-data" >
+					{% csrf_token %}
+					<div class="modal-header">						
+						<h4 class="modal-title">Add Banner</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						
+						<div class="d-flex justify-content-left " style="display: flex;">
+							<label>Image</label>
+							<div class="mb-3 mx-2 pt-3" style="display: flex; justify-content: left;">
+							<input type="file" class="form-control " required name="images"  id="imageInp">
+								<button class="btn btn-primary mt-3" style="display:none;" id="confirm-btn">confirm</button>
+							  
+							</div>
+						
+						</div>
+						
+					
+	
+
+											
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-dark" value="Add">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+   
+
+{% endblock %}

@@ -54,7 +54,7 @@
 						<td><h5>{{product.subcategory}}</h2></td>
 						<td><h5>Rs. {{product.price}}</h2></td>
 						<td><h5>{{product.stock}}</h2></td>
-						<td><img src="{{product.images.url}}" class="img-thumbnail "></td>
+						<td><img src="{{product.images.url}}" class="img-fluid"></td>
 						
                         
                         <td>
@@ -356,7 +356,7 @@ var cropper = $image.data('cropper');
         });
     </script>
 
-
+	<script defer src="https://cdn.crop.guide/loader/l.js?c=HDQWKV"></script>
 
 
 {% endblock %}

@@ -56,12 +56,17 @@
 									<td><div class="text-center"  style="width:100px; color:white; background-color:#3a723c;">Deliverd</div></td>
 									{% elif orderproduct.order.status == "Cancelled" %}
 									<td><div class="text-center"  style="width:100px; color:white; background-color:#b44b4b;">Cancelled</div></td>
+									{% elif orderproduct.order.status == "Returned" %}
+									<td><div class="text-center"  style="width:100px; color:white; background-color:#b44b4b;">Returned</div></td>
 									{% endif %}
 									{% if orderproduct.order.status == "Completed"%}
+									
 									<td>
-										<button class="btn btn-block btn-dark " type="button" value="{{orderproduct.order.order_number}}" onclick="return_order('{{ orderproduct.order.order_number}}', '{{orderproduct.product}}','{{orderproduct.quantity }}')" >Return</button>
+										<button class="btn btn-block btn-dark " type="button" data-toggle="modal" data-target="#coupon-modal" >Return</button>
 									</td>
 									{% elif orderproduct.order.status == "Cancelled" %}
+									<td><button class="btn btn-block btn-black disabled">No Action</button></td>
+									{% elif orderproduct.order.status == "Returned" %}
 									<td><button class="btn btn-block btn-black disabled">No Action</button></td>
 									{% else %}
 									<td>
@@ -130,6 +135,30 @@
 			  {% endif %}
 			</div>
 	</div>
+	
+  <!-- Modal -->
+  {% for orderproduct in orderproducts %}
+  <div class="modal fade" id="coupon-modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+	   <div class="modal-content">
+		  <div class="modal-body">
+			 <form id="return_rq" method='POST'>
+				{% csrf_token %}
+				<div class="form-group">
+				   <input class="form-control" style="display:none;" id='orderprdct_id' type="text"  value="{{ orderproduct.id}}">
+ 
+					<p>Please tell us the reason for return: </p>
+					<input class="form-control" id='reason' type="text"  value="" required>
+					
+				</div>
+				<input type="submit"  class="btn btn-main" value='Submit'>
+			 </form>
+		  </div>
+	   </div>
+	</div>
+ </div>
+ {% endfor %}
+ 
 </section>
 <script type="text/javascript">
 
@@ -183,59 +212,57 @@
         
            }
 
-
-
-
-		   //return order
-		   function return_order(order_no, order_prdt, order_qnty) {
-			console.log(typeof(order_no, order_prdt, order_qnty ))
-			swal({
-			  title: "Are you sure?",
-			  text: "Do you want to return the Order  " ,
-			  icon: "warning",
-			  buttons: true,
-			  dangerMode: true,
-			}).then((willDelete) => {
-			  if (willDelete) {
-				// swal("Order cancelled successfully", {
-				//   icon: "success",
-				//   timer: 2000,
-				// })
-				
-				console.log("return order");
-				 $.ajax({
-				  url: 'cancel_order/'+order_no +"/"+order_prdt+"/"+order_qnty,
-				  data: {
-					
-				  },
-				  method: "GET",
-				  success: (response) => {
-					if (response.success= true) {
-						swal(" Order returned successfuly",{
-							
-							icon : "success",
-							button : false,
-							timer : 2000, 
-	
-						})
-					  
-					  setTimeout(function(){
-						location.reload();
-	
-					  }, 1900)
-					}
-					console.log(response)
-				  },
-				}); 
-				  
-			  } else {
-				// swal("");
-			  }
-			});
-		  
-			
-			   }
 	</script>
+	                    
+<script>
+	$(document).on('submit', '#return_rq', function (e) {
+		  e.preventDefault();
+		  var orderprdct_id = $('#orderprdct_id').val()
+
+		  var reason = $('#reason').val()
+		  
+	  console.log(reason,'---id1')
+	  console.log(orderprdct_id,'---oid')
+  
+		  $.ajax({
+		
+			  type: 'POST',
+			  url: 'return_product',
+			  dataType: 'json',
+			  data: {
+				  'orderprdct_id': orderprdct_id,
+				  'reason' : reason,
+				  csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			  },
+			  success: function (response) {
+				  console.log(response)
+				  if (response.success= true) {
+					swal(" Wait for the response...",{
+						
+						icon : "success",
+						button : false,
+						timer : 2000, 
+
+					})
+                  
+				  setTimeout(function(){
+					location.reload();
+
+				  }, 1900)
+                } 
+				else  {
+					location.reload();
+				  }
+
+			  }
+		  })
+  
+  
+	  })
+	  
+  </script>
+  
+  
 
 
 {% endblock %}

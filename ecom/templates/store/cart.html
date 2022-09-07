@@ -9,21 +9,21 @@
     <div class="cart shopping">
       <div class="container">
         <div class="row">
-          <div class="col-md-8 col-md-offset-2">
+          <div class="col-md-10 col-md-offset-1">
             <div class="block">
               <div class="product-list">
                 <form method="post">
                   <table class="table">
                     <thead>
-                      <tr>
-                        <th class="">Product</th> 
+                      <tr class=" text-align-center">
+                        <th class="text-align-center">Product</th> 
                         <th class=""></th>
                         <th class=""></th>
                         <th class=""></th>
-                        <th class="">Quantity</th>
+                        <th class="text-align-center">Quantity</th>
                         <th class=""></th>
                         <th class=""></th>
-                        <th class="">Item Price</th>
+                        <th class="text-align-center">Item Price</th>
                         <th class=""></th>
                         
                         <th class="">Actions</th>
@@ -53,15 +53,14 @@
                         <td ></td>
 
                           <td >
-                            <div class="product-quantity" style="width: 1px;">
+                            <div class="product-quantity col-md-12 " style="width: 1px;">
                             
-                             <div class="product-quantity-slider " style="width: 100px; height:10px;">
+                             <div class="product-quantity-slider col-md-12 d-flex " style="width: 100px; height:10px;">
                                  <div class="input-group bootstrap-touchspin block">
-                                   {% if cart_item.quantity > 1%}
-                                   <span class="input-group-btn ">
-                                     
                                   
-                                     <input type="button"  id="div_id" class="btn btn-default bootstrap-touchspin-up" onclick="removefromCart('{{ cart_item.id }}','{{cart_item.product.id}}')" value="-">
+                                   {% if cart_item.quantity > 0%}
+                                   <span class="input-group-btn ">
+                                     <input type="button"  id="div_id" class="btn btn-default bootstrap-touchspin-up" onclick="removefromCart('{{ cart_item.id }}','{{cart_item.product.id}}')" value="-"  >
                                     </span>
                                    {% else %}
                                    <span class="input-group-btn ">
@@ -105,15 +104,17 @@
                           </td>
                           <td class="">
                             <div class="price-wrap text-center d-flex ">
-                              
-                              <p class="price fw-500" >
+                              <div class="col-md-12 ">
+                           
+                              <p class="price fw-500" >Rs.
                                 {% if cart_item.product.discount > cart_item.product.category.discount%}
                                 <input id="sub_total{{ cart_item.id }}" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{% sell_price cart_item.sub_total cart_item.product.discount %}" disabled>
                                 {% else %}
                                 <input id="sub_total{{ cart_item.id }}" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{% sell_price cart_item.sub_total cart_item.product.category.discount %}" disabled>
                                 {% endif %}
                               </p>
-                              <small class="text-muted text-center">
+                            </div>
+                              <small class="text-muted text-center">1 x Rs.
                                 <span  class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="" disabled><del>{{ cart_item.product.price }}</del></span>
                                  </small>
                               <small class="text-muted text-center">
@@ -149,7 +150,7 @@
                       <div class="card-body " style="width: 250px;">
                         <ul class="list-group list-group-flush">
                           <li
-                            class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0" ">
+                            class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0" >
                             <span  >Total Price :         Rs.</span> <span style="margin-left :40px; ">
                               <input  id="total_price" class=" rounded-0  border-0 " style="background-color: white; border:none; width:140px;"  type="number" value="{{ total }}" disabled>
                             </span>
@@ -326,10 +327,14 @@
         document.getElementById("gst").value=gst;
         document.getElementById("total_amount").value=total_amount;
 
-        qn = document.getElementById("product_quantity"+pid).value= this.responseText;
+        qn = document.getElementById("product_quantity"+pid).value;
+        console.log(qn,'--qn')
 
         if(qn < 1){
-          document.getElementById("product_quantity"+pid).style.display= hidden;
+          document.getElementById("div_id").disabled = true;
+        }
+        else{
+          document.getElementById("div_id").disabled =false;
         }
         
         
@@ -370,6 +375,16 @@
   document.getElementById("total_price").value=totall_price;
   document.getElementById("gst").value=gst;
   document.getElementById("total_amount").value=total_amount;
+
+  qn = document.getElementById("product_quantity"+pid).value;
+        console.log(qn,'--qn')
+
+        if(qn < 2){
+          document.getElementById("div_id").disabled = true;
+        }
+        else{
+          document.getElementById("div_id").disabled = false;
+        }
   
   
   

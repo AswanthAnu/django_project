@@ -15,6 +15,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="{% url 'admin_sales' %}">
+            <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+            <span class="menu-title"><h5>Sales Report</h5></span>
+          </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="{% url 'admin_user' %}">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
               <span class="menu-title"><h5>Users</h5></span>
@@ -52,10 +58,18 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'admin_order' %}">
+            <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
               <span class="menu-title"><h5>Orders</h5></span>
+              <i class="menu-arrow"></i>
             </a>
+            <div class="collapse" id="ui-basic">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="{% url 'admin_order' %}"><h5>Order details</h5></a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'admin_return' %}"><h5>Return details</h5></a></li>
+                
+              </ul>
+            </div>
           </li>
           <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
@@ -72,13 +86,13 @@
             </div>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="index.html">
+            <a class="nav-link" href="{% url 'admin_coupon' %}">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
               <span class="menu-title"><h5>Coupons</h5></span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="index.html">
+            <a class="nav-link" href="{% url 'admin_banner' %}">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
               <span class="menu-title"><h5>Banners</h5></span>
             </a>

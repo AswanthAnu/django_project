@@ -74,8 +74,16 @@
                       <ul class="summary-prices">
                          <li>
                             <span>Subtotal:</span>
-                            <span class="price">Rs.{{ total }}.00 </span>
+                            <span class="price">Rs.{{ totals }}.00 </span>
                          </li>
+                         {% if coupon_code == None or coupon_code == 0 %}
+                         
+                        {% else %}
+                        <li>
+                           <span>Discount:</span>
+                           <span class="price">-Rs.{{ coupon_discount_total }}.00 </span>
+                        </li>
+                        {% endif %}
                          
                          <li>
                                 

@@ -1,0 +1,190 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+
+<div class="main-panel">
+    
+  
+    <div class="container">
+        <div class="table-wrapper ">
+            <div class="table-title "style="background-color:black;">
+                <div class="row">
+                    <div class="col-sm-6 ">
+						<h2>Return details </h2>
+					</div>
+					<div class="col-sm-6">
+						
+											
+					</div>
+                </div>
+            </div>
+		<div style='overflow-x:auto'>
+           
+            <table class="table table-striped table-hover col-sm-6 col-12">
+                <thead>
+                    <tr>
+						<th>
+							<span class="custom-checkbox">
+								
+								
+							</span>
+						</th>
+                        <th  class="text-center"><h4>Order ID</h4></th>
+                        <th  class="text-center"><h4>Billing Name</h4></th>
+                        <th  class="text-center"><h4>Product</h4></th>
+						<th  class="text-center"><h4>Reason</h4></th>
+						<th  class="text-center"><h4>Status</h4></th>
+                        
+                        
+                    </tr>
+                </thead>
+                <tbody>
+				{% for return_prodt  in return_products%}
+                    <tr>
+						<td>
+							
+						</td>
+                        <td  class="text-center"><h5>{{return_prodt.return_product.order.order_number}}</h5></td>
+                        <td  class="text-center"><h5>{{return_prodt.return_product.order.full_name}}</h5></td>
+                        <td  class="text-center"><h5>{{return_prodt.return_product.product}}</h5></td>
+						<td  class="text-center"><h5>{{return_prodt.reason}}</h5></td>
+						<td  class="text-center"><h5>Returned</h5></td>
+                   
+						
+                       
+                        {% comment %} <td>
+                            <form>
+
+                                <select class="form-control text-center dark " style="background-color:#001737; color:white;" onchange="ChangeStatus(this.value)">
+
+                                    {% if return_prodt.returnstatus == "Waiting" %}
+                                        <option class="label label-primary" value="Waiting/{{return_prodt.id}}/{{return_prodt.return_product.product_id}}" selected>Waiting</option>
+                                        <option value="Accepted/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Approved</option>
+                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Rejected</option>
+ 
+              
+                                    {% endif %}
+
+
+                                </select>
+                            </form>
+
+                        </td> {% endcomment %}
+						
+                    </tr>
+					</div>
+                {% endfor %}
+                </tbody>
+            </table>
+			<div class="clearfix">
+                
+             
+            </div>
+            
+		</div>
+		</div>
+		</div>
+               
+    </div>
+    
+	<div >
+        
+		<nav aria-label="Page navigation example" style="position: fixed; bottom:80px; right:70px;">
+		  {% if return_products.has_other_pages %}
+		  <ul class="pagination pg-black">
+			{% if return_products.has_previous %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ return_products.previous_page_number}}" tabindex="-1" style="color: black;">Previous</a>
+			</li>
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black; display:none;"></a>
+			</li>
+			{% endif %}
+			
+		   
+			{% for i in return_products.paginator.page_range %}
+			{% if return_products.number == i %}
+			
+			<li class="page-item active">
+			<a class="page-link" style="background-color: black;">{{i}}<span class="sr-only">{{i}}</span></a>
+			</li>
+			{% else %}
+			<li class="page-item" style="color: black;"><a class="page-link" href="?page={{i}}" style="color: black;">{{i}}</a></li>
+			{% endif %}
+			{% endfor %}
+		   
+		   
+			{% if return_products.has_next %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ return_products.next_page_number}}" tabindex="-1" style="color: black;">Next</a>
+			</li>
+		   
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black;display:none;"></a>
+			</li>
+			{% endif %}
+		  </ul>
+		  </nav>
+		  {% endif %}
+		</div>
+
+    
+<script>
+	function ChangeStatus(str) {
+        console.log(str)
+		st = str.split("/");
+
+		if (st[0] == "Accepted") {
+
+			console.log(st[0])
+
+			xhttp.onload = function () {
+				document.getElementById("orders_pending").innerHTML = this.responseText;
+				var re = this.responseText
+
+			}
+			xhttp.open("GET", "change_order_status/" + str);
+			xhttp.send();
+		}
+		else if (st[0] == "Transist") {
+
+			console.log(st[0])
+
+			xhttp.onload = function () {
+				document.getElementById("orders_pending").innerHTML = this.responseText;
+				var re = this.responseText
+
+			}
+			xhttp.open("GET", "change_order_status/" + str);
+			xhttp.send();
+		}
+		else if(st[0]=="Completed"){
+			xhttp.onload = function () {
+				document.getElementById("orders_pending").innerHTML = this.responseText;
+				var op = parseInt("{{orders_deliverd}}")+1
+				document.getElementById('orders_deliverd').innerHTML = op
+				var re = this.responseText
+
+			}
+			xhttp.open("GET", "change_order_status/" + str);
+			xhttp.send();
+		}
+		else if(st[0]=="Cancelled"){
+		   
+			xhttp.open("GET", "change_order_status/" + str);
+			xhttp.send();
+		}
+	}
+	const xhttp = new XMLHttpRequest();
+	// xhttp.onload = function() {
+	//     document.getElementById("txtHint").innerHTML = this.responseText;
+	// }
+</script>
+	
+{% endblock %}

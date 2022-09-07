@@ -6,40 +6,22 @@
 
 
 {% block content %}
+
 <div class="hero-slider">
-  <div class="slider-item th-fullpage hero-area" style="background-image: {% static 'images/slider/slider-1.jpg' %};">
+	{% for banner in banners %}
+  <div class="slider-item th-fullpage hero-area" style = "background-image: url({{banner.banner_image.url}});">
     <div class="container">
       <div class="row">
         <div class="col-lg-8 text-center">
           <p data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".1">PRODUCTS</p>
           <h1 data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".5">The beauty of nature <br> is hidden in details.</h1>
-          <a data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".8" class="btn" href="shop.html">Shop Now</a>
+          <a data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".8" class="btn" href="{% url 'store' %}">Shop Now</a>
         </div>
       </div>
     </div>
   </div>
-  <div class="slider-item th-fullpage hero-area" style="background-image:{% static 'images/slider/slider-3.jpg' %};">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 text-left">
-          <p data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".1">PRODUCTS</p>
-          <h1 data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".5">The beauty of nature <br> is hidden in details.</h1>
-          <a data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".8" class="btn" href="shop.html">Shop Now</a>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="slider-item th-fullpage hero-area" style="background-image: {% static 'images/slider/slider-2.jpg' %};">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 text-right">
-          <p data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".1">PRODUCTS</p>
-          <h1 data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".5">The beauty of nature <br> is hidden in details.</h1>
-          <a data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".8" class="btn" href="shop.html">Shop Now</a>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% endfor %}
+ 
 </div>
 
 <section class="product-category section">
@@ -53,19 +35,19 @@
 			<div class="col-md-6">
 				<div class="category-box">
 					<a href="#!">
-						<img src="{% static 'images/shop/category/category-.jpg' %}" alt="" />
-						<div class="content">
-							<h3>Clothes Sales</h3>
-							<p>Shop New Season Clothing</p>
+						<img src="https://images.unsplash.com/photo-1488693236539-d8f00a91b7ca?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MzV8fHZpbnRhZ2UlMjB3b21lbnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="" />
+						<div class="content" >
+							<h3 style="color: white;">Clothes Sales</h3>
+							<p style="color: white;">Shop For Special Occasions</p>
 						</div>
 					</a>	
 				</div>
 				<div class="category-box">
 					<a href="#!">
-						<img src="{% static 'images/shop/category/category-.jpg' %}" alt="" />
+						<img src="https://images.unsplash.com/photo-1468186376524-b53e47314061?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NDF8fHZpbnRhZ2UlMjB3b21lbnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="" />
 						<div class="content">
-							<h3>Smart Casuals</h3>
-							<p>Get Wide Range Selection</p>
+							<h3 style="color: white;">Smart Casuals</h3>
+							<p style="color: white;">Get Wide Range Selection</p>
 						</div>
 					</a>	
 				</div>
@@ -73,10 +55,10 @@
 			<div class="col-md-6">
 				<div class="category-box category-box-2">
 					<a href="#!">
-						<img src="{% static 'images/shop/category/category-.jpg' %}" alt="" />
+						<img src="https://images.unsplash.com/photo-1599058919476-4933715fa828?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NTN8fHZpbnRhZ2UlMjB3b21lbnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="" />
 						<div class="content">
-							<h3>Jewellery</h3>
-							<p>Special Design Comes First</p>
+							<h3  style="color: white;">Brands</h3>
+							<p  style="color: white;">Special Design Brands First</p>
 						</div>
 					</a>	
 				</div>
@@ -89,7 +71,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="title text-center">
-				<h2>Trendy Products</h2>
+				<h2>New Arrivals</h2>
 			</div>
 		</div>
 		<div class="row">

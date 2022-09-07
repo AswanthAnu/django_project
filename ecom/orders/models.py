@@ -1,6 +1,6 @@
 from django.db import models
 from accounts.models import Account
-from store.models import product, Variation
+from store.models import Coupon, product, Variation
 
 
 
@@ -23,10 +23,12 @@ class Order(models.Model):
         ('Transist', 'Transist'),
         ('Completed', 'Completed'),
         ('Cancelled', 'Cancelled'),
+        ('Returned', 'Returned')
     )
 
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
+    coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null= True, blank=True)
     order_number = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -71,3 +73,21 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return self.product.product_name
+
+
+
+        
+class ReturnProduct(models.Model):
+    STATUS =(
+        ('Waiting','Waiting'),
+        ('Approved','Approved'),
+        ('Rejected','Rejected')
+   
+    )
+    return_product= models.ForeignKey(OrderProduct,on_delete=models.CASCADE)
+    reason=models.CharField(max_length=200)
+    comment= models.CharField(max_length=200)
+    returnstatus=models.CharField(max_length=200,choices=STATUS, default='Processing')
+
+    def __str__(self):
+        return self.return_product.product.product_name

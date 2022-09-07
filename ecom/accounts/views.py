@@ -9,7 +9,7 @@ from .form import RegistrationForm, UserForm, UserProfileForm
 from .models import Account, UserProfile, Address
 from django.http import JsonResponse
 from django.urls import reverse
-from orders.models import Order, OrderProduct  
+from orders.models import Order, OrderProduct , ReturnProduct
 from carts.views import _cart_id
 from carts.models import Cart, CartItem
 from store.models import product
@@ -398,6 +398,31 @@ def cancel_order(request, order_no, order_prdt, order_qnty ):
     order_product.save()
 
     return JsonResponse({'success': True},safe= False)
+
+def return_product(request):
+    print( '----403')
+    if request.method == "POST":
+        orderprdct_id = request.POST['orderprdct_id']
+        reason = request.POST['reason']
+        print(reason, '----406')
+        order_pd = OrderProduct.objects.get(id = orderprdct_id)
+        order_pd.order.status = "Returned"
+        order_pd.order.save()
+        print(order_pd.order.status)
+        return_prdt = ReturnProduct(
+            return_product = order_pd,
+            reason = reason,
+            returnstatus = 'Waiting'
+        )
+
+        return_prdt.save()
+        print(return_prdt,'----414')
+
+        return JsonResponse(
+            {'success' : True}, safe= False
+        )
+        
+
 
 def address(request):
 

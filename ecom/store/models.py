@@ -58,3 +58,14 @@ class Variation(models.Model):
 
     def __str__(self):
         return self.variation_value
+
+
+class Coupon(models.Model):
+    coupon_code = models.CharField(max_length=8)
+    is_expired = models.BooleanField(default=False)
+    disccount = models.IntegerField(default=0)
+    minimum_amount = models.IntegerField(default=500)
+    maximum_amount = models.IntegerField(null=True)
+
+    def __str__(self):
+        return self.coupon_code

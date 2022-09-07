@@ -1,0 +1,100 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="main-panel">
+    
+  
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title "style="background-color:black;">
+                <div class="row">
+                    <div class="col-sm-6 ">
+						<h2>Sales Report </h2>
+					</div>
+					
+					<div class="col-md-4 col-12 mt-sm-2 mt-3 mt-md-0 col-sm-12 d-flex justify-content-end align-items-end">
+						<form action='' method="POST">
+                            {% csrf_token %}
+					<div class="col-md-12">
+						<h5>By date</h5>
+						<div class="col-md-8">
+							<input type="date" name="salesdate" id="salesdate_id" class="datechk form-control" value="{{current_date}}" min="{{dates.0}}" max="{{dates_max}}">
+							
+						</div>
+						<div class="col-md-4">
+						<input type="submit" class="btn  btn-dark " value="Submit">
+						</div>
+						</div>
+						
+						</form>					
+					</div>
+                </div>
+            </div>
+			{% include 'includes/sales_include.html' %}
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-12 d-flex ">
+				   
+					<form action="{% url 'export_pdf' %}" method="POST">
+						{% csrf_token %}
+						<input type="date" id="salesdate_pdf_id" name="salesdate_pdf_id" style="display: none;" class="datechk form-control" value="{{current_date}}" >
+						<button type="submit" class="btn  btn-dark " >
+							<span >
+								Export PDF
+			
+							</span>
+						</button>
+						</form>
+						
+	
+						<form action="{% url 'export_excel' %}" method="POST">
+							{% csrf_token %}
+							<input type="date" id="salesdate_pdf_id" name="salesdate_excel" style="display: none;" class="datechk form-control" value="{{current_date}}" >
+							<button type="submit" class="btn bg-transparent text-warning rounded-0 " >
+								<button type="submit" class="btn  btn-dark " >
+									<span >
+										Export Excel
+					
+									</span>
+							</button>
+							</form>
+				
+				</div>
+			</div>
+	
+	
+		</div>
+	
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script>
+			var dateClass = '.datechk';
+			$(document).ready(function () {
+				if (document.querySelector(dateClass).type !== 'date') {
+					var oCSS = document.createElement('link');
+					oCSS.type = 'text/css';
+					oCSS.rel = 'stylesheet';
+					oCSS.href = '//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css';
+					oCSS.onload = function () {
+						var oJS = document.createElement('script');
+						oJS.type = 'text/javascript';
+						oJS.src = '//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js';
+						oJS.onload = function () {
+							$(dateClass).datepicker();
+						}
+						document.body.appendChild(oJS);
+					}
+					document.body.appendChild(oCSS);
+				}
+			});
+	
+	
+	
+	
+			
+		</script>
+	
+
+{% endblock %}
