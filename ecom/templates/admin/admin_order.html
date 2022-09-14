@@ -65,19 +65,19 @@
                                 <select class="form-control text-center dark " style="background-color:#001737; color:white;" onchange="ChangeStatus(this.value)">
 
                                     {% if orderproduct.order.status == "New" %}
-                                        <option class="label label-primary" value="New/{{  orderproduct.order.order_number}}/{{orderproduct.product_id}}" selected>New</option>
-                                        <option value="Accepted/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Accepted</option>
-                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Transist</option>
+                                        <option class="label label-primary" value="New/{{  orderproduct.order.order_number}}/{{orderproduct.product_id}}" selected>Accepted</option>
+                                        <option value="Accepted/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Shipped</option>
+                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Out for delivery</option>
                                         <option value="Completed/{{ orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Deliverd</option>
                                         <option value="Cancelled/{{ orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Cancelled</option>
                                     {% elif orderproduct.order.status == "Accepted" %}
-                                        <option value="Accepted/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}" selected>Accepted</option>
-                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Transist</option>
+                                        <option value="Accepted/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}" selected>Shipped</option>
+                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Out for delivery</option>
                                         <option value="Completed/{{ orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Deliverd</option>
                                         <option value="Cancelled/{{ orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Cancelled</option>
                                     {% elif orderproduct.order.status == "Transist" %}
      
-                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}" selected>Transist</option>
+                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}" selected>Out for delivery</option>
                                         <option value="Completed/{{ orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Deliverd</option>
                                         <option value="Cancelled/{{orderproduct.order.order_number  }}/{{ orderproduct.product_id }}">Cancelled</option>
                                     {% elif orderproduct.order.status == "Completed" %}

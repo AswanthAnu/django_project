@@ -151,8 +151,8 @@ def admin_user(request):
 
     if 'is_admin' not in request.session:
         return redirect('admin_login')
-    user = Account.objects.all().order_by('id')
-    paginator = Paginator(user, 4)
+    user = Account.objects.all().order_by('-id')
+    paginator = Paginator(user, 10)
     page = request.GET.get('page')
     paged_user = paginator.get_page(page)
     return render(request, 'admin/admin_user.html', {'users' : paged_user})
@@ -174,8 +174,8 @@ def block_unblock(request,id):
 
 @log(admin_login)   
 def admin_category(request):
-    categ = category.objects.all().order_by('id')
-    paginator = Paginator(categ, 1)
+    categ = category.objects.all().order_by('-id')
+    paginator = Paginator(categ, 10)
     page = request.GET.get('page')
     paged_categ = paginator.get_page(page)
     context={'categ' : paged_categ }
@@ -221,8 +221,8 @@ def delete_category(request,id):
 def admin_brand(request):
     if 'is_admin' not in request.session:
         return redirect('admin_login')
-    brandd = brand.objects.all().order_by('id')
-    paginator = Paginator(brandd, 1)
+    brandd = brand.objects.all().order_by('-id')
+    paginator = Paginator(brandd, 10)
     page = request.GET.get('page')
     paged_brandd = paginator.get_page(page)
    
@@ -270,11 +270,11 @@ def delete_brand(request,id):
 def admin_product(request):
     if 'is_admin' not in request.session:
         return redirect('admin_login')
-    categories = category.objects.all().order_by('id')
-    brands = brand.objects.all().order_by('id')
-    products = product.objects.all().order_by('id')
-    subcategories = SubCategory.objects.all().order_by('id')
-    paginator = Paginator(products, 1)
+    categories = category.objects.all().order_by('-id')
+    brands = brand.objects.all().order_by('-id')
+    products = product.objects.all().order_by('-id')
+    subcategories = SubCategory.objects.all().order_by('-id')
+    paginator = Paginator(products, 10)
     page = request.GET.get('page')
     paged_products = paginator.get_page(page)
    
@@ -382,11 +382,11 @@ def delete_product(request,id):
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 @log(admin_login)
 def admin_variation(request):
-    products = product.objects.all().order_by('id')
-    variations = Variation.objects.all().order_by('id')
+    products = product.objects.all().order_by('-id')
+    variations = Variation.objects.all().order_by('-id')
 
     
-    paginator = Paginator(variations, 6)
+    paginator = Paginator(variations, 10)
     page = request.GET.get('page')
     paged_variations = paginator.get_page(page)
 
@@ -466,9 +466,9 @@ def delete_variation(request, id):
 
 def admin_subcategory(request):
 
-    subcategory = SubCategory.objects.all().order_by('id')
-    categories = category.objects.all().order_by('id')
-    paginator = Paginator(subcategory, 6)
+    subcategory = SubCategory.objects.all().order_by('-id')
+    categories = category.objects.all().order_by('-id')
+    paginator = Paginator(subcategory, 10)
     page = request.GET.get('page')
     paged_subcategory = paginator.get_page(page)
     context={'subcategory' : paged_subcategory, 'categories' : categories  }
@@ -543,12 +543,12 @@ def delete_subcategory (request, id):
 
 def admin_order(request):
 
-    orderproducts = OrderProduct.objects.all().order_by('id')
-    paginator = Paginator(orderproducts, 6)
+    orderproducts = OrderProduct.objects.all().order_by('-id')
+    paginator = Paginator(orderproducts, 10)
     page = request.GET.get('page')
     paged_orderproducts = paginator.get_page(page)
     total_orders_count= OrderProduct.objects.all().count()
-    orders_pending = Order.objects.filter(status__contains='New').count()
+    orders_pending = Order.objects.filter(status__contains='New', is_ordered = True).count()
     orders_deliverd = Order.objects.filter(status__contains='Completed').count()
 
     context = {
@@ -589,8 +589,8 @@ def admin_cancel_order(request,oid):
 
 def admin_offer(request):
 
-    products = product.objects.all().order_by('id')
-    paginator = Paginator(products, 1)
+    products = product.objects.all().order_by('-id')
+    paginator = Paginator(products, 10)
     page = request.GET.get('page')
     paged_products = paginator.get_page(page)
 
@@ -609,7 +609,7 @@ def add_offer(request):
         prdct_ofer = request.POST.get('prdct_offer')
         prdct_offer = int(prdct_ofer)
 
-        if prdct_offer < 0 or prdct_offer > 100  :
+        if prdct_offer < 0 or prdct_offer > 80  :
             return JsonResponse({
                 'success' : False} ,
                   safe= False  )
@@ -626,6 +626,40 @@ def add_offer(request):
 
     return render(request,'admin/admin_offer.html')
 
+def edit_offer(request):
+    if request.method == "POST":
+        product_name = request.POST.get('product_name')
+        product_offer = int(request.POST.get('product_offer'))
+        category_name = request.POST.get('category_name')
+        category_offer = int(request.POST.get('category_offer'))
+        print(product_name,product_offer, '---635')
+        print(category_name,category_offer, '---636')
+        
+
+        if product_offer < 0 or product_offer > 80  :
+            return JsonResponse({
+                'product_offer' : False} ,
+                  safe= False  )
+        elif category_offer < 0 or category_offer > 80  :
+            return JsonResponse({
+                'category_offer' : False} ,
+                  safe= False  )
+        else:
+            products = product.objects.get(product_name = product_name)
+            categories = category.objects.get(category_name = category_name)
+            products.discount = product_offer
+            categories.discount = category_offer
+            products.save()
+            categories.save()
+            return JsonResponse({
+            'success' : True} ,
+                safe= False  )
+
+        
+
+
+
+
 def delete_offer(request, id):
 
     products = product.objects.get(id = id )
@@ -637,8 +671,8 @@ def delete_offer(request, id):
 
 def admin_offer_cat(request):
 
-    categories = category.objects.all().order_by('id')
-    paginator = Paginator(categories, 1)
+    categories = category.objects.all().order_by('-id')
+    paginator = Paginator(categories, 10)
     page = request.GET.get('page')
     paged_categories = paginator.get_page(page)
 
@@ -657,7 +691,7 @@ def add_offer_cat(request):
         categ_offer = int(categ_ofer)
         print(categ_offer, '----offer cat')
 
-        if categ_offer < 0 or categ_offer > 100  :
+        if categ_offer < 0 or categ_offer > 80  :
 
             return JsonResponse({
                 'success' : False} ,
@@ -687,8 +721,8 @@ def delete_offer_cat(request, id):
 
 def admin_coupon(request):
 
-    coupons = Coupon.objects.all().order_by('id')
-    paginator = Paginator(coupons, 1)
+    coupons = Coupon.objects.all().order_by('-id')
+    paginator = Paginator(coupons, 10)
     page = request.GET.get('page')
     paged_coupons = paginator.get_page(page)
 
@@ -715,7 +749,7 @@ def add_coupon(request):
                     { 'coupon_exist' : True}, safe= False
                 )
         except:
-            if discount < 0 or discount > 100:
+            if discount < 0 or discount > 80:
                 return JsonResponse(
                     {'discount' : False }, safe= False
                 )
@@ -741,15 +775,22 @@ def add_coupon(request):
 
 def expire_coupon(request , id ):
     coupons = Coupon.objects.get(id = id )
-    coupons.is_expired = True
-    coupons.save()
-    return JsonResponse({
-            'success': True
-        }, safe= False)
+    if coupons.is_expired == True:
+        coupons.is_expired = False
+        coupons.save()
+        return JsonResponse({
+                'success': True
+            }, safe= False)
+    elif coupons.is_expired == False:
+        coupons.is_expired = True
+        coupons.save()
+        return JsonResponse({
+                'success': False
+            }, safe= False)
 
 def admin_return(request):
-    return_product = ReturnProduct.objects.all()
-    paginator = Paginator(return_product, 4)
+    return_product = ReturnProduct.objects.all().order_by('-id')
+    paginator = Paginator(return_product, 10)
     page = request.GET.get('page')
     paged_return_product = paginator.get_page(page)
 
@@ -824,7 +865,7 @@ def admin_sales(request, *args, **kwargs):
             total_with_offer=0
             for t in grandtotalfind:
                 total_without_discount+=(t.product.price)*(t.quantity)
-                total_with_offer+=(t.product_price)*(t.quantity)
+                total_with_offer+=int((t.product_price)*(t.quantity))
                 print(t.product_price, '----791')
                 print(t.quantity)
             
@@ -846,7 +887,41 @@ def admin_sales(request, *args, **kwargs):
                 print("total")
                 print(total)
         except:
-            total="calculating"    
+            total="calculating"   
+    else:
+        try:
+
+            sales = OrderProduct.objects.filter().values('product_id').annotate(qty=Sum('quantity'))
+            grandtotalfind=OrderProduct.objects.filter().all()
+            print(grandtotalfind, '----855')
+            total_without_discount=0
+            total_with_offer=0
+            for t in grandtotalfind:
+                total_without_discount+=(t.product.price)*(t.quantity)
+                total_with_offer+=int((t.product_price)*(t.quantity))
+                print(t.product_price, '----861')
+                print(t.quantity)
+            
+            
+            print(sales)
+            for s in sales:
+                    pass
+            current_date=salesdate
+        except KeyError:
+            pass
+            salesdate=dates_max
+      
+        try:
+              total_payment= Payment.objects.filter(created_at__date=salesdate).all()
+              print(total_payment,'=total_earn--875')
+              total=0
+              for t in total_payment:
+                total+=float(t.amount_paid)
+                print("total---879")
+                print(total)
+        except:
+            total="calculating" 
+
     context= {
       'dates':dates,
       'dates_max':dates_max,
@@ -869,28 +944,6 @@ def admin_sales(request, *args, **kwargs):
 def export_pdf(request):
 
 
-    # response = HttpResponse(content_type ='application/pdf')
-    # response['Content-Disposition']='attachment;filemame=Export'+ \
-    # str(dt.datetime.now())+'.pdf'
-    # response['Content-Transfer-Encoding']='binary'
-    # path = r"ecom/templates/export/sales_pdf.html"
-    # assert os.path.isfile(path)
-    # html_string = render_to_string(
-    #     path,{'expenses':[], 'total': 0}
-    # )
-    # html =HTML(string = html_string)
-    # result = html.write_pdf()
-
-
-    
-
-    # with tempfile.NamedTemporaryFile(delete=True) as output:
-    #     output.write(result)
-    #     output.flush()
-
-    #     output = open(output.name, 'rb')
-    #     response.write(output.read())
-    # return response
     products = product.objects.all()
     
     
@@ -1079,7 +1132,8 @@ def add_banner(request):
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def admin_logout(request):
 
-    auth.logout(request)
+    
     request.session.flush() 
+    auth.logout(request)
 
     return redirect(admin_login)

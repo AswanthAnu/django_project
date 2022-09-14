@@ -189,7 +189,7 @@
 
 	<!-- Edit Modal HTML -->
 	{% for subcateg in subcategory %}
-	<div id="editEmployeeModal-{{forloop.counter}}" class="modal fade">
+	<div id="editEmployeeModal-{{subcateg.id}}" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				
@@ -200,24 +200,24 @@
 					<div class="modal-body">					
 						<div class="form-group">
 							<label>Category Name</label>
-							<select id="cat_id"  name="category" type="text" class="form-control disabled" >
+							<select id="cat_id-{{subcateg.id}}"  name="category" type="text" class="form-control disabled" >
 								<option value="{{ subcateg.cat.id}}" selected>{{subcateg.category.category_name}}</option>
 								
 								</select>
 						</div>
 						<div class="form-group">
 							<label>Description</label>
-							<input  name = "Description" id="descri" type="type"  value="{{ subcateg.category.description}}" class="form-control" required>
+							<input  name = "Description" id="descri-{{subcateg.id}}" type="type"  value="{{ subcateg.category.description}}" class="form-control" required>
 						</div>
-						<form  id="edit_subcategory" method = "POST" >
+						<form  id="edit_subcategory-{{subcateg.id}}" method = "POST" >
 							{% csrf_token %}
 						<div class="form-group">
 							<label>Sub Category Name</label>
-							<input name="subcategory_name"  id="subcateg_name" value="{{ subcateg.sub_category_name}}" placeholder="sub category name" type="text" class="form-control " required>
+							<input name="subcategory_name"  id="subcateg_name-{{subcateg.id}}" value="{{ subcateg.sub_category_name}}" placeholder="sub category name" type="text" class="form-control " required>
 						</div>
 						<div class="form-group" style="display: none;" >
 							<label>Sub Category id</label>
-							<input id="subc_id"  name="sub_id" type="text" class="form-control" value="{{subcateg.id}}" placeholder="category value" >
+							<input id="subc_id-{{subcateg.id}}"  name="sub_id" type="text" class="form-control" value="{{subcateg.id}}" placeholder="category value" >
 						</div>
 						
 										
@@ -230,17 +230,17 @@
 			</div>
 		</div>
 	</div>
-	{% endfor %}
+	
 
 	
 
 <script>
 
-	$(document).on('submit', '#edit_subcategory', function (e) {
+	$(document).on('submit', '#edit_subcategory-{{subcateg.id}}', function (e) {
 		e.preventDefault();
-		var subcategory_name = $('#subcateg_name').val()
-		var sub_id = $('#subc_id').val()
-		var cat_id = $('#cat_id').val()
+		var subcategory_name = $('#subcateg_name-{{subcateg.id}}').val()
+		var sub_id = $('#subc_id-{{subcateg.id}}').val()
+		var cat_id = $('#cat_id-{{subcateg.id}}').val()
 		console.log(subcategory_name, '----')
 		console.log(sub_id)
 		
@@ -276,16 +276,17 @@
 
 
 </script>
+{% endfor %}
 
 
 
 
 	<!-- Delete Modal HTML -->
 	{% for subcateg in subcategory %}
-	<div id="deleteEmployeeModal-{{forloop.counter}}" class="modal fade">
+	<div id="deleteEmployeeModal-{{subcateg.id}}" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form id="delete_sub" method="POST" >
+				<form id="delete_sub-{{subcateg.id}}" method="POST" >
 					<div class="modal-header">						
 						<h4 class="modal-title">Delete Sub Category</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -297,7 +298,7 @@
 					</div>
 					<div class="form-group" style="display: none;" >
 						<label>Sub id</label>
-						<input id="delete_sub_id"  name="sub_id" type="text" class="form-control" value="{{subcateg.id}}" placeholder="category value" >
+						<input id="delete_sub_id-{{subcateg.id}}"  name="sub_id" type="text" class="form-control" value="{{subcateg.id}}" placeholder="category value" >
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
@@ -307,16 +308,16 @@
 			</div>
 		</div>
 	</div>
-	{% endfor %}
+	
 
 
 	
 
 <script>
 
-	$(document).on('submit', '#delete_sub', function (e) {
+	$(document).on('submit', '#delete_sub-{{subcateg.id}}', function (e) {
 		e.preventDefault();
-		var subcat_id = $('#delete_sub_id').val()
+		var subcat_id = $('#delete_sub_id-{{subcateg.id}}').val()
 		$.ajax({
 			method: "POST",
 			url: "delete_subcategory/"+subcat_id,
@@ -340,7 +341,7 @@
 
 
 </script>
-
+{% endfor %}
 
 
 

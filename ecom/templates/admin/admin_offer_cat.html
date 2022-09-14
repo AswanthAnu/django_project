@@ -170,7 +170,7 @@
 				
 				else {
 					document.getElementById("categ_offer").value="";
-					document.getElementById("categ_offer").placeholder = "Discount must be between 0-100";
+					document.getElementById("categ_offer").placeholder = "Discount must be between 0-80";
 					document.getElementById("categ_offer").style.border = "solid red 1px";
 				}
 			}
@@ -184,105 +184,13 @@
 </script>
 
 
-	<!-- Edit Modal HTML -->
-	{% for subcateg in subcategory %}
-	<div id="editEmployeeModal-{{forloop.counter}}" class="modal fade">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				
-					<div class="modal-header">						
-						<h4 class="modal-title">Edit Sub Category</h4>
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					</div>
-					<div class="modal-body">					
-						<div class="form-group">
-							<label>Category Name</label>
-							<select id="cat_id"  name="category" type="text" class="form-control disabled" >
-								<option value="{{ subcateg.cat.id}}" selected>{{subcateg.category.category_name}}</option>
-								
-								</select>
-						</div>
-						<div class="form-group">
-							<label>Description</label>
-							<input  name = "Description" id="descri" type="type"  value="{{ subcateg.category.description}}" class="form-control" required>
-						</div>
-						<form  id="edit_subcategory" method = "POST" >
-							{% csrf_token %}
-						<div class="form-group">
-							<label>Sub Category Name</label>
-							<input name="subcategory_name"  id="subcateg_name" value="{{ subcateg.sub_category_name}}" placeholder="sub category name" type="text" class="form-control " required>
-						</div>
-						<div class="form-group" style="display: none;" >
-							<label>Sub Category id</label>
-							<input id="subc_id"  name="sub_id" type="text" class="form-control" value="{{subcateg.id}}" placeholder="category value" >
-						</div>
-						
-										
-					</div>
-					<div class="modal-footer">
-						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="submit" class="btn btn-dark" value="Save">
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-	{% endfor %}
-
-	
-
-<script>
-
-	$(document).on('submit', '#edit_subcategory', function (e) {
-		e.preventDefault();
-		var subcategory_name = $('#subcateg_name').val()
-		var sub_id = $('#subc_id').val()
-		var cat_id = $('#cat_id').val()
-		console.log(subcategory_name, '----')
-		console.log(sub_id)
-		
-
-		$.ajax({
-			method: "POST",
-			url: "update_subcategory/"+sub_id,
-			dataType: 'json',
-			data: {
-		
-				'subcategory_name' : subcategory_name,
-				'cat_id': cat_id,
-	
-				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
-			},
-			success: function (responce) {
-				console.log(responce)
-				if (responce.success == true) {
-					window.location.replace('admin_subcategory')
-				} 
-				
-				else {subcategory_name
-					document.getElementById("subcategory_name").value="";
-					document.getElementById("subcategory_name").placeholder = "Type value here..";
-					document.getElementById("subcategory_name").style.border = "solid red 1px";
-				}
-			}
-		})
-
-
-	})
-	
-
-
-</script>
-
-
-
 
 	<!-- Delete Modal HTML -->
 	{% for category in categories %}
 	<div id="deleteEmployeeModal-{{category.id}}" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form id="delete_offer_cat" method="POST" >
+				<form id="delete_offer_cat-{{category.id}}" method="POST" >
 					<div class="modal-header">						
 						<h4 class="modal-title">Delete Category Offer</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -294,7 +202,7 @@
 					</div>
 					<div class="form-group" style="display: none;" >
 						<label>Sub id</label>
-						<input id="catg_id"  name="catg_id" type="text" class="form-control" value="{{category.id}}" placeholder="category value" >
+						<input id="catg_id-{{category.id}}"  name="catg_id" type="text" class="form-control" value="{{category.id}}" placeholder="category value" >
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
@@ -304,16 +212,16 @@
 			</div>
 		</div>
 	</div>
-	{% endfor %}
+	
 
 
 	
 
 <script>
 
-	$(document).on('submit', '#delete_offer_cat', function (e) {
+	$(document).on('submit', '#delete_offer_cat-{{category.id}}', function (e) {
 		e.preventDefault();
-		var catg_id = $('#catg_id').val()
+		var catg_id = $('#catg_id-{{category.id}}').val()
 		$.ajax({
 			method: "POST",
 			url: "delete_offer_cat/"+catg_id,
@@ -337,6 +245,7 @@
 
 
 </script>
+{% endfor %}
 
 
 

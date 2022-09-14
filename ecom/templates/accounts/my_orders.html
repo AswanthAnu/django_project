@@ -28,6 +28,7 @@
 									<th class="text-center" >Date</th>
 									<th class="text-center" >Status</th>
 									<th class="text-center" >Action</th>
+									<th class="text-center" >Invoice</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -47,17 +48,23 @@
 									<td>{{    orderproduct.order.created_at   }}</td>
 									
 									{% if orderproduct.order.status == "New" %}
-									<td><div class="text-center"  style="width:100px; color:white; background-color:#3a5172;">Processing</div></td>
+									<td><div class="text-center"  style="width:100px;  height:40px; display: grid;
+										place-items: center; color:white; background-color:#3a5172;">Processing</div></td>
 									{% elif orderproduct.order.status == "Transist" %}
-									<td><div class="text-center"  style="width:100px; color:white; background-color:#a3913d;">Transist</div></td>
+									<td><div class="text-center"  style="width:100px;  height:40px; display: grid;
+										place-items: center; color:white; background-color:#a3913d;">Shipped</div></td>
 									{% elif orderproduct.order.status == "Accepted" %}
-									<td><div class="text-center"  style="width:100px; color:white; background-color:#3b7367;">Out for delivery</div></td>
+									<td><div class="text-center"  style="width:100px;  height:40px; display: grid;
+										place-items: center; color:white; background-color:#3b7367;">Out for delivery</div></td>
 									{% elif orderproduct.order.status == "Completed" %}
-									<td><div class="text-center"  style="width:100px; color:white; background-color:#3a723c;">Deliverd</div></td>
+									<td><div class="text-center"  style="width:100px;  height:40px; display: grid;
+										place-items: center; color:white; background-color:#3a723c;">Deliverd</div></td>
 									{% elif orderproduct.order.status == "Cancelled" %}
-									<td><div class="text-center"  style="width:100px; color:white; background-color:#b44b4b;">Cancelled</div></td>
+									<td><div class="text-center"  style="width:100px;  height:40px; display: grid;
+										place-items: center; color:white; background-color:#b44b4b;">Cancelled</div></td>
 									{% elif orderproduct.order.status == "Returned" %}
-									<td><div class="text-center"  style="width:100px; color:white; background-color:#b44b4b;">Returned</div></td>
+									<td><div class="text-center"  style="width:100px;  height:40px; display: grid;
+										place-items: center; color:white; background-color:#b44b4b;">Returned</div></td>
 									{% endif %}
 									{% if orderproduct.order.status == "Completed"%}
 									
@@ -73,6 +80,19 @@
 										<button class="btn btn-block btn-dark " type="button" value="{{orderproduct.order.order_number}}" onclick="cancel_order('{{ orderproduct.order.order_number}}', '{{orderproduct.product}}','{{orderproduct.quantity }}')" >Cancel</button>
 									</td>
 									{% endif %}
+									<td>
+										<form action="{% url 'invoice_download' %}" method="POST">
+											{% csrf_token %}
+											<input type="text" id="order_number" name="order_number" style="display: none;" class="datechk form-control" value="{{orderproduct.order.order_number}}" >
+											<input type="text" id="payment_id" name="payment_id" style="display: none;" class="datechk form-control" value="{{orderproduct.payment.payment_id}}" >
+											<button type="submit" class="btn  btn-dark " >
+												<span >
+													Download
+								
+												</span>
+											</button>
+											</form>
+									</td>
 
 								</tr>
 								{% endfor %}

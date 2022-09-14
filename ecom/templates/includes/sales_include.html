@@ -14,12 +14,7 @@
     <table class="table table-striped table-hover ">
         <thead>
             <tr>
-                <th>
-                    <span class="custom-checkbox">
-                        
-                        
-                    </span>
-                </th>
+                
                 <th><h4>No</h4></th>
                 <th><h4>Product Name</h4></th>
                 <th><h4>Category</h4></th>
@@ -32,13 +27,11 @@
         <tbody>
         {% for sale in sales %}
             <tr>
+                <td scope="row"><h5>{{ forloop.counter }}</h5></td>
                
                 {%for product in products %}
                 {% if product.id == sale.product_id %}
-                <td scope="row"><h5>{{ forloop.counter }}</h5></td>
-                <td>
-                    
-                </td>
+                
                 <td><h5>{{product.product_name}}</h5></td>
                 <td><h5>{{product.category.category_name}}</h5></td>
                 <td><h5>{{product.brand.brand_name}}</h5></td>

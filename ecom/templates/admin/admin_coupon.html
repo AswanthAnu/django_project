@@ -222,7 +222,7 @@
 	<div id="deleteEmployeeModal-{{coupon.id}}" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form id="expire_coupon" method="POST" >
+				<form id="expire_coupon-{{coupon.id}}" method="POST" >
 					<div class="modal-header">						
 						<h4 class="modal-title">Change Expiry</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -234,7 +234,7 @@
 					</div>
 					<div class="form-group" style="display: none;" >
 						<label>Sub id</label>
-						<input id="coupon_id"  name="coupon_id" type="text" class="form-control" value="{{coupon.id}}" placeholder="category value" >
+						<input id="coupon_id-{{coupon.id}}"  name="coupon_id" type="text" class="form-control" value="{{coupon.id}}" placeholder="category value" >
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
@@ -244,16 +244,16 @@
 			</div>
 		</div>
 	</div>
-	{% endfor %}
+	
 
 
 	
 
 <script>
 
-	$(document).on('submit', '#expire_coupon', function (e) {
+	$(document).on('submit', '#expire_coupon-{{coupon.id}}', function (e) {
 		e.preventDefault();
-		var coupon_id = $('#coupon_id').val()
+		var coupon_id = $('#coupon_id-{{coupon.id}}').val()
 		$.ajax({
 			method: "POST",
 			url: "expire_coupon/"+coupon_id,
@@ -264,6 +264,9 @@
 			success: function (responce) {
 				console.log(responce)
 				if (responce.success == true) {
+					window.location.replace('admin_coupon')
+				}
+				else if (responce.success == false) {
 					window.location.replace('admin_coupon')
 				} 
 				
@@ -277,6 +280,7 @@
 
 
 </script>
+{% endfor %}
 
 
 

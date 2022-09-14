@@ -21,5 +21,6 @@ urlpatterns = [
     path('change_password/',views.change_password, name='change_password'),
     path('my_orders/cancel_order/<str:order_no>/<str:order_prdt>/<str:order_qnty>', views.cancel_order, name='cancel_order'),
     path('my_orders/return_product', views.return_product, name='return_product'),
+    path('invoice_download', views.invoice_download, name='invoice_download'),
     
 ]

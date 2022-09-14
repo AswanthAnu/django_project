@@ -103,7 +103,7 @@
                          <span>Total</span>
                          <span>Rs.{{ grand_total}}.00</span>
                       </div>
-                      <div class="btn btn-main mt-20" >
+                      
                       
                         <form action="{% url 'payments_razor' %}" method="POST" >
                            {% csrf_token %}
@@ -129,7 +129,7 @@
                            <input type="hidden" custom="Hidden Element" name="hidden">
                            </form>
                            
-                      </div>
+                      
                       
                       
                         <div class="verified-icon">

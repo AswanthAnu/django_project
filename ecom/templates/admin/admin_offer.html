@@ -33,6 +33,8 @@
 						</th>
                         <th><h4>Product Name </h4></th>
                         <th><h4>Discount</h4></th>
+						<th><h4>Category Name </h4></th>
+						<th><h4>Category Discount</h4></th>
                         <th><h4>Action</h4></th>
                     </tr>
                 </thead>
@@ -42,12 +44,14 @@
 						<td>
 							
 						</td>
-                        <td><h5>{{ product.product_name }}</h5></td>
-                        <td><h5>{{ product.discount}}</h5></td>
+                        <td><h5 >{{ product.product_name }}</h5></td>
+                        <td><h5 >{{ product.discount}}</h5></td>
+						<td><h5 >{{ product.category.category_name}}</h5></td>
+						<td><h5 style="text-align: center;">{{ product.category.discount}}</h5></td>
 						
                         
                         <td>
-                            {% comment %} <a href="#editEmployeeModal-{{forloop.counter}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Edit</span></a> {% endcomment %}
+                            <a href="#editEmployeeModal-{{product.id}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Edit</span></a>
 							
 							<a href="#deleteEmployeeModal-{{product.id}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Delete</span></a>
 							
@@ -170,7 +174,7 @@
 				
 				else {
 					document.getElementById("prdct_offer").value="";
-					document.getElementById("prdct_offer").placeholder = "Discount must be between 0-100";
+					document.getElementById("prdct_offer").placeholder = "Discount must be between 0-80";
 					document.getElementById("prdct_offer").style.border = "solid red 1px";
 				}
 			}
@@ -185,36 +189,34 @@
 
 
 	<!-- Edit Modal HTML -->
-	{% for subcateg in subcategory %}
-	<div id="editEmployeeModal-{{forloop.counter}}" class="modal fade">
+	{% for product in products %}
+	<div id="editEmployeeModal-{{product.id}}" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				
 					<div class="modal-header">						
-						<h4 class="modal-title">Edit Sub Category</h4>
+						<h4 class="modal-title">Edit Product Offer</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 					</div>
 					<div class="modal-body">					
 						<div class="form-group">
-							<label>Category Name</label>
-							<select id="cat_id"  name="category" type="text" class="form-control disabled" >
-								<option value="{{ subcateg.cat.id}}" selected>{{subcateg.category.category_name}}</option>
-								
-								</select>
+							<label>Product Name</label>
+							<input name="product_name"  id="product_name-{{product.id}}" value="{{ product.product_name}}" placeholder="category name" type="text" class="form-control " disabled>
 						</div>
-						<div class="form-group">
-							<label>Description</label>
-							<input  name = "Description" id="descri" type="type"  value="{{ subcateg.category.description}}" class="form-control" required>
-						</div>
-						<form  id="edit_subcategory" method = "POST" >
+						<form  id="edit_product_offer-{{product.id}}" method = "POST" >
 							{% csrf_token %}
 						<div class="form-group">
-							<label>Sub Category Name</label>
-							<input name="subcategory_name"  id="subcateg_name" value="{{ subcateg.sub_category_name}}" placeholder="sub category name" type="text" class="form-control " required>
+							<label>Offer</label>
+							<input  name = "product_offer" id="product_offer-{{product.id}}" type="number"  value="{{ product.discount}}" class="form-control" required>
 						</div>
-						<div class="form-group" style="display: none;" >
-							<label>Sub Category id</label>
-							<input id="subc_id"  name="sub_id" type="text" class="form-control" value="{{subcateg.id}}" placeholder="category value" >
+						
+						<div class="form-group">
+							<label>Category Name</label>
+							<input name="category_name"  id="category_name-{{product.id}}" value="{{ product.category.category_name}}" placeholder="category name" type="text" class="form-control " disabled>
+						</div>
+						<div class="form-group"  >
+							<label>Category offer</label>
+							<input id="category_offer-{{product.id}}"  name="category_offer" type="number" class="form-control" value="{{product.category.discount}}" placeholder="category value" required>
 						</div>
 						
 										
@@ -227,42 +229,49 @@
 			</div>
 		</div>
 	</div>
-	{% endfor %}
-
 	
 
+	
 <script>
 
-	$(document).on('submit', '#edit_subcategory', function (e) {
+	$(document).on('submit', '#edit_product_offer-{{product.id}}', function (e) {
 		e.preventDefault();
-		var subcategory_name = $('#subcateg_name').val()
-		var sub_id = $('#subc_id').val()
-		var cat_id = $('#cat_id').val()
-		console.log(subcategory_name, '----')
-		console.log(sub_id)
+		var product_name = $('#product_name-{{product.id}}').val()
+		var product_offer = $('#product_offer-{{product.id}}').val()
+		var category_name = $('#category_name-{{product.id}}').val()
+		var category_offer = $('#category_offer-{{product.id}}').val()
+		console.log(category_name, '----')
+		console.log(product_name)
 		
 
 		$.ajax({
 			method: "POST",
-			url: "update_subcategory/"+sub_id,
+			url: "edit_offer",
 			dataType: 'json',
 			data: {
 		
-				'subcategory_name' : subcategory_name,
-				'cat_id': cat_id,
+				'product_name' : product_name,
+				'product_offer': product_offer,
+				'category_name': category_name,
+				'category_offer':category_offer,
 	
 				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
 			},
 			success: function (responce) {
 				console.log(responce)
 				if (responce.success == true) {
-					window.location.replace('admin_subcategory')
+					window.location.replace('admin_offer')
 				} 
 				
-				else {subcategory_name
-					document.getElementById("subcategory_name").value="";
-					document.getElementById("subcategory_name").placeholder = "Type value here..";
-					document.getElementById("subcategory_name").style.border = "solid red 1px";
+				else if (responce.product_offer == false){
+					document.getElementById("product_offer-{{product.id}}").value="";
+					document.getElementById("product_offer-{{product.id}}").placeholder = "Integer between 0-80 ";
+					document.getElementById("product_offer-{{product.id}}").style.border = "solid red 1px";
+				}
+				else if (responce.category_offer == false){
+					document.getElementById("category_offer-{{product.id}}").value="";
+					document.getElementById("category_offer-{{product.id}}").placeholder = "Integer between 0-80 ";
+					document.getElementById("category_offer-{{product.id}}").style.border = "solid red 1px";
 				}
 			}
 		})
@@ -273,6 +282,7 @@
 
 
 </script>
+{% endfor %}
 
 
 
@@ -282,7 +292,7 @@
 	<div id="deleteEmployeeModal-{{product.id}}" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form id="delete_offer" method="POST" >
+				<form id="delete_offer-{{product.id}}" method="POST" >
 					<div class="modal-header">						
 						<h4 class="modal-title">Delete Product Offer</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -294,7 +304,7 @@
 					</div>
 					<div class="form-group" style="display: none;" >
 						<label>Sub id</label>
-						<input id="prodct_id"  name="prodct_id" type="text" class="form-control" value="{{product.id}}" placeholder="category value" >
+						<input id="prodct_id-{{product.id}}"  name="prodct_id" type="text" class="form-control" value="{{product.id}}" placeholder="category value" >
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
@@ -304,16 +314,16 @@
 			</div>
 		</div>
 	</div>
-	{% endfor %}
+	
 
 
 	
 
 <script>
 
-	$(document).on('submit', '#delete_offer', function (e) {
+	$(document).on('submit', '#delete_offer-{{product.id}}', function (e) {
 		e.preventDefault();
-		var product_id = $('#prodct_id').val()
+		var product_id = $('#prodct_id-{{product.id}}').val()
 		$.ajax({
 			method: "POST",
 			url: "delete_offer/"+product_id,
@@ -337,6 +347,7 @@
 
 
 </script>
+{% endfor %}
 
 
 

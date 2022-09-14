@@ -413,8 +413,12 @@ def place_order(request, totals=0, quantity=0, ):
             print('entering if')
             data = Order()
             pay_method = Payment()
-            coupon = Coupon.objects.get(coupon_code = coupon_code)
-            print(coupon , '-------415.........')
+            try:
+                coupon = Coupon.objects.get(coupon_code = coupon_code)
+                print(coupon , '-------415.........')
+                data.coupon = coupon
+            except:
+                pass
             
             data.user = current_user
             data.first_name = request.POST['first_name']
@@ -429,7 +433,7 @@ def place_order(request, totals=0, quantity=0, ):
             data.order_note = request.POST['order_note']
             data.order_total = grand_total
             data.tax = tax
-            data.coupon = coupon
+            
             data.ip = request.META.get('REMOTE_ADDR')
             data.save()
             payment_method = request.POST['payment_method']

@@ -9,7 +9,7 @@ from .form import RegistrationForm, UserForm, UserProfileForm
 from .models import Account, UserProfile, Address
 from django.http import JsonResponse
 from django.urls import reverse
-from orders.models import Order, OrderProduct , ReturnProduct
+from orders.models import Order, OrderProduct, ReturnProduct, Payment
 from carts.views import _cart_id
 from carts.models import Cart, CartItem
 from store.models import product
@@ -18,6 +18,10 @@ from django.contrib.auth.decorators import login_required
 from twilio.rest import Client
 from django.conf import settings
 from django.core.paginator import Paginator
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import xlwt
 
 
 
@@ -371,7 +375,7 @@ def my_orders(request):
 
 
     orderproducts = OrderProduct.objects.filter(user = request.user).order_by('-created_at')
-    paginator = Paginator(orderproducts, 6)
+    paginator = Paginator(orderproducts, 10)
     page = request.GET.get('page')
     paged_orderproducts = paginator.get_page(page)
 
@@ -517,3 +521,49 @@ def change_password(request):
             messages.error(request, 'Password does not match!')
             return redirect('change_password')
     return render(request, 'accounts/change_password.html' )
+
+def invoice_download(request):
+    if request.method == "POST":
+        order_number = request.POST['order_number']
+        transID = request.POST['payment_id']
+
+        try:
+            order = Order.objects.get(order_number=order_number, is_ordered=True)
+            ordered_products = OrderProduct.objects.filter(order_id=order.id)
+
+            subtotal = 0
+            for i in ordered_products:
+                subtotal += i.product_price * i.quantity
+
+            payment = Payment.objects.get(payment_id=transID)
+            discount_total = ((subtotal + order.tax)-order.order_total )
+            print(discount_total, 'discount_total....')
+            template_path = 'export/invoice_pdf.html' 
+            context = {
+                'order': order,
+                'ordered_products': ordered_products,
+                'order_number': order.order_number,
+                'transID': payment.payment_id,
+                'payment': payment,
+                'subtotal': subtotal,
+                'discount_total': discount_total,
+            }
+        
+            response = HttpResponse(content_type ='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="invoice_report.pdf"'
+        
+            template = get_template(template_path)
+
+            html = template.render(context)
+
+            # create a pdf
+            pisa_status = pisa.CreatePDF(
+            html, dest=response)
+            # if error then show some funy view
+            if pisa_status.err:
+                return HttpResponse('We had some errors <pre>' + html + '</pre>')
+            return response
+        
+        except (Payment.DoesNotExist, Order.DoesNotExist):
+        
+            return redirect('home')
