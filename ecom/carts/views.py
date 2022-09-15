@@ -23,7 +23,6 @@ def _cart_id(request):        # creating to session to get cart_id
 def add_cart(request, product_id):
 
     current_user = request.user
-    print('---')
 
     prod = product.objects.get(id = product_id)  #fetching the product
     # if the user is authenticated
@@ -175,10 +174,6 @@ def add_cart(request, product_id):
 def update_cart(request,product_id ):
 
     current_user = request.user
-    print('---')
-    print("add_cart_from_cart")
-    # product = Product.objects.get(id=product_id)
-    # print(type(product))
   
      
     #fetching the product
@@ -190,7 +185,6 @@ def update_cart(request,product_id ):
       
 
         cart_id = product_id
-        print(cart_id)
 
 
         cart_ite = CartItem.objects.get(id = cart_id)
@@ -198,7 +192,6 @@ def update_cart(request,product_id ):
         cart_ite.save()
 
         cart_q = cart_ite.quantity
-        print(cart_q, "cart quantity")
         
 
         return HttpResponse(cart_q)
@@ -211,8 +204,6 @@ def update_cart(request,product_id ):
         if request.method == 'POST':
 
             cart_id = request.POST['cart_id']
-            print(cart_id)
-
 
             cart_ite = CartItem.objects.filter(id = cart_id)
             cart_ite.quantity += 1
@@ -278,7 +269,6 @@ def remove_cart(request, product_id, cart_item_id):
             cart_item.quantity -= 1
             cart_item.save()
             cart_q =  cart_item.quantity
-            print(cart_q)
         else:
             cart_item.delete()
 
@@ -333,21 +323,14 @@ def checkout(request, totals = 0, quantity = 0 , cart_items = None):
             quantity += cart_item.quantity
             for i in cart_ii:
                 cart_item_id = (i['id'])
-            print(cart_item_id, '.....cart_item id in checkout')
 
             cart_i = CartItem.objects.get(id =cart_item_id)
             coupon_code = cart_i.coupon
            
             try:        #coupon_code = cart_i.coupon
                 coupon = Coupon.objects.get(coupon_code = coupon_code)
-                print(coupon.id , 'coupon_id')
-                print(coupon_code, '-----coupon_code')
                 coupon_code_ = Coupon.objects.get(coupon_code = coupon_code)
-                print(coupon_code_, '-----coupon_code_')
-
                 coupon_discount = coupon_code_.disccount
-                
-                print(coupon_discount, '-------coupon_discount')
 
                 coupon_discount_total = int((totals * (coupon_discount/100)))
                 if coupon_discount_total > coupon_code_.maximum_amount:
@@ -356,11 +339,9 @@ def checkout(request, totals = 0, quantity = 0 , cart_items = None):
                     coupon_discount_total = coupon_code_.minimum_amount
 
                 total = totals - coupon_discount_total
-                print(total, "=====total")
 
             except:
                 total = totals
-                print('except', total,'----')
 
         gst = int((12 * total)/100)
         grand_total = int(total + gst)
@@ -394,13 +375,13 @@ def coupon(request):
     cart_item_id = 0
     if request.method == "GET":
         coupon_code = request.GET['coupon_code']
-        coupon = Coupon.objects.get(coupon_code = coupon_code)
-        print(coupon_code,'request post...order')
+        try:
+            coupon = Coupon.objects.get(coupon_code = coupon_code)
+        except:
+            return JsonResponse({'exist' : False}, safe= False)
         
         
         try:
-            
-            print('code is true')
 
             if coupon.is_expired == False:
                 if request.user.is_authenticated:
@@ -411,7 +392,6 @@ def coupon(request):
                         cart_item_id = (i['id'])
                     cart_i = CartItem.objects.get(id =cart_item_id)
                     cart_coupon = cart_i.coupon
-                    print(cart_item_id, '.....cart_item id in coupon')
 
 
                     if cart_coupon == coupon_code:
@@ -434,7 +414,6 @@ def coupon(request):
                     else:
                         cart_i.coupon = coupon_code
                         cart_i.save()
-                        print('cart_i.coupon afret,', cart_i.coupon)
                 else:
                     cart = Cart.objects.get(cart_id=_cart_id(request))
                     cart_ii = CartItem.objects.values().filter(user=request.user).order_by('id')[:1]
@@ -497,7 +476,6 @@ def remove_coupon(request):
             cart_i.coupon = None
             cart_i.save()
 
-            print('usr cart')
             return JsonResponse(
             {
             'success' : True,
@@ -514,7 +492,6 @@ def remove_coupon(request):
             cart_i = CartItem.objects.get(id =cart_item_id)
             cart_i.coupon = None
             cart_i.save()
-            print('not user')
             return JsonResponse(
             {
             'success' : False,
@@ -523,9 +500,6 @@ def remove_coupon(request):
                                 )
 
     else:               
-
-
-        print('aaaroooo..')
         return JsonResponse(
             {
                 'notget' : True,

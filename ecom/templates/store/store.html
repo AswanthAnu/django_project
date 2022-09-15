@@ -88,21 +88,7 @@
 					
 					  <div class="panel panel-default">
 					    <div class="panel-heading" role="tab" id="headingThree">
-					      {% comment %} <h4 class="panel-title">
-					        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-					          	Filter
-					        </a>
-					      </h4>
-					    </div>
-					    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-					    	<div class="panel-body">
-					      		<ul>
-									<li><a href="#!">Size</a></li>
-									<li><a href="#!">Color</a></li>
-									<li><a href="#!">Price</a></li>
-									<li><a href="#!"></a></li>
-								</ul>
-					    	</div> {% endcomment %}
+					   
 					    </div>
 					  </div>
 					</div>
@@ -132,23 +118,12 @@
                                     <div class="preview-meta">
                                         <ul>
                                             <li>
-                                                <span  data-toggle="modal" data-target="#product-modal">
+                                                <span  data-toggle="modal" data-target="#product-modal-{{ product.id }}">
                                                     <i class="tf-ion-ios-search-strong"></i>
                                                 </span>
                                             </li>
-                                            <li>
-                                                <a href="#!" ><i class="tf-ion-ios-heart"></i></a>
-                                            </li>
-											{% if product.stock != 0 %}
-                                            <li>
-                                                <a href="{% url 'add_cart' product.id %}"><i class="tf-ion-android-cart"></i></a>
-                                            </li>
-											{% else %}
-											<li>
-                                                <a href=""><i class="tf-ion-android-cart"></i></a>
-                                            </li>
-											
-											{% endif %}
+                                            
+										
                                         </ul>
                                       </div>
                                 </div>
@@ -178,6 +153,41 @@
                             </div>
                         </div>
                         {% endfor %}
+						{%for product in products%}
+						<!-- Modal -->
+						<div class="modal product-modal fade" id="product-modal-{{ product.id }}">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<i class="tf-ion-close"></i>
+							</button>
+							  <div class="modal-dialog " role="document">
+								<div class="modal-content">
+									  <div class="modal-body">
+										<div class="row">
+											<div class="col-md-8 col-sm-6 col-xs-12">
+												<div class="modal-image">
+													<img class="img-responsive" src="{{product.images.url}}" alt="product-img" />
+												</div>
+											</div>
+											<div class="col-md-4 col-sm-6 col-xs-12">
+												<div class="product-short-details">
+													<h2 class="product-title">{{product.product_name}}</h2>
+													<p class="product-price">Rs.{{product.price}}</p>
+													<p class="product-short-description">
+														
+													</p>
+													<a href="{{ product.get_url }}" class="btn btn-main">View Product details</a>
+								
+										</div>
+									</div>
+								</div>
+												</div>
+											
+							  </div>
+						</div><!-- /.modal -->
+				
+						</div>
+					{% endfor %}
+					</div>
 						
 						
 				</div>		

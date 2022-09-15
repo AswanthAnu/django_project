@@ -50,8 +50,8 @@
 						
                         
                         <td>
-                            <a href="#editEmployeeModal-{{forloop.counter}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Edit</span></a>
-							<a href="#deleteEmployeeModal-{{forloop.counter}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Delete</span></a>
+                            <a href="#editEmployeeModal-{{variation.id}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Edit</span></a>
+							<a href="#deleteEmployeeModal-{{ variation.id}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Delete</span></a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -200,10 +200,10 @@
 
 <!-- Edit Modal HTML -->
 {% for variation in variations %}
-<div id="editEmployeeModal-{{forloop.counter}}" class="modal fade" >
+<div id="editEmployeeModal-{{variation.id}}" class="modal fade" >
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form method = "POST"  id="edit_category" >
+			<form method = "POST"  id="edit_category-{{variation.id}}" >
 				{% csrf_token %}
 				<div class="modal-header">						
 					<h4 class="modal-title">Edit Variation</h4>
@@ -212,7 +212,7 @@
 				<div class="modal-body">					
 					<div class="form-group">
 						<label>Product </label>
-						<select id="update_products"  name="products" type="text" class="form-control" required>
+						<select id="update_products-{{variation.id}}"  name="products" type="text" class="form-control" required>
 						<option value="" selected>{{variation.product}}</option>
 						{% for product in products %}
 						<option data-style="btn-dark"  value="{{product.id}}">{{product.product_name}}</option>
@@ -221,7 +221,7 @@
 					</div>
 					<div class="form-group">
 						<label>Variation Category</label>
-						<select id="update_variation_category"  name="variation_category" type="text" class="form-control" required>
+						<select id="update_variation_category-{{variation.id}}"  name="variation_category" type="text" class="form-control" required>
 						<option value="" selected>{{variation.variation_category}}</option>
 						
 						<option data-style="btn-dark"value="color">color</option>
@@ -231,11 +231,11 @@
 					</div>
 					<div class="form-group">
 						<label>Variartion Value</label>
-						<input id="update_variation_value"  name="variation_value" type="text" class="form-control" value="{{variation.variation_value}}" placeholder="category value" required>
+						<input id="update_variation_value-{{variation.id}}"  name="variation_value" type="text" class="form-control" value="{{variation.variation_value}}" placeholder="category value" required>
 					</div>
 					<div class="form-group" style="display: none;" >
 						<label>Variartion id</label>
-						<input id="update_variation_id"  name="variation_id" type="text" class="form-control" value="{{variation.id}}" placeholder="category value" >
+						<input id="update_variation_id-{{variation.id}}"  name="variation_id" type="text" class="form-control" value="{{variation.id}}" placeholder="category value" >
 					</div>
 					
 									
@@ -248,18 +248,18 @@
 		</div>
 	</div>
 </div>
-{% endfor %}
+
 
 
 
 <script>
 
-	$(document).on('submit', '#edit_category', function (e) {
+	$(document).on('submit', '#edit_category-{{variation.id}}', function (e) {
 		e.preventDefault();
-		var products = $('#update_products').val()
-		var variation_category = $('#update_variation_category').val()
-		var variation_value = $('#update_variation_value').val()
-		var variation_id = $('#update_variation_id').val()
+		var products = $('#update_products-{{variation.id}}').val()
+		var variation_category = $('#update_variation_category-{{variation.id}}').val()
+		var variation_value = $('#update_variation_value-{{variation.id}}').val()
+		var variation_id = $('#update_variation_id-{{variation.id}}').val()
 		console.log(products)
 		console.log(variation_id)
 		
@@ -295,16 +295,13 @@
 
 
 </script>
-
-
-
-<!-- Delete Modal HTML -->
+{% endfor %}
 <!-- Delete Modal HTML -->
 {% for variation in variations %}
-<div id="deleteEmployeeModal-{{forloop.counter}}" class="modal fade">
+<div id="deleteEmployeeModal-{{variation.id}}" class="modal fade">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form method="POST" id="delete_variation" >
+			<form method="POST" id="delete_variation-{{variation.id}}" >
 				<div class="modal-header">						
 					<h4 class="modal-title">Delete Variation</h4>
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -315,7 +312,7 @@
 				</div>
 				<div class="form-group" style="display: none;" >
 					<label>Variartion id</label>
-					<input id="delete_variation_id"  name="variation_id" type="text" class="form-control" value="{{variation.id}}" placeholder="category value" >
+					<input id="delete_variation_id-{{variation.id}}"  name="variation_id" type="text" class="form-control" value="{{variation.id}}" placeholder="category value" >
 				</div>
 				<div class="modal-footer">
 					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
@@ -325,14 +322,14 @@
 		</div>
 	</div>
 </div>
-{% endfor %}
+
 
 
 <script>
 
-	$(document).on('submit', '#delete_variation', function (e) {
+	$(document).on('submit', '#delete_variation-{{variation.id}}', function (e) {
 		e.preventDefault();
-		var variation_id = $('#delete_variation_id').val()
+		var variation_id = $('#delete_variation_id-{{variation.id}}').val()
 		$.ajax({
 			method: "POST",
 			url: "delete_variation/"+variation_id,
@@ -356,42 +353,6 @@
 
 
 </script>
-
-
-
-
-
-
-
-
-
-    <script>
-        $(document).ready(function(){
-            // Activate tooltip
-            $('[data-toggle="tooltip"]').tooltip();
-            
-            // Select/Deselect checkboxes
-            var checkbox = $('table tbody input[type="checkbox"]');
-            $("#selectAll").click(function(){
-                if(this.checked){
-                    checkbox.each(function(){
-                        this.checked = true;                        
-                    });
-                } else{
-                    checkbox.each(function(){
-                        this.checked = false;                        
-                    });
-                } 
-            });
-            checkbox.click(function(){
-                if(!this.checked){
-                    $("#selectAll").prop("checked", false);
-                }
-            });
-        });
-    </script>
-
-
-
+{% endfor %}
 
 {% endblock %}

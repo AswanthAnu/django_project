@@ -1,8 +1,14 @@
 <div style='overflow-x:auto'>
     <div class="row mt-3">
+        {% if salesdates %}
         <div class="col-12 col-md-12 col-sm-12 d-flex justify-content-center align-items-center">
             <span class="">Sales Report of :{{salesdate}}</span>
         </div>
+        {% else %}
+        <div class="col-12 col-md-12 col-sm-12 d-flex justify-content-center align-items-center">
+            <span class="">Total Sales Report</span>
+        </div>
+        {% endif %}
     </div>
     {% if not sales%}
     <div class="row mt-3">

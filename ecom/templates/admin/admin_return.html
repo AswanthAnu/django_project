@@ -54,27 +54,6 @@
 						<td  class="text-center"><h5>{{return_prodt.reason}}</h5></td>
 						<td  class="text-center"><h5>Returned</h5></td>
                    
-						
-                       
-                        {% comment %} <td>
-                            <form>
-
-                                <select class="form-control text-center dark " style="background-color:#001737; color:white;" onchange="ChangeStatus(this.value)">
-
-                                    {% if return_prodt.returnstatus == "Waiting" %}
-                                        <option class="label label-primary" value="Waiting/{{return_prodt.id}}/{{return_prodt.return_product.product_id}}" selected>Waiting</option>
-                                        <option value="Accepted/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Approved</option>
-                                        <option value="Transist/{{  orderproduct.order.order_number }}/{{ orderproduct.product_id }}">Rejected</option>
- 
-              
-                                    {% endif %}
-
-
-                                </select>
-                            </form>
-
-                        </td> {% endcomment %}
-						
                     </tr>
 					</div>
                 {% endfor %}
@@ -134,57 +113,6 @@
 		  {% endif %}
 		</div>
 
-    
-<script>
-	function ChangeStatus(str) {
-        console.log(str)
-		st = str.split("/");
-
-		if (st[0] == "Accepted") {
-
-			console.log(st[0])
-
-			xhttp.onload = function () {
-				document.getElementById("orders_pending").innerHTML = this.responseText;
-				var re = this.responseText
-
-			}
-			xhttp.open("GET", "change_order_status/" + str);
-			xhttp.send();
-		}
-		else if (st[0] == "Transist") {
-
-			console.log(st[0])
-
-			xhttp.onload = function () {
-				document.getElementById("orders_pending").innerHTML = this.responseText;
-				var re = this.responseText
-
-			}
-			xhttp.open("GET", "change_order_status/" + str);
-			xhttp.send();
-		}
-		else if(st[0]=="Completed"){
-			xhttp.onload = function () {
-				document.getElementById("orders_pending").innerHTML = this.responseText;
-				var op = parseInt("{{orders_deliverd}}")+1
-				document.getElementById('orders_deliverd').innerHTML = op
-				var re = this.responseText
-
-			}
-			xhttp.open("GET", "change_order_status/" + str);
-			xhttp.send();
-		}
-		else if(st[0]=="Cancelled"){
-		   
-			xhttp.open("GET", "change_order_status/" + str);
-			xhttp.send();
-		}
-	}
-	const xhttp = new XMLHttpRequest();
-	// xhttp.onload = function() {
-	//     document.getElementById("txtHint").innerHTML = this.responseText;
-	// }
-</script>
+   
 	
 {% endblock %}

@@ -209,7 +209,7 @@ new Chart("pay", {
 
 
 <script>
-var paystat = ['Out for delivery','Accepted', 'Completed', 'Shipped', 'Cancelled' ];
+var paystat = ['Accepted ','Shipped', 'Out for delivery', 'Deliverd', 'Returned', 'Cancelled' ];
 var status_count = [{% for i in status_count %}'{{i}}', {% endfor %}];
 
 var barColors = [

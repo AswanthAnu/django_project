@@ -1,9 +1,7 @@
 from multiprocessing import context
 from pickle import TRUE
-from re import template
-from urllib import response
 from django.contrib import messages
-from django.contrib.auth.models import auth, User
+from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from homeapp.models import banner
@@ -14,12 +12,7 @@ from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
 from django.db.models import Count, Sum
-
-from cgi import print_arguments
-import os
 import datetime as dt
-from datetime import datetime
-
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 import xlwt
@@ -44,20 +37,15 @@ def admin_login(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-        print(email)
-        print(password)
 
         user = authenticate(email=email, password=password,)
         try:
             if user.is_admin == True:
                 request.session['is_admin'] = True
-                print(user.is_admin)
                 auth.login(request, user)
-                print('dash')
                 return redirect('admin_dashboard')
             
             else:
-                print('else')
                 messages.error(request, 'Invalid admin credentials')
                 return redirect('admin_login')
         except:
@@ -85,7 +73,7 @@ def admin_dashboard(request):
     for i in pay:
         pay_count.append(i['count'])
 
-    status = Order.objects.values('status').annotate(count = Count('status'))
+    status = Order.objects.filter(is_ordered = True).values('status').annotate(count = Count('status'))
     pay_status = []
     status_count = []
     for i in status:
@@ -97,7 +85,6 @@ def admin_dashboard(request):
     try: 
         day = 7 
         day = int(request.GET.get('days'))
-        print(day,'===98')
         order_product_count_graph = OrderProduct.objects.filter().values('created_at__date').order_by('-created_at__date')[:day].annotate(count=Count('quantity'))
     except:
         order_product_count_graph = OrderProduct.objects.filter().values('created_at__date').order_by('-created_at__date')[:7].annotate(count=Count('quantity'))
@@ -114,19 +101,14 @@ def admin_dashboard(request):
    
     for i in order_product_count_graph:
         sale_count.append(i['count'])
-    print(sale_count)
 
     payments = Payment.objects.values('amount_paid').all()
     total_sales = 0
     for i in payments:
         total_sales = int( total_sales + float(i['amount_paid']))
-        print(total_sales, '---123')
     no_of_sales = 0
     no_of_sale = OrderProduct.objects.aggregate(Sum('quantity'))
     no_of_sales = no_of_sale['quantity__sum']
-
-    print(no_of_sales,'---127')
-
 
     context = {
         'active_users' : active_user,
@@ -300,28 +282,20 @@ def add_product(request):
         brands = request.POST.get('brand')
         categories= request.POST.get('category')
         subcategories = request.POST.get('subcategory')
-        print('below  categ')
-        print(categories)
-        print(brands)
         if products.price == "0" or products.stock == "0" :
             messages.error(request, 'Please Fill with correct Value')
-            print('inside  price')
             return redirect('admin_product')
         if len(products.product_name) == 0 or len(categories) == 0 or len(brands) == 0:
-            print('inside  categ')
             messages.error(request, 'Fields cannot be blank')
             return redirect('admin_product')
 
         products.category   = category.objects.get(id = categories)
         products.brand   =  brand.objects.get(id = brands)   
         products.subcategory = SubCategory.objects.get(id = subcategories)
-        print('below  brand')
         if len(request.FILES) != 0:
-            print('inside images')
             products.images = request.FILES['images']
             products.image2 = request.FILES['image2']
             products.image3 = request.FILES['image3']
-            print('inside images')
         
             products.save()
           
@@ -411,8 +385,6 @@ def add_variation(request):
         variations.variation_value = request.POST.get('variation_value')
 
         if len(variations.variation_value.strip()) == 0 :
-            # messages.error(request, 'Please fill Category value')
-            print('inside  categ')
             return JsonResponse({
                 'success' : False} ,
                   safe= False  )
@@ -441,20 +413,15 @@ def update_variation(request, id):
         variation_detail.variation_category = request.POST.get('variation_category')
         variation_detail.variation_value = request.POST.get('variation_value')
         if len(variation_detail.variation_value.strip()) == 0 :
-        # messages.error(request, 'Please fill Category value')
-            print('inside  categ')
             return JsonResponse({
                 'success' : False} ,
                     safe= False  )
     
         else:   
-            print('outside categ')
             variation_detail.save()
             return JsonResponse({
                 'success' : True} ,
                     safe= False  )
-
-    print('return categ')
     return render(request,'admin/admin_variation.html' )
 
 def delete_variation(request, id):
@@ -482,13 +449,10 @@ def add_subcategory(request):
 
         category_id = request.POST.get('category')
         subcategory_name = request.POST.get('subcategory_name')
-        print(subcategory_name)
         description = request.POST.get('description')
         slug = subcategory_name.replace(" ", "-").lower()
-        print(slug)
 
         if len(subcategory_name.strip()) == 0:
-            print('inside  subcateg')
             return JsonResponse({
                 'success' : False} ,
                   safe= False  )
@@ -512,21 +476,15 @@ def update_subcategory(request, id):
     if request.method == "POST":
 
         subcategory = SubCategory.objects.get(id = id)
-        print(id)
-        print(subcategory)
         subcategory.subcategory_name = request.POST['subcategory_name']
-        print(subcategory.subcategory_name)
         
         subcategory.slug = subcategory.subcategory_name.replace(" ", "-").lower()
-        print(subcategory.slug)
 
         if len(subcategory.subcategory_name.strip()) == 0:
-            print('inside  subcateg')
             return JsonResponse({
                 'success' : False} ,
                   safe= False  )
         else:
-            print(subcategory,";-;-;-;")
             subcategory.save()
             return JsonResponse({
                 'success' : True} ,
@@ -560,30 +518,16 @@ def admin_order(request):
     return render(request, 'admin/admin_order.html', context)       
 
 def change_order_status(request,st,oid,pid):
-    print(st)
-    print(oid)
-    print(pid)
-    # status_ordr = OrderProduct.objects.get(order_id = oid)
-    # print(status_ordr.status)
     order_product_details = Order.objects.get(order_number=oid)
-    print(order_product_details)
-    # order_details = Order.objects.get(order_product_details.)
     order_product_details.status = st
-    print(order_product_details.status )
     order_product_details.save()
     order_product_details=Order.objects.all().order_by('-created_at')
     orders_pending = Order.objects.filter(status__contains='New').count()
-    # context={
-    #     'order_details':order_details
-    # }
     return HttpResponse(orders_pending)
  
 def admin_cancel_order(request,oid):
-    print(oid)
-    print("yeah s")
     order_cancel = Order.objects.get(id=oid)
     order_cancel.status = 'Cancelled'
-    print(order_cancel.status )
     order_cancel.save()
     return HttpResponseRedirect(reverse('index'))
 
@@ -632,8 +576,6 @@ def edit_offer(request):
         product_offer = int(request.POST.get('product_offer'))
         category_name = request.POST.get('category_name')
         category_offer = int(request.POST.get('category_offer'))
-        print(product_name,product_offer, '---635')
-        print(category_name,category_offer, '---636')
         
 
         if product_offer < 0 or product_offer > 80  :
@@ -689,7 +631,6 @@ def add_offer_cat(request):
         category_id = request.POST.get('category_id')
         categ_ofer = request.POST.get('categ_offer')
         categ_offer = int(categ_ofer)
-        print(categ_offer, '----offer cat')
 
         if categ_offer < 0 or categ_offer > 80  :
 
@@ -741,7 +682,6 @@ def add_coupon(request):
         maximum_amount = int(request.POST.get('add_maximum'))
         minimum_amount = int(request.POST.get('add_minimum'))
         coupon_code = coupon_cod.replace(" ", "")
-        print(coupon_code)
         try:
             coupon = Coupon.objects.get(coupon_code = coupon_code)
             if coupon.coupon_code == coupon_code:
@@ -825,16 +765,13 @@ def admin_sales(request, *args, **kwargs):
     current_date =dates_max
     dates_len =len(dates)
     dates_len-=dates_len
-    print(dates_len)
   
     try:
         sales = OrderProduct.objects.filter(created_at__date=dates[-1]).values('product_id').annotate(qty=Sum('quantity'))
         grandtotalfind=OrderProduct.objects.filter(created_at__date=dates[-1]).all()
-        print(grandtotalfind)
         total_without_discount=0
         for t in grandtotalfind:
             total_without_discount+=(t.product.price)*(t.quantity)
-            print(t.product.price)
     except:
         sales=[]
     # get total money earned in day qty*productprice
@@ -848,29 +785,20 @@ def admin_sales(request, *args, **kwargs):
               total=0
               for t in total_earn:
                 total+=float(t.amount_paid)
-              print("total")
-              print(total,'---784')
     except:
             total="calculating"
     if request.method=="POST":
         try:
+            salesdates = True
             salesdate =request.POST['salesdate']
-            print("Ssssss")
-            print(salesdate, '---783--')
 
             sales = OrderProduct.objects.filter(created_at__date=salesdate).values('product_id').annotate(qty=Sum('quantity'))
             grandtotalfind=OrderProduct.objects.filter(created_at__date=salesdate).all()
-            print(grandtotalfind, '----787')
             total_without_discount=0
             total_with_offer=0
             for t in grandtotalfind:
                 total_without_discount+=(t.product.price)*(t.quantity)
                 total_with_offer+=int((t.product_price)*(t.quantity))
-                print(t.product_price, '----791')
-                print(t.quantity)
-            
-            
-            print(sales)
             for s in sales:
                     pass
             current_date=salesdate
@@ -880,30 +808,24 @@ def admin_sales(request, *args, **kwargs):
       
         try:
               total_payment= Payment.objects.filter(created_at__date=salesdate).all()
-              print(total_payment,'=total_earn--804')
               total=0
               for t in total_payment:
                 total+=float(t.amount_paid)
-                print("total")
-                print(total)
         except:
             total="calculating"   
     else:
         try:
+            salesdates = None
 
             sales = OrderProduct.objects.filter().values('product_id').annotate(qty=Sum('quantity'))
             grandtotalfind=OrderProduct.objects.filter().all()
-            print(grandtotalfind, '----855')
             total_without_discount=0
             total_with_offer=0
             for t in grandtotalfind:
                 total_without_discount+=(t.product.price)*(t.quantity)
                 total_with_offer+=int((t.product_price)*(t.quantity))
-                print(t.product_price, '----861')
-                print(t.quantity)
             
             
-            print(sales)
             for s in sales:
                     pass
             current_date=salesdate
@@ -913,12 +835,9 @@ def admin_sales(request, *args, **kwargs):
       
         try:
               total_payment= Payment.objects.filter(created_at__date=salesdate).all()
-              print(total_payment,'=total_earn--875')
               total=0
               for t in total_payment:
                 total+=float(t.amount_paid)
-                print("total---879")
-                print(total)
         except:
             total="calculating" 
 
@@ -929,6 +848,7 @@ def admin_sales(request, *args, **kwargs):
       'sales':sales,
         'products':products,
         'salesdate':salesdate,
+        'salesdates':salesdates,
         'total':total,
         'total_without_discount':total_without_discount,
         'total_with_offer' : total_with_offer,
@@ -966,16 +886,13 @@ def export_pdf(request):
     current_date =dates_max
     dates_len =len(dates)
     dates_len-=dates_len
-    print(dates_len)
   
     try:
         sales = OrderProduct.objects.filter(created_at__date=dates[-1]).values('product_id').annotate(qty=Sum('quantity'))
         grandtotalfind=OrderProduct.objects.filter(created_at__date=dates[-1]).all()
-        print(grandtotalfind)
         total_without_discount=0
         for t in grandtotalfind:
             total_without_discount+=(t.product.price)*(t.quantity)
-            print(t.product.price, '----899')
     except:
         sales=[]
     # get total money earned in day qty*productprice
@@ -989,29 +906,20 @@ def export_pdf(request):
               total=0
               for t in total_earn:
                 total+=float(t.amount_paid)
-              print("total---913")
-              print(total)
     except:
             total="calculating"
     if request.method=="POST":
         try:
             salesdate =request.POST['salesdate_pdf_id']
-            print("Ssssss")
-            print(salesdate, '---783--')
 
             sales = OrderProduct.objects.filter(created_at__date=salesdate).values('product_id').annotate(qty=Sum('quantity'))
             grandtotalfind=OrderProduct.objects.filter(created_at__date=salesdate).all()
-            print(grandtotalfind, '----787')
             total_without_discount=0
             total_with_offer=0
             for t in grandtotalfind:
                 total_without_discount+=(t.product.price)*(t.quantity)
                 total_with_offer+=(t.product_price)*(t.quantity)
-                print(t.product_price, '----791')
-                print(t.quantity)
             
-            
-            print(sales)
             for s in sales:
                     pass
             current_date=salesdate
@@ -1021,12 +929,9 @@ def export_pdf(request):
       
         try:
               total_payment= Payment.objects.filter(created_at__date=salesdate).all()
-              print(total_payment,'=total_earn--804')
               total=0
               for t in total_payment:
                 total+=float(t.amount_paid)
-                print("total")
-                print(total)
         except:
             total="calculating"    
 
@@ -1106,8 +1011,6 @@ def admin_banner(request):
     return render(request, 'admin/admin_banner.html', context)
 
 def banner_select(request, id):
-    print(id)
-
     banners = banner.objects.get(id = id)
     if banners.is_selected == True:
         banners.is_selected = False
@@ -1121,9 +1024,7 @@ def add_banner(request):
     banners = banner()
     if request.method == "POST":
         banners.banner_image = request.FILES['images']
-        print(  '==1076')
         banners.save()
-        print(banners.banner_image , '==1079===')
 
         return redirect('admin_banner')
         

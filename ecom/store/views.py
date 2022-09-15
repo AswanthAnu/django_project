@@ -21,15 +21,10 @@ def store(request,category_slug= None, brand_slug= None, sub_category_slug=None 
     brands = None
     products = None
     paged_products = None
-
-    print(sub_category_slug)
-    print(category_slug)
-    print(brand_slug)
     
     try:
 
         if brand_slug != None:
-            print('-----brand-----')
             
             brands = get_object_or_404(brand, slug = brand_slug  )
             products = product.objects.filter(brand = brands, is_available = True)
@@ -41,12 +36,10 @@ def store(request,category_slug= None, brand_slug= None, sub_category_slug=None 
 
 
         elif category_slug != None and sub_category_slug == None:
-            print('-----cat-----')
             
             categories = get_object_or_404(category, slug = category_slug  )
            
             products = product.objects.filter(category = categories, is_available = True)
-            print('-----products-----', products)
             
             product_count = products.count()
             paginator = Paginator(products, 6)
@@ -68,7 +61,6 @@ def store(request,category_slug= None, brand_slug= None, sub_category_slug=None 
        
 
         else:
-            print('----49')
             products = product.objects.all().filter(is_available = True).order_by('id')
             paginator = Paginator(products, 6)
             page = request.GET.get('page')
@@ -76,7 +68,6 @@ def store(request,category_slug= None, brand_slug= None, sub_category_slug=None 
             product_count = products.count()
 
     except:
-        print('----57')
         products = product.objects.all().filter(is_available = True).order_by('id')
         paginator = Paginator(products, 6)
         page = request.GET.get('page')

@@ -30,9 +30,6 @@ def payments_cod(request):
         return redirect('cart')
 
     try: 
-        
-    
-            print('entering into payments_cod')
             if request.method == "POST":
                 order = Order.objects.get(user=request.user, is_ordered=False, order_number=request.POST['orderID'])
             # Store transaction details inside Payment model
@@ -40,9 +37,7 @@ def payments_cod(request):
                 payment_method =  request.POST['payment_method']
                 status = request.POST['status']
                 randomLetter = random.choice(string.ascii_letters)
-                print(randomLetter)
                 randomnumber = random.randrange(10000, 99999)
-                print(randomnumber)
                 payment = Payment(
                     user = request.user,
                     payment_method ='cod',
@@ -53,7 +48,6 @@ def payments_cod(request):
                 )
 
                 payment.save()
-                print(payment, '-----------')
 
                 order.payment = payment
                 order.is_ordered = True
@@ -88,9 +82,7 @@ def payments_cod(request):
 
                 # Reduce the quantity of the stock
                     prod = product.objects.get(id=item.product_id)
-                    print('stock before',prod.stock )
                     prod.stock -= item.quantity
-                    print('stock after',prod.stock )
                     prod.save()
                 
                 # clear the cart item
@@ -98,7 +90,6 @@ def payments_cod(request):
                 
                 # send email
                 mail_subject = 'Your order placed successfully...!'
-                print(mail_subject)
                 message = render_to_string('orders/success_email.html', {
                     'user': request.user,
                     'order': order,
@@ -106,17 +97,6 @@ def payments_cod(request):
                 to_email = request.user.email
                 
                 send_email = EmailMessage(mail_subject, message, to=[to_email])
-                #send_email.send()
-
-                
-
-
-                # data = {
-                #     'success' : True,
-                #     'order_number': order.order_number,
-                #     'transID': payment.payment_id,
-                #     }
-                print("enter into data")
                 return JsonResponse({
                     'success' : True,
                     'order_number': order.order_number,
@@ -180,9 +160,7 @@ def payments(request):
 
             # Reduce the quantity of the stock
                 prod = product.objects.get(id=item.product_id)
-                print('stock before',prod.stock )
                 prod.stock -= item.quantity
-                print('stock after',prod.stock )
                 prod.save()
             
             # clear the cart item
@@ -190,7 +168,6 @@ def payments(request):
             
             # send email
             mail_subject = 'Your order placed successfully...!'
-            print(mail_subject)
             message = render_to_string('orders/success_email.html', {
                 'user': request.user,
                 'order': order,
@@ -260,9 +237,7 @@ def payments_razor(request):
             orderproduct.save()
 
             prod = product.objects.get(id=item.product_id)
-            print('stock before',prod.stock )
             prod.stock -= item.quantity
-            print('stock after',prod.stock )
             prod.save()
 
             CartItem.objects.filter(user=request.user).delete()
@@ -293,67 +268,13 @@ def payments_razor(request):
     return render(request, 'orders/payments_razor.html')
 
 
-# we need to csrf_exempt this url as
-# POST request will be made by Razorpay
-# and it won't have the csrf token.
-@csrf_exempt
-def paymenthandler(request):
- 
-   # only accept POST request.
-    if request.method == "POST":
-        try:
-           
-            # get the required parameters from post request.
-            payment_id = request.POST.get('razorpay_payment_id', '')
-            razorpay_order_id = request.POST.get('razorpay_order_id', '')
-            signature = request.POST.get('razorpay_signature', '')
-            params_dict = {
-                'razorpay_order_id': razorpay_order_id,
-                'razorpay_payment_id': payment_id,
-                'razorpay_signature': signature
-            }
-            razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
-            # verify the payment signature.
-            result = razorpay_client.utility.verify_payment_signature(
-                params_dict)
-            if result is None:
-                amount = 20000  # Rs. 200
-                try:
- 
-                    # capture the payemt
-                    razorpay_client.payment.capture(payment_id, amount)
- 
-                    # render success page on successful caputre of payment
-                    return render(request, 'paymentsuccess.html')
-                except:
- 
-                    # if there is an error while capturing payment.
-                    return render(request, 'paymentfail.html')
-            else:
- 
-                # if signature verification fails.
-                return render(request, 'paymentfail.html')
-        except:
- 
-            # if we don't find the required parameters in POST data
-            return HttpResponseBadRequest()
-    else:
-       # if other than POST request is made.
-        return HttpResponseBadRequest()
-
-
-
-
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def place_order(request, totals=0, quantity=0, ):
 
     if CartItem.quantity == 0:
-        print(CartItem.quantity)
-        print("----quantity")
         return redirect('cart')
 
     current_user = request.user
-    print('entering into place_order')
 
     coupon_discount_total=0
     cart_ii=[]
@@ -377,17 +298,11 @@ def place_order(request, totals=0, quantity=0, ):
                 cart_item_id = (i['id'])
 
         cart_i = CartItem.objects.get(id =cart_item_id)
-        print(cart_i)
         coupon_code = cart_i.coupon
-        print(coupon_code, '---381---coupon_code')
         try:
-            print(coupon_code, '-----coupon_code')
             coupon_code_ = Coupon.objects.get(coupon_code = coupon_code)
-            print(coupon_code_, '-----coupon_code_')
 
             coupon_discount = coupon_code_.disccount
-            
-            print(coupon_discount, '-------coupon_discount')
 
             coupon_discount_total = int((totals * (coupon_discount/100)))
             if coupon_discount_total > coupon_code_.maximum_amount:
@@ -396,13 +311,10 @@ def place_order(request, totals=0, quantity=0, ):
                 coupon_discount_total = coupon_code_.minimum_amount
 
             total = totals - coupon_discount_total
-            print(total, "=====total")
-
         except:
             total = totals
     tax = int((12 * total)/100)
     grand_total = int(total + tax)
-    print(grand_total, '===place order')
     
     
     if request.method == 'POST':
@@ -410,12 +322,10 @@ def place_order(request, totals=0, quantity=0, ):
         
         
             # Store all the billing information inside Order table
-            print('entering if')
             data = Order()
             pay_method = Payment()
             try:
                 coupon = Coupon.objects.get(coupon_code = coupon_code)
-                print(coupon , '-------415.........')
                 data.coupon = coupon
             except:
                 pass
@@ -510,7 +420,6 @@ def place_order(request, totals=0, quantity=0, ):
 
 
                 callback_url = 'paymenthandler/'
-                print(order_number, 'order number')
             
                 # we need to pass these details to frontend.
                 context = {
@@ -567,7 +476,6 @@ def order_success(request):
 
                 payment = Payment.objects.get(payment_id=transID)
                 discount_total = ((subtotal + order.tax)-order.order_total )
-                print(discount_total, 'discount_total....')
                 context = {
                     'order': order,
                     'ordered_products': ordered_products,

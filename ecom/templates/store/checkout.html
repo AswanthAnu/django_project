@@ -314,6 +314,11 @@
                document.getElementById("coupon_code").placeholder = "Coupon applied once";
                document.getElementById("coupon_code").style.border = "solid red 1px";
             }
+            else if (responce.exist == false) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "Not a valid Coupon";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
 			}
 		})
 

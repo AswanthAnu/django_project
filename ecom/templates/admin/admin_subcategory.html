@@ -47,8 +47,8 @@
 						
                         
                         <td>
-                            <a href="#editEmployeeModal-{{forloop.counter}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Edit</span></a>
-							<a href="#deleteEmployeeModal-{{forloop.counter}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Delete</span></a>
+                            <a href="#editEmployeeModal-{{subcateg.id}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Edit</span></a>
+							<a href="#deleteEmployeeModal-{{subcateg.id}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Delete</span></a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -342,40 +342,4 @@
 
 </script>
 {% endfor %}
-
-
-
-
-
-
-
-    <script>
-        $(document).ready(function(){
-            // Activate tooltip
-            $('[data-toggle="tooltip"]').tooltip();
-            
-            // Select/Deselect checkboxes
-            var checkbox = $('table tbody input[type="checkbox"]');
-            $("#selectAll").click(function(){
-                if(this.checked){
-                    checkbox.each(function(){
-                        this.checked = true;                        
-                    });
-                } else{
-                    checkbox.each(function(){
-                        this.checked = false;                        
-                    });
-                } 
-            });
-            checkbox.click(function(){
-                if(!this.checked){
-                    $("#selectAll").prop("checked", false);
-                }
-            });
-        });
-    </script>
-
-
-
-
 {% endblock %}

@@ -1,6 +1,3 @@
-
-from multiprocessing import Value, context
-from pickle import FALSE
 from django.contrib import messages
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
@@ -35,8 +32,6 @@ def register(request):
 
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
-        print(form.is_valid())
-        print(form.errors)
         if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
@@ -63,15 +58,15 @@ def register(request):
             if len(phone_number) == 10:
 
                 user = Account.objects.create_user(first_name = first_name, last_name = last_name, email = email, username = username, password = password)
-                user.phone_number = phone_number
-
-                print(phone_number)
-                
+                user.phone_number = phone_number   
                 user.is_staff = False
                 user.is_admin = False
                 user.save()
                 username = user.email
-                print(username)
+                profile = UserProfile()
+                profile.user_id = user.id
+                profile.profile_picture = 'default/default-user.png'
+                profile.save()
 
                 phone_num = "+91" + phone_number
 
@@ -94,7 +89,7 @@ def register(request):
                 
             
             else: 
-                messages.error(request, '10 digits number required')
+                
                 return JsonResponse({'success': False}, safe=True)
                
 
@@ -102,7 +97,7 @@ def register(request):
 
         else:
             
-            messages.error(request, "")
+            
             return JsonResponse({'phone_number' : False}, safe= False)
                 
             
@@ -119,12 +114,6 @@ def otp_registration(request):
      return render(request, 'accounts/otp_registration.html')
 
 def otp_registration(request, phone_number):
-
-    #username = Account.request.get('email')
-    #print(username,"username" )
-    
-
-
     if request.method == "POST":
         phone_num = "+91"+ str(phone_number)
         otp_input = request.POST['otp']
@@ -146,25 +135,19 @@ def otp_registration(request, phone_number):
 
                     if otp_check.status == "approved":
                         user = Account.objects.get(phone_number =phone_number )
-                        print(user)
                         user.is_active = True   
                         user.Phone_number = phone_number        
                         user.save()          
                         auth.login(request,user)
                         return JsonResponse({"success" :True }, safe= False)
                     else:
-                        #messages.success(request, "Invalid OTP")
-                        print("inside otp")
                         return JsonResponse({"success" :False }, safe= False)
             else:
-            # messages.success(request, "Invalid OTP")
-                print("outside otp")
                 return JsonResponse({"phone" : True }, safe= False)
         except:
             return JsonResponse({"phone" : False }, safe= False)
 
     else:
-        print("out")
         return render(request, 'accounts/otp_registration.html', {'phone_number': phone_number} )
 
 
@@ -183,9 +166,6 @@ def login(request):
             if len(email.strip()) == 0: 
                 length = len(email.strip())
                 return JsonResponse({"email_length" : True }, safe= False)
-
-            print(email)
-            print(password)
             user = authenticate(email=email, password=password)
             if user is not None and user.is_admin == False:
 
@@ -256,12 +236,9 @@ def otp_view(request):
          
             if Account.objects.filter(phone_number = phone_number).exists():
                 users = Account.objects.get(phone_number = phone_number)
-                print(users)
                 phone_num = "+91"+ phone_number
                 account_sid= settings.ACCOUNT_SID
                 auth_token= settings.TOKEN_SID
-                
-               
                
                 request.session['email'] = users.email
 
@@ -297,7 +274,6 @@ def otp_login(request, phone_number):
     
     
     if request.method == 'POST':
-        print(phone_number)
         if Account.objects.filter(phone_number= phone_number).exists():
             user = Account.objects.get(phone_number= phone_number)
 
@@ -324,17 +300,13 @@ def otp_login(request, phone_number):
                     return JsonResponse({"phone" :True }, safe= False)
 
                 else:
-                    #messages.error(request, "Invalid OTP")
                     return JsonResponse({"phone" :False }, safe= False)
             else:
-                #messages.error(request, "Invalid OTP")
                 return JsonResponse({"success" : True }, safe= False)
 
         else:
-            #messages.error(request, "Invalid Phone Number")
             return JsonResponse({"success" : False }, safe= False)
 
-    print(phone_number)
     return render(request, 'accounts/otp_login.html',{'phone_number':phone_number})
 
 
@@ -387,8 +359,6 @@ def my_orders(request):
 
   
 def cancel_order(request, order_no, order_prdt, order_qnty ):
-    print(order_no)
-    
     order_cancel = Order.objects.get(order_number=order_no)
     
     order_product = product.objects.get(product_name = order_prdt)
@@ -404,15 +374,12 @@ def cancel_order(request, order_no, order_prdt, order_qnty ):
     return JsonResponse({'success': True},safe= False)
 
 def return_product(request):
-    print( '----403')
     if request.method == "POST":
         orderprdct_id = request.POST['orderprdct_id']
         reason = request.POST['reason']
-        print(reason, '----406')
         order_pd = OrderProduct.objects.get(id = orderprdct_id)
         order_pd.order.status = "Returned"
         order_pd.order.save()
-        print(order_pd.order.status)
         return_prdt = ReturnProduct(
             return_product = order_pd,
             reason = reason,
@@ -420,7 +387,6 @@ def return_product(request):
         )
 
         return_prdt.save()
-        print(return_prdt,'----414')
 
         return JsonResponse(
             {'success' : True}, safe= False
@@ -537,7 +503,6 @@ def invoice_download(request):
 
             payment = Payment.objects.get(payment_id=transID)
             discount_total = ((subtotal + order.tax)-order.order_total )
-            print(discount_total, 'discount_total....')
             template_path = 'export/invoice_pdf.html' 
             context = {
                 'order': order,

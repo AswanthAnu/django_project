@@ -14,7 +14,7 @@
 			<div class="col-md-4 col-xs-12 col-sm-4">
 				<!-- Site Logo -->
 				<div class="logo text-center">
-					<a href="index.html">
+					<a href="{% url 'home' %}">
 						<!-- replace logo here -->
 						<svg width="135px" height="29px" viewBox="0 0 155 29" version="1.1" xmlns="{% static 'http://www.w3.org/2000/svg' %}"
 							xmlns:xlink="{% static 'http://www.w3.org/1999/xlink' %}">
@@ -177,7 +177,7 @@
 							{% else %}
 										<li><a href="{% url 'login' %}">Login</a></li>
 										<li><a href="{% url 'register' %}">Signup</a></li>
-										<li><a href="forget-password.html">Forget Password</a></li>
+										
 										
 							{% endif %} 
 						</ul>

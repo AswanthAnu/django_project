@@ -88,26 +88,37 @@
 					document.getElementById("first_name_id").value="";
 					document.getElementById("first_name_id").placeholder = "First name required";
 					document.getElementById("first_name_id").style.border = "solid red 1px";
+          document.getElementById("password_id").value="";
+          document.getElementById("confirm_password_id").value="";
+          
 				}
         else if (responce.first_name == false) {
 					document.getElementById("last_name_id").value="";
 					document.getElementById("last_name_id").placeholder = "Last name required";
 					document.getElementById("last_name_id").style.border = "solid red 1px";
+          document.getElementById("password_id").value="";
+          document.getElementById("confirm_password_id").value="";
 				}
         else if (responce.phone_number == true) {
 					document.getElementById("otp").value="";
 					document.getElementById("otp").placeholder = "10 digits required";
 					document.getElementById("otp").style.border = "solid red 1px";
+          document.getElementById("password_id").value="";
+          document.getElementById("confirm_password_id").value="";
 				}
         else if (responce.phone_number == false) {
 					document.getElementById("email_id").value="";
 					document.getElementById("email_id").placeholder = "Email already exists";
 					document.getElementById("email_id").style.border = "solid red 1px";
+          document.getElementById("password_id").value="";
+          document.getElementById("confirm_password_id").value="";
 				}
         else if (responce.success == false) {
 					document.getElementById("phone_number_id").value="";
 					document.getElementById("phone_number_id").placeholder = "10 digits required";
 					document.getElementById("phone_number_id").style.border = "solid red 1px";
+          document.getElementById("password_id").value="";
+          document.getElementById("confirm_password_id").value="";
 				}
         else if (responce.success == true) {
           console.log(responce)

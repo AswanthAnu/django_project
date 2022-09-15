@@ -198,30 +198,6 @@
 			</div>
 		</div>
 	</div>
-	<script>
-		var $image = $('#imageInp');
-
-$image.cropper({
-  aspectRatio: 16 / 9,
-  crop: function(event) {
-    console.log(event.detail.x);
-    console.log(event.detail.y);
-    console.log(event.detail.width);
-    console.log(event.detail.height);
-    console.log(event.detail.rotate);
-    console.log(event.detail.scaleX);
-    console.log(event.detail.scaleY);
-  }
-});
-
-// Get the Cropper.js instance after initialized
-var cropper = $image.data('cropper');
-	</script>
-
-
-
-
-
 
 	<!-- Edit Modal HTML -->
 	{% for product in products %}
@@ -330,32 +306,7 @@ var cropper = $image.data('cropper');
 		</div>
 	</div>
 	{% endfor %}
-    <script>
-        $(document).ready(function(){
-            // Activate tooltip
-            $('[data-toggle="tooltip"]').tooltip();
-            
-            // Select/Deselect checkboxes
-            var checkbox = $('table tbody input[type="checkbox"]');
-            $("#selectAll").click(function(){
-                if(this.checked){
-                    checkbox.each(function(){
-                        this.checked = true;                        
-                    });
-                } else{
-                    checkbox.each(function(){
-                        this.checked = false;                        
-                    });
-                } 
-            });
-            checkbox.click(function(){
-                if(!this.checked){
-                    $("#selectAll").prop("checked", false);
-                }
-            });
-        });
-    </script>
-
+   
 	<script defer src="https://cdn.crop.guide/loader/l.js?c=HDQWKV"></script>
 
 
