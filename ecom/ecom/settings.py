@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 
 from pathlib import Path
-import os
-
 from decouple import config
 
 
@@ -32,6 +30,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
 
 
 # Application definition
@@ -105,6 +104,7 @@ DATABASES = {
         'HOST': 'localhost', 
         'PORT': '5432',      
     }
+
 }
 
 
