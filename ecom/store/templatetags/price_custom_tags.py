@@ -9,7 +9,7 @@ def sell_price(pric , discout):
     price = int(pric)
     discount = int(discout)
 
-    if discount is None or discount is 0:
+    if discount == None or discount == 0:
         return price 
 
     
