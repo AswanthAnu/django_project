@@ -189,3 +189,4 @@ EMAIL_USE_TLS = True
 
 
 API_KEY = config("API_KEY")
+
