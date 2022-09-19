@@ -1,6 +1,6 @@
 
 from django.db import models
-from store.models import product, Variation, Coupon
+from store.models import product, Variation
 from accounts.models import Account
 
 
