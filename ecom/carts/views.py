@@ -178,42 +178,24 @@ def update_cart(request,product_id ):
      
     #fetching the product
     # if the user is authenticated
-    if current_user.is_authenticated:
+ 
         
-        product_variation = []
+    product_variation = []
 
-      
+    
 
-        cart_id = product_id
+    cart_id = product_id
 
 
-        cart_ite = CartItem.objects.get(id = cart_id)
-        cart_ite.quantity += 1
-        cart_ite.save()
+    cart_ite = CartItem.objects.get(id = cart_id)
+    cart_ite.quantity += 1
+    cart_ite.save()
 
-        cart_q = cart_ite.quantity
-        
+    cart_q = cart_ite.quantity
+    
 
-        return HttpResponse(cart_q)
+    return HttpResponse(cart_q)
      
-
-   # if the user is not auth
-
-    else:
-
-        if request.method == 'POST':
-
-            cart_id = request.POST['cart_id']
-
-            cart_ite = CartItem.objects.filter(id = cart_id)
-            cart_ite.quantity += 1
-            cart_ite.save()
-
-            cart_q = cart_ite.quantity
-
-        return HttpResponse(cart_q)
-     
-
 
 
 

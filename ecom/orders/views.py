@@ -215,53 +215,57 @@ def payments_razor(request):
 
     cart_items = CartItem.objects.filter(user=request.user)
     for item in cart_items:
-            product_pri = 0
-            if item.product.discount > item.product.category.discount:
-                product_pri += (int(item.product.price - (item.product.price * item.product.discount * 0.01 )))
-            else:
-                product_pri += (int(item.product.price - (item.product.price * item.product.category.discount * 0.01 )))
-            orderproduct = OrderProduct()
-            orderproduct.order_id = order.id
-            orderproduct.payment = payment
-            orderproduct.user_id = request.user.id
-            orderproduct.product_id = item.product_id
-            orderproduct.quantity = item.quantity
-            orderproduct.product_price = product_pri
-            orderproduct.ordered = True
-            orderproduct.save()
+        print('ite in cart item 218', item)
+    for item in cart_items:
+        print('cart item 220', item)
+        product_pri = 0
+        if item.product.discount > item.product.category.discount:
+            product_pri += (int(item.product.price - (item.product.price * item.product.discount * 0.01 )))
+        else:
+            product_pri += (int(item.product.price - (item.product.price * item.product.category.discount * 0.01 )))
+        orderproduct = OrderProduct()
+        orderproduct.order_id = order.id
+        orderproduct.payment = payment
+        orderproduct.user_id = request.user.id
+        orderproduct.product_id = item.product_id
+        print('228---', item.product_id,   '=-----orderid == ')
+        orderproduct.quantity = item.quantity
+        orderproduct.product_price = product_pri
+        orderproduct.ordered = True
+        orderproduct.save()
 
-            cart_item = CartItem.objects.get(id=item.id)
-            product_variation = cart_item.variation.all()
-            orderproduct = OrderProduct.objects.get(id=orderproduct.id)
-            orderproduct.variations.set(product_variation)
-            orderproduct.save()
+        cart_item = CartItem.objects.get(id=item.id)
+        product_variation = cart_item.variation.all()
+        orderproduct = OrderProduct.objects.get(id=orderproduct.id)
+        orderproduct.variations.set(product_variation)
+        orderproduct.save()
 
-            prod = product.objects.get(id=item.product_id)
-            prod.stock -= item.quantity
-            prod.save()
+        prod = product.objects.get(id=item.product_id)
+        prod.stock -= item.quantity
+        prod.save()
 
-            CartItem.objects.filter(user=request.user).delete()
+    CartItem.objects.filter(user=request.user).delete()
 
-            try:
-                order = Order.objects.get(order_number=order_number, is_ordered=True)
-                ordered_products = OrderProduct.objects.filter(order_id=order.id)
+    try:
+        order = Order.objects.get(order_number=order_number, is_ordered=True)
+        ordered_products = OrderProduct.objects.filter(order_id=order.id)
 
-                subtotal = 0
-                for i in ordered_products:
-                    subtotal += i.product_price * i.quantity
-                context = {
-                    'order': order,
-                    'ordered_products': ordered_products,
-                    'order_number': order.order_number,
-                    'transID': payment.payment_id,
-                    'payment': payment,
-                    'subtotal': subtotal,
-                }
-            except:
-                pass
+        subtotal = 0
+        for i in ordered_products:
+            subtotal += i.product_price * i.quantity
+        context = {
+            'order': order,
+            'ordered_products': ordered_products,
+            'order_number': order.order_number,
+            'transID': payment.payment_id,
+            'payment': payment,
+            'subtotal': subtotal,
+        }
+    except:
+        pass
 
 
-            return render(request, 'orders/order_success.html', context )
+    return render(request, 'orders/order_success.html', context )
 
 
 
@@ -420,6 +424,9 @@ def place_order(request, totals=0, quantity=0, ):
 
 
                 callback_url = 'paymenthandler/'
+
+                for i in cart_items:
+                    print(i, 'cart item')
             
                 # we need to pass these details to frontend.
                 context = {
@@ -440,10 +447,6 @@ def place_order(request, totals=0, quantity=0, ):
                 'callback_url' : callback_url
                 }
 
-
-
-               
-                
                 return render(request, 'orders/payments_razor.html', context )
 
 

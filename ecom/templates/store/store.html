@@ -171,7 +171,25 @@
 											<div class="col-md-4 col-sm-6 col-xs-12">
 												<div class="product-short-details">
 													<h2 class="product-title">{{product.product_name}}</h2>
-													<p class="product-price">Rs.{{product.price}}</p>
+													{% if product.discount > product.category.discount %}
+										{% if product.discount > 1%}
+											<span class="price">Rs. <del>{{product.price}}</del>
+												&nbsp; &nbsp;
+											<span >{% sell_price product.price product.discount  %}</span>
+											</span>
+										{% else %}
+											<span class="price">Rs.{{product.price}}</span>
+										{% endif %}
+									{% else %}
+										{% if product.category.discount > 1%}
+											<span class="price">Rs. <del>{{product.price}}</del>
+												&nbsp; &nbsp;
+											<span >{% sell_price product.price product.category.discount  %}</span>
+											</span>
+										{% else %}
+											<span class="price">Rs.{{product.price}}</span>
+										{% endif %}
+									{% endif %}
 													<p class="product-short-description">
 														
 													</p>

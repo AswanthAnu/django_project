@@ -58,7 +58,7 @@
                              <div class="product-quantity-slider col-md-12 d-flex " style="width: 100px; height:10px;">
                                  <div class="input-group bootstrap-touchspin block">
                                   
-                                   {% if cart_item.quantity > 0%}
+                                   {% if cart_item.quantity > 0 %}
                                    <span class="input-group-btn ">
                                      <input type="button"  id="div_id" class="btn btn-default bootstrap-touchspin-up" onclick="removefromCart('{{ cart_item.id }}','{{cart_item.product.id}}')" value="-"  >
                                     </span>
@@ -308,19 +308,21 @@
             // pid -product id
             console.log(pid)
             xhttp.onload = function () {
-              var re = this.responseText
-        console.log(re)
-        document.getElementById("product_quantity"+pid).value= this.responseText;
-        p_price= document.getElementById("each_total"+pid).value;
+            var re = parseInt(this.responseText)
+            console.log(typeof(re), '312---')
+        document.getElementById("product_quantity"+pid).value= re;
+        p_price= parseInt(document.getElementById("each_total"+pid).value);
         
-        console.log(p_price, 'each price')
-        p_price=parseInt(p_price);
-        sub_total=parseInt(p_price*this.responseText);
-        console.log(sub_total, 'total price')
+        console.log(p_price, '315---')
+        console.log((typeof(p_price)), '------316')
+        console.log('318---------')
+        sub_total=parseInt(p_price*re);
+        console.log(sub_total, 'total price--319')
+        console.log((typeof(sub_total)), 'total price---320')
         document.getElementById("sub_total"+pid).value=sub_total;
         total_price = document.getElementById("total_price").value;
         totall_price = parseInt(total_price) + parseInt(p_price);
-        console.log(totall_price);
+        console.log(totall_price, '324');
         gst = parseInt(totall_price * (12/100)) ;
         total_amount = parseInt(totall_price + gst);
         document.getElementById("total_price").value=totall_price;
@@ -337,10 +339,6 @@
           document.getElementById("div_id").disabled =false;
         }
         
-        
-        
-
-
         }
 
         xhttp.open("GET", "update_cart/" + pid);

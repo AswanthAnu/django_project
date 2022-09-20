@@ -27,7 +27,7 @@ def store(request,category_slug= None, brand_slug= None, sub_category_slug=None 
         if brand_slug != None:
             
             brands = get_object_or_404(brand, slug = brand_slug  )
-            products = product.objects.filter(brand = brands, is_available = True)
+            products = product.objects.filter(brand = brands, is_available = True).order_by('id')
             product_count = products.count()
             paginator = Paginator(products, 6)
             page = request.GET.get('page')
@@ -39,7 +39,7 @@ def store(request,category_slug= None, brand_slug= None, sub_category_slug=None 
             
             categories = get_object_or_404(category, slug = category_slug  )
            
-            products = product.objects.filter(category = categories, is_available = True)
+            products = product.objects.filter(category = categories, is_available = True).order_by('id')
             
             product_count = products.count()
             paginator = Paginator(products, 6)
@@ -51,7 +51,7 @@ def store(request,category_slug= None, brand_slug= None, sub_category_slug=None 
             
             categories = get_object_or_404(category, slug = category_slug  )
             sub_categories = get_object_or_404(SubCategory, slug = sub_category_slug  )
-            products = product.objects.filter(category = categories, subcategory = sub_categories )
+            products = product.objects.filter(category = categories, subcategory = sub_categories ).order_by('id')
             product_count = products.count()
             paginator = Paginator(products, 6)
             page = request.GET.get('page')
