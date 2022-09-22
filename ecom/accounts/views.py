@@ -85,7 +85,7 @@ def register(request):
                 
                 messages.success(request,'OTP has been sent to ' + str(phone_num))
                 return JsonResponse({'success': True, 'phone_number': phone_number}, safe=True)
-                return render(request, 'accounts/otp_registration.html', {'phone_number': phone_number,  'username' : username})
+                
                 
             
             else: 
@@ -320,24 +320,16 @@ def otp_login(request, phone_number):
     return render(request, 'accounts/otp_login.html',{'phone_number':phone_number})
 
 
-
+@login_required(login_url = 'login')
 def logout(request):
 
-    if 'email' not in request.session:
-
-        return redirect ('home')
-
-    
     request.session.flush() 
 
     return redirect('home')
-
+@login_required(login_url = 'login')
 def dashboard(request):
 
 
-    if 'email' in request.session:
-
-        return redirect ('home')
 
     try:
         orders = Order.objects.order_by('-created_at').filter(user_id = request.user.id, is_ordered=True)
@@ -358,13 +350,9 @@ def dashboard(request):
     }
 
     return render(request, 'accounts/dashboard.html', context )
-
-
+@login_required(login_url = 'login')
 def my_orders(request):
 
-    if 'email' in request.session:
-
-        return redirect ('home')
 
 
 
@@ -383,9 +371,6 @@ def my_orders(request):
   
 def cancel_order(request, order_no, order_prdt, order_qnty ):
 
-    if 'email' in request.session:
-
-        return redirect ('home')
     order_cancel = Order.objects.get(order_number=order_no)
     
     order_product = product.objects.get(product_name = order_prdt)
@@ -402,9 +387,7 @@ def cancel_order(request, order_no, order_prdt, order_qnty ):
 
 def return_product(request):
 
-    if 'email' in request.session:
 
-        return redirect ('home')
     if request.method == "POST":
         orderprdct_id = request.POST['orderprdct_id']
         reason = request.POST['reason']
@@ -424,12 +407,9 @@ def return_product(request):
         )
         
 
-
+@login_required(login_url = 'login')
 def address(request):
 
-    if 'email' in request.session:
-
-        return redirect ('home')
 
 
     user = request.user
@@ -451,7 +431,7 @@ def address(request):
 
             address.save()
             
-            addresses = Address.objects.get(user_id = us)
+            addresses = Address.objects.filter(user_id = us)
             messages.success(request, 'New Address added to the list...')
             return redirect('address')
     except:
@@ -462,11 +442,9 @@ def address(request):
         'addresses' : addresses,
     }
     return render(request, 'accounts/address.html', context)
-
+@login_required(login_url = 'login')
 def edit_profile(request):
-    if 'email' in request.session:
-
-        return redirect ('home')
+  
     try:
         userprofile = get_object_or_404(UserProfile, user=request.user)
         if request.method == 'POST':
@@ -502,9 +480,7 @@ def edit_profile(request):
 
 def change_password(request):
 
-    if 'email' in request.session:
-
-        return redirect ('home')
+   
 
     if request.method == 'POST':
         current_password = request.POST['current_password']
@@ -532,9 +508,6 @@ def change_password(request):
 
 def invoice_download(request):
 
-    if 'email' in request.session:
-
-        return redirect ('home')
     if request.method == "POST":
         order_number = request.POST['order_number']
         transID = request.POST['payment_id']

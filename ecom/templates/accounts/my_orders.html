@@ -80,6 +80,12 @@
 										<button class="btn btn-block btn-dark " type="button" value="{{orderproduct.order.order_number}}" onclick="cancel_order('{{ orderproduct.order.order_number}}', '{{orderproduct.product}}','{{orderproduct.quantity }}')" >Cancel</button>
 									</td>
 									{% endif %}
+									{% if  orderproduct.order.status == "Cancelled"  %}
+									<td><button class="btn btn-block btn-black disabled">No Action</button></td>
+									{% elif orderproduct.order.status == "Returned" %}
+									<td><button class="btn btn-block btn-black disabled">No Action</button></td>
+									{% else %}
+
 									<td>
 										<form action="{% url 'invoice_download' %}" method="POST">
 											{% csrf_token %}
@@ -93,6 +99,7 @@
 											</button>
 											</form>
 									</td>
+									{% endif %}
 
 								</tr>
 								{% endfor %}

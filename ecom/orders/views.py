@@ -2,7 +2,7 @@ from multiprocessing import context
 from time import process_time_ns
 from django.shortcuts import render, redirect
 from carts.models import CartItem
-from .forms import OrderForm
+from accounts.models import Address
 from .models import Order, Payment, OrderProduct
 from store.models import product, Coupon
 import datetime
@@ -289,11 +289,6 @@ def payments_razor(request):
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def place_order(request, totals=0, quantity=0, ):
 
-    if 'order_number' not in request.session :
-    
-        return redirect ('home')
-
-
 
     if CartItem.quantity == 0:
         return redirect('cart')
@@ -371,6 +366,25 @@ def place_order(request, totals=0, quantity=0, ):
             data.ip = request.META.get('REMOTE_ADDR')
             data.save()
             payment_method = request.POST['payment_method']
+
+            # new user
+
+            us = current_user.id
+            no_address = Address.objects.filter(user_id = us).count()
+            if no_address < 1:
+                address = Address()
+                address.user_id = us
+                address.first_name = request.POST['first_name']
+                address.last_name = request.POST['last_name']
+                address.phone = request.POST['phone_number']
+                address.email = request.POST['email']
+                address.address_line_1 = request.POST['address_line_1']
+                address.address_line_2 = request.POST['address_line_2']
+                address.country = request.POST['country']
+                address.state = request.POST['state']
+                address.city = request.POST['city']
+                address.save()
+            
             
             # generate order number 
             

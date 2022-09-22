@@ -105,7 +105,7 @@ def admin_dashboard(request):
     payments = Payment.objects.values('amount_paid').all()
     total_sales = 0
     for i in payments:
-        total_sales = int( total_sales + float(i['amount_paid']))
+        total_sales = int( total_sales + float(i['amount_paid'])) 
     no_of_sales = 0
     no_of_sale = OrderProduct.objects.aggregate(Sum('quantity'))
     no_of_sales = no_of_sale['quantity__sum']

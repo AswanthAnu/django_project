@@ -44,7 +44,7 @@
 								<span>Quantity</span>
 								<span class="total-price"> {{ cart_count }}</span>
 							</div>
-
+							{% if cart_count > 0%}
 							<div class="cart-summary">
 								<span>Total price</span>
 								<span class="total-price">Rs.{{ cart_total }}.00</span>
@@ -62,6 +62,8 @@
 								<li><a href="{% url 'cart' %}" class="btn btn-small">View Cart</a></li>
 								<li><a href="{% url 'checkout' %}" class="btn btn-small btn-solid-border">Checkout</a></li>
 							</ul>
+							{% else %}
+							{% endif %}
 						</div>
 
 					</li><!-- / Cart -->

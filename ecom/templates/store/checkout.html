@@ -5,8 +5,8 @@
 
 {% block content%}
 
-
-<div class="container mt-3">
+{% if no_address > 0 %}
+<div class="container mt-3">  
    <h4 class="widget-title">Select Address</h4>
     <form>
     
@@ -33,7 +33,11 @@
 
    </form>    
  </div>
- 
+ {% else %}
+ <div class="container mt-3">  
+   <h4 class="widget-title">No address to Select</h4>
+</div>
+{% endif %}
 <div class="page-wrapper">
     <div class="checkout shopping">
        <div class="container">
@@ -44,6 +48,7 @@
                    <form class="checkout-form" action="{% url 'place_order' %}" method='POST'>
                     
                      {% csrf_token %}
+                     {% if no_address > 0 %}
                      {% for address in addressesfirst%}
                      <div class="checkout-country-code clearfix">
                         <div class="form-group">
@@ -115,6 +120,77 @@
                  
                 </div>
                 {% endfor %}
+                {% else %}
+                <div class="checkout-country-code clearfix">
+                  <div class="form-group">
+                     <label >First Name</label>
+                     <input type="text" class="form-control" id="first_name" name="first_name"  value="" required>
+                  </div>
+                  <div class="form-group" >
+                     <label >last Name</label>
+                     <input type="text" class="form-control" name="last_name" id="last_name"  value=""required>
+                  </div>
+               </div>
+               <div class="checkout-country-code clearfix">
+                  <div class="form-group">
+                     <label >Email</label>
+                     <input type="email" class="form-control" name="email" id="email"  value=""required> 
+                  </div>
+                  <div class="form-group" >
+                     <label >Phone Number</label>
+                     <input type="text" class="form-control" name="phone_number" id="phone_number" value=""required>
+                  </div>
+               </div>
+                <div class="form-group">
+                   <label >Address Line 1</label>
+                   <input type="text" class="form-control" name="address_line_1" id="address_line_1"  value=""required>
+                </div>
+                <div class="form-group">
+                  <label >Address Line 2</label>
+                  <input type="text" class="form-control" name="address_line_2" id="address_line_2"  value=""required>
+               </div>
+                <div class="checkout-country-code clearfix">
+                   <div class="form-group">
+                      <label >state</label>
+                      <input type="text" class="form-control" id="state" name="state" value=""required>
+                   </div>
+                   <div class="form-group" >
+                      <label >City</label>
+                      <input type="text" class="form-control" id="city" name="city" value=""required>
+                   </div>
+                </div>
+                <div class="form-group">
+                   <label >Country</label>
+                   <input type="text" class="form-control" id="country" name="country" value=""required>
+                </div>
+               <div class="form-group">
+                  <label >Order Note</label>
+                  <input type="text" class="form-control" id="order_note" name="order_note"  value="">
+               </div>
+               <div class="mt-3" style="margin-top:30px;">
+               <h4 class="widget-title " >Payment Method</h4>
+               </div>
+               <div class="form-check">
+                  <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault1" value="cod_method" required>
+                  <label class="form-check-label" for="flexRadioDefault1">
+                    Cash On Delivery
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault2" value="paypal_method" required>
+                  <label class="form-check-label" for="flexRadioDefault2">
+                    PayPal
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault3" value="razor_method" required>
+                  <label class="form-check-label" for="flexRadioDefault3">
+                    Razor Pay
+                  </label>
+                </div>
+           
+          </div>
+          {% endif %}
              </div>
              <div class="col-md-4">
                 <div class="product-checkout-details">

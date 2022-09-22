@@ -305,6 +305,9 @@ def checkout(request, totals = 0, quantity = 0 , cart_items = None):
             cart_ii = CartItem.objects.values().filter(user=request.user).order_by('id')[:1]
             addresses = Address.objects.filter(user = request.user)
             addressesfirst = Address.objects.filter(user = request.user).order_by('id')[:1]
+            current_user = request.user
+            us = current_user.id
+            no_address = Address.objects.filter(user_id = us).count()
     
         else:
             cart = Cart.objects.get(cart_id=_cart_id(request))
@@ -359,6 +362,7 @@ def checkout(request, totals = 0, quantity = 0 , cart_items = None):
             'grand_total' : grand_total,
             'addresses' : addresses,
             'addressesfirst' : addressesfirst,
+            'no_address' : no_address,
         }
         
         return render(request, 'store/checkout.html', context )
