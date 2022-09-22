@@ -44,77 +44,77 @@
                    <form class="checkout-form" action="{% url 'place_order' %}" method='POST'>
                     
                      {% csrf_token %}
-                   
+                     {% for address in addressesfirst%}
                      <div class="checkout-country-code clearfix">
                         <div class="form-group">
                            <label >First Name</label>
-                           <input type="text" class="form-control" id="first_name" name="first_name"  value="{{addresses.first_name}}">
+                           <input type="text" class="form-control" id="first_name" name="first_name"  value="{{address.first_name}}">
                         </div>
                         <div class="form-group" >
                            <label >last Name</label>
-                           <input type="text" class="form-control" name="last_name" id="last_name"  value="{{addresses.last_name}}">
+                           <input type="text" class="form-control" name="last_name" id="last_name"  value="{{address.last_name}}">
                         </div>
                      </div>
                      <div class="checkout-country-code clearfix">
                         <div class="form-group">
                            <label >Email</label>
-                           <input type="email" class="form-control" name="email" id="email"  value=""> 
+                           <input type="email" class="form-control" name="email" id="email"  value="{{address.email}}"> 
                         </div>
                         <div class="form-group" >
                            <label >Phone Number</label>
-                           <input type="text" class="form-control" name="phone_number" id="phone_number" value="">
+                           <input type="text" class="form-control" name="phone_number" id="phone_number" value="{{address.phone_number}}">
                         </div>
                      </div>
                       <div class="form-group">
                          <label >Address Line 1</label>
-                         <input type="text" class="form-control" name="address_line_1" id="address_line_1"  value="">
+                         <input type="text" class="form-control" name="address_line_1" id="address_line_1"  value="{{address.address_line_1}}">
                       </div>
                       <div class="form-group">
                         <label >Address Line 2</label>
-                        <input type="text" class="form-control" name="address_line_2" id="address_line_2"  value="">
+                        <input type="text" class="form-control" name="address_line_2" id="address_line_2"  value="{{address.address_line_2}}">
                      </div>
                       <div class="checkout-country-code clearfix">
                          <div class="form-group">
                             <label >state</label>
-                            <input type="text" class="form-control" id="state" name="state" value="">
+                            <input type="text" class="form-control" id="state" name="state" value="{{address.state}}">
                          </div>
                          <div class="form-group" >
                             <label >City</label>
-                            <input type="text" class="form-control" id="city" name="city" value="">
+                            <input type="text" class="form-control" id="city" name="city" value="{{address.city}}">
                          </div>
                       </div>
                       <div class="form-group">
                          <label >Country</label>
-                         <input type="text" class="form-control" id="country" name="country" value="">
+                         <input type="text" class="form-control" id="country" name="country" value="{{address.country}}">
                       </div>
                      <div class="form-group">
                         <label >Order Note</label>
-                        <input type="text" class="form-control" id="order_note" name="order_note"  value="">
+                        <input type="text" class="form-control" id="order_note" name="order_note"  value="{{address.last_name}}">
                      </div>
                      <div class="mt-3" style="margin-top:30px;">
                      <h4 class="widget-title " >Payment Method</h4>
                      </div>
                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault1" value="cod_method">
+                        <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault1" value="cod_method" required>
                         <label class="form-check-label" for="flexRadioDefault1">
                           Cash On Delivery
                         </label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault2" value="paypal_method" checked>
+                        <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault2" value="paypal_method" required>
                         <label class="form-check-label" for="flexRadioDefault2">
                           PayPal
                         </label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault3" value="razor_method" >
+                        <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault3" value="razor_method" required>
                         <label class="form-check-label" for="flexRadioDefault3">
                           Razor Pay
                         </label>
                       </div>
                  
                 </div>
-               
+                {% endfor %}
              </div>
              <div class="col-md-4">
                 <div class="product-checkout-details">
@@ -134,7 +134,7 @@
                             {% else %}
                             <p class="price">{{ cart_item.quantity}} x Rs.{% sell_price cart_item.product.price cart_item.product.category.discount %}.00</p>
                             {% endif %}
-                            <span class="remove" > <a href="{% url 'remove_cart'  cart_item.product.id cart_item.id %}">Remove</a> </span>
+      
                          </div>
                       </div>
                       

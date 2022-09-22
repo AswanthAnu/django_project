@@ -1,4 +1,3 @@
-from ast import Delete
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Cart, CartItem
@@ -209,6 +208,17 @@ def cart(request, total = 0, quantity = 0 , cart_items = None):
         grand_total = 0
         if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(user=request.user , is_active = True)
+            try:
+                cart_ii = CartItem.objects.values().filter(user=request.user).order_by('id')[:1]
+                for i in cart_ii:
+                    cart_item_id = (i['id'])
+                cart_i = CartItem.objects.get(id =cart_item_id)
+                cart_i.coupon = None
+                cart_i.save()
+            except:
+                pass
+
+
         else:
             cart =  Cart.objects.get(cart_id = _cart_id(request))
             cart_items = CartItem.objects.filter(cart = cart , is_active = True)
@@ -278,6 +288,8 @@ def remove_cart_item(request, product_id, cart_item_id):
 @login_required(login_url = 'login')
 def checkout(request, totals = 0, quantity = 0 , cart_items = None):
 
+       
+
 
     # try:
         total = 0
@@ -287,10 +299,12 @@ def checkout(request, totals = 0, quantity = 0 , cart_items = None):
         coupon_code = 0
         cart_ii=[]
         cart_item_id = 0
+
         if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True)
             cart_ii = CartItem.objects.values().filter(user=request.user).order_by('id')[:1]
             addresses = Address.objects.filter(user = request.user)
+            addressesfirst = Address.objects.filter(user = request.user).order_by('id')[:1]
     
         else:
             cart = Cart.objects.get(cart_id=_cart_id(request))
@@ -328,6 +342,7 @@ def checkout(request, totals = 0, quantity = 0 , cart_items = None):
         gst = int((12 * total)/100)
         grand_total = int(total + gst)
         request.session["grand_total"] = grand_total
+       
         
     # except ObjectDoesNotExist:
         # pass
@@ -343,6 +358,7 @@ def checkout(request, totals = 0, quantity = 0 , cart_items = None):
             'gst' : gst,
             'grand_total' : grand_total,
             'addresses' : addresses,
+            'addressesfirst' : addressesfirst,
         }
         
         return render(request, 'store/checkout.html', context )
@@ -351,6 +367,10 @@ def checkout(request, totals = 0, quantity = 0 , cart_items = None):
 
 
 def coupon(request):
+
+    if 'email' in request.session:
+
+        return redirect ('home')
 
     cart_coupon = None
     cart_ii=[]
@@ -445,6 +465,10 @@ def coupon(request):
                 )
 
 def remove_coupon(request):
+
+    if 'email' in request.session:
+
+        return redirect ('home')
 
 
     if request.method == "GET":

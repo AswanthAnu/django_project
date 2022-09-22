@@ -93,14 +93,10 @@ def register(request):
                 return JsonResponse({'success': False}, safe=True)
                
 
-            
-
         else:
             
             
             return JsonResponse({'phone_number' : False}, safe= False)
-                
-            
             
         
     else:
@@ -111,9 +107,15 @@ def register(request):
             }
     return render(request, 'accounts/register.html', context)
 def otp_registration(request):
-     return render(request, 'accounts/otp_registration.html')
+    if 'email' in request.session:
+
+        return redirect ('home')
+    return render(request, 'accounts/otp_registration.html')
 
 def otp_registration(request, phone_number):
+    if 'email' in request.session:
+
+        return redirect ('home')
     if request.method == "POST":
         phone_num = "+91"+ str(phone_number)
         otp_input = request.POST['otp']
@@ -229,47 +231,55 @@ def login(request):
         return render(request, 'accounts/login.html')
 
 def otp_view(request):
+
+    if 'email' in request.session:
+
+        return redirect ('home')
        
 
-        if request.method == 'POST':
-            phone_number = request.POST.get('phone_number')
-         
-            if Account.objects.filter(phone_number = phone_number).exists():
-                users = Account.objects.get(phone_number = phone_number)
-                phone_num = "+91"+ phone_number
-                account_sid= settings.ACCOUNT_SID
-                auth_token= settings.TOKEN_SID
-               
-                request.session['email'] = users.email
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number')
+        
+        if Account.objects.filter(phone_number = phone_number).exists():
+            users = Account.objects.get(phone_number = phone_number)
+            phone_num = "+91"+ phone_number
+            account_sid= settings.ACCOUNT_SID
+            auth_token= settings.TOKEN_SID
+            
+            request.session['email'] = users.email
 
-                client=Client(account_sid,auth_token)
-                verification = client.verify \
-                    .services(settings.SERVICES) \
-                    .verifications \
-                    .create(to=phone_num,channel='sms')
+            client=Client(account_sid,auth_token)
+            verification = client.verify \
+                .services(settings.SERVICES) \
+                .verifications \
+                .create(to=phone_num,channel='sms')
+            
+            #messages.success(request,'OTP has been sent to ' + str(phone_num))
+            
+            return JsonResponse({'phone': True,  'phone_number':phone_number}, safe=False)
+
+        elif  len(phone_number) < 10 or len(phone_number) > 10 :
                 
-                #messages.success(request,'OTP has been sent to ' + str(phone_num))
-               
-                return JsonResponse({'phone': True,  'phone_number':phone_number}, safe=False)
+            #messages.error(request, '10 digits number required')
+            return JsonResponse({'success': True}, safe=False)
 
-            elif  len(phone_number) < 10 or len(phone_number) > 10 :
-                 
-                #messages.error(request, '10 digits number required')
-                return JsonResponse({'success': True}, safe=False)
-
-            else:
-                #messages.error(request, 'Invalid Phone Number')
-                return JsonResponse({'success': False}, safe=False)
+        else:
+            #messages.error(request, 'Invalid Phone Number')
+            return JsonResponse({'success': False}, safe=False)
 
 
 
 
         
-        return render(request, 'accounts/otp_view.html ')
-       
+    return render(request, 'accounts/otp_view.html ')
+           
 
 def otp_login(request, phone_number):
 
+
+    if 'email' in request.session:
+
+        return redirect ('home')
 
     
     
@@ -313,12 +323,21 @@ def otp_login(request, phone_number):
 
 def logout(request):
 
+    if 'email' not in request.session:
+
+        return redirect ('home')
+
     
     request.session.flush() 
 
     return redirect('home')
 
 def dashboard(request):
+
+
+    if 'email' in request.session:
+
+        return redirect ('home')
 
     try:
         orders = Order.objects.order_by('-created_at').filter(user_id = request.user.id, is_ordered=True)
@@ -343,6 +362,10 @@ def dashboard(request):
 
 def my_orders(request):
 
+    if 'email' in request.session:
+
+        return redirect ('home')
+
 
 
 
@@ -359,6 +382,10 @@ def my_orders(request):
 
   
 def cancel_order(request, order_no, order_prdt, order_qnty ):
+
+    if 'email' in request.session:
+
+        return redirect ('home')
     order_cancel = Order.objects.get(order_number=order_no)
     
     order_product = product.objects.get(product_name = order_prdt)
@@ -374,6 +401,10 @@ def cancel_order(request, order_no, order_prdt, order_qnty ):
     return JsonResponse({'success': True},safe= False)
 
 def return_product(request):
+
+    if 'email' in request.session:
+
+        return redirect ('home')
     if request.method == "POST":
         orderprdct_id = request.POST['orderprdct_id']
         reason = request.POST['reason']
@@ -395,6 +426,10 @@ def return_product(request):
 
 
 def address(request):
+
+    if 'email' in request.session:
+
+        return redirect ('home')
 
 
     user = request.user
@@ -429,6 +464,9 @@ def address(request):
     return render(request, 'accounts/address.html', context)
 
 def edit_profile(request):
+    if 'email' in request.session:
+
+        return redirect ('home')
     try:
         userprofile = get_object_or_404(UserProfile, user=request.user)
         if request.method == 'POST':
@@ -464,6 +502,10 @@ def edit_profile(request):
 
 def change_password(request):
 
+    if 'email' in request.session:
+
+        return redirect ('home')
+
     if request.method == 'POST':
         current_password = request.POST['current_password']
         new_password = request.POST['new_password']
@@ -489,6 +531,10 @@ def change_password(request):
     return render(request, 'accounts/change_password.html' )
 
 def invoice_download(request):
+
+    if 'email' in request.session:
+
+        return redirect ('home')
     if request.method == "POST":
         order_number = request.POST['order_number']
         transID = request.POST['payment_id']

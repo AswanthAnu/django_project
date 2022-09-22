@@ -25,6 +25,10 @@ from django.db.models import Q,F
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def payments_cod(request):
 
+    if 'order_number' not in request.session :
+
+        return redirect ('home')
+
 
     if CartItem.quantity == 0:
         return redirect('cart')
@@ -87,7 +91,7 @@ def payments_cod(request):
                 
                 # clear the cart item
                 CartItem.objects.filter(user=request.user).delete()
-                
+                request.session['order_number'] = order.order_number
                 # send email
                 mail_subject = 'Your order placed successfully...!'
                 message = render_to_string('orders/success_email.html', {
@@ -109,6 +113,10 @@ def payments_cod(request):
 
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def payments(request):
+
+    if 'order_number' not in request.session :
+
+        return redirect ('home')
 
     if CartItem.quantity == 0:
         return redirect('cart')
@@ -165,6 +173,7 @@ def payments(request):
             
             # clear the cart item
             CartItem.objects.filter(user=request.user).delete()
+            request.session['order_number'] = order.order_number
             
             # send email
             mail_subject = 'Your order placed successfully...!'
@@ -192,6 +201,10 @@ def payments(request):
 
 
 def payments_razor(request):
+
+    if 'order_number' not in request.session:
+
+        return redirect ('home')
 
     response = request.POST
     order_number = request.POST['order_number']
@@ -245,6 +258,7 @@ def payments_razor(request):
         prod.save()
 
     CartItem.objects.filter(user=request.user).delete()
+    request.session['order_number'] = order.order_number
 
     try:
         order = Order.objects.get(order_number=order_number, is_ordered=True)
@@ -274,6 +288,12 @@ def payments_razor(request):
 
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def place_order(request, totals=0, quantity=0, ):
+
+    if 'order_number' not in request.session :
+    
+        return redirect ('home')
+
+
 
     if CartItem.quantity == 0:
         return redirect('cart')
@@ -459,6 +479,10 @@ def place_order(request, totals=0, quantity=0, ):
 @cache_control(no_cache =True, must_revalidate =True, no_store =True)
 def order_success(request):
 
+    if 'order_number' not in request.session:
+
+        return redirect ('home')
+
 
     if CartItem.quantity == 0:
         return redirect('cart')
@@ -479,6 +503,8 @@ def order_success(request):
 
                 payment = Payment.objects.get(payment_id=transID)
                 discount_total = ((subtotal + order.tax)-order.order_total )
+                del request.session['order_number'] 
+
                 context = {
                     'order': order,
                     'ordered_products': ordered_products,
