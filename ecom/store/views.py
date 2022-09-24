@@ -1,16 +1,12 @@
-
-
-from ast import keyword
-from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .models import product
 from category.models import SubCategory, category
 from brand.models import brand
 from carts.views import _cart_id
 from carts.models import CartItem
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.core.paginator import Paginator
 
 
 # Create your views here.

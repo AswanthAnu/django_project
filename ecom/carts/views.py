@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Cart, CartItem
-from accounts.models import Account, Address
+from accounts.models import Address
 from store.models import product, Variation, Coupon
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required

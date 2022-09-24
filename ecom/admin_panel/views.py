@@ -1,5 +1,4 @@
 from multiprocessing import context
-from pickle import TRUE
 from django.contrib import messages
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
