@@ -30,7 +30,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['3.110.117.34', 'pepperecom.ml', 'www.pepperecom,ml']
+ALLOWED_HOSTS = ['3.110.117.34', 'pepperecom.ml', 'www.pepperecom.ml', '127.0.0.1']
 
 
 
