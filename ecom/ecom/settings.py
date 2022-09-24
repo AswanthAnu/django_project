@@ -30,7 +30,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['3.110.117.34', 'pepperecom.ml', 'www.pepperecom,ml']
 
 
 
@@ -101,8 +101,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'DjangoEcom',
         'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
+        'PASSWORD': 'Aswanth123',
+        'HOST': 'database-1.cngs7bih7mfu.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 
