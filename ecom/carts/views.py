@@ -355,9 +355,6 @@ def checkout(request, totals=0, quantity=0, cart_items=None):
 
 def coupon(request):
 
-    if 'email' in request.session:
-
-        return redirect('home')
 
     cart_coupon = None
     cart_ii = []

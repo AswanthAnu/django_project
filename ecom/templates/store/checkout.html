@@ -329,6 +329,7 @@
 	$(document).on('submit', '#couponss', function (e) {
 		e.preventDefault();
 		var coupon_code = $('#coupon_code').val()
+      console.log('hello')
 		
 
 		$.ajax({
@@ -338,7 +339,7 @@
 			data: {
 		
             'coupon_code' : coupon_code,
-            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            
 			},
 			success: function (responce) {
 				console.log(responce)
