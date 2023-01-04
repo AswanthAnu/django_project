@@ -57,3 +57,39 @@ Pepper is an end-to-end ecommerce website that specializes in selling women's vi
 
 ## Hosting and Deployment
 The website is hosted on AWS EC2 and the database is hosted on AWS RDS (PostgreSQL). The code for the project is available on GitHub.
+
+
+## Run Locally
+Clone the project
+``https://github.com/AswanthAnu/django_project.git``
+Go to the project directory
+```bash 
+    cd ecom
+```
+Install dependencies
+```bash
+    pip install -r requirements.txt
+```
+Start the server
+```bash 
+    cd ecom
+    python manage.py runserver - Windows OS
+    python3 manage.py runserver - MAC OS, Linux OS
+```
+## Appendix
+
+Before Running the project make sure that you are in virtual env
+
+
+## Environment Variables
+
+To run this project, you will need to add the following enivronment variables to your .env file
+`SECRET KEY` - Django Secret Key
+## PayPal
+`ACCOUNT_SID` `AUTH_TOKEN` `SERVICE`
+## Razorpay
+`RAZOR_KEY_ID` `RAZOR_KEY_SECRET` `OPENEXCHANGEKEY`
+## AWS S3 Static Files Configuration
+`AWS_ACCESS_KEY_ID` `AWS_SECRET_ACCESS_KEY` `AWS_STORAGE_BUCKET_NAME` 
+
+
