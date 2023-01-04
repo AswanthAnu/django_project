@@ -61,7 +61,9 @@ The website is hosted on AWS EC2 and the database is hosted on AWS RDS (PostgreS
 
 ## Run Locally
 Clone the project
-``https://github.com/AswanthAnu/django_project.git``
+```bash 
+https://github.com/AswanthAnu/django_project.git
+```
 Go to the project directory
 ```bash 
     cd ecom
@@ -92,4 +94,21 @@ To run this project, you will need to add the following enivronment variables to
 ## AWS S3 Static Files Configuration
 `AWS_ACCESS_KEY_ID` `AWS_SECRET_ACCESS_KEY` `AWS_STORAGE_BUCKET_NAME` 
 
+
+### Walk through the site
+
+**Landing Page**
+![pepper1](https://user-images.githubusercontent.com/101197982/210614795-17a597bf-af3a-4104-b0b9-6aca68b82dac.png)
+
+**Store and individual product details**
+![Peppercol1](https://user-images.githubusercontent.com/101197982/210614966-528a64f5-b001-4a3e-b54c-63961f2dbf89.jpg)
+
+**Cart and checkout**
+![peppercol2](https://user-images.githubusercontent.com/101197982/210615033-68ae34c1-558c-425a-9afe-a780b5948643.jpg)
+
+**Coupon, Order, Order details**
+![peppercol3](https://user-images.githubusercontent.com/101197982/210615168-d0d2a547-3569-4004-9c5b-95631006e514.jpg)
+
+**Admin Side**
+![peppercol4](https://user-images.githubusercontent.com/101197982/210615209-f9ccad1c-68be-4385-937e-b5a99dc0818b.jpg)
 
